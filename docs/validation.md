@@ -65,3 +65,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.9.6
 41 Python-Tests und sieben JavaScript-Prüfgruppen waren erfolgreich. `tests/navigation.test.js` prüft für alle vier Hauptseiten den Klick aus einer Detailansicht bei gleichem Browseranker sowie Strg-Klick, mittlere Maustaste, neuen Tab, fremden Ursprung und andere Anker. Eine interaktive Browserprüfung des Ablaufs „Projekt anlegen → Übersicht“ steht noch aus. Die lokale UI-Kit-Kopie entspricht dem lokalen Designsystem-Repository.
+
+## Prüfung Version 0.9.7
+Die Änderung betrifft ausschließlich die Darstellung der bestehenden Kapazitätslegende und Diagrammlinien. Die lokale UI-Kit-Kopie wurde gegen das lokale Designsystem geprüft. Eine visuelle Browserprüfung der neuen Strichstärken und Umbrüche steht noch aus.

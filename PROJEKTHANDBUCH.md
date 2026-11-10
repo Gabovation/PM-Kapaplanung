@@ -184,3 +184,9 @@ Nach dem Anlegen oder Öffnen eines Projekts zeigt die Anwendung die Projektplan
 
 ## Ergänzte Lessons Learned
 - Ein interner Ansichtswechsel ohne Änderung der Adresse kann den Browseranker und die sichtbare Seite auseinanderlaufen lassen. Ein erneuter Klick auf denselben Anker erzeugt kein `hashchange`-Ereignis; dieser Fall muss gesondert behandelt werden.
+
+## Lesbarkeit der Kapazitätslegende
+Die Legende der Kapazitätsvorschau verwendet eine größere, kräftigere Schrift und längere, dickere Linienmuster. Die Diagrammlinien wurden passend verstärkt. Die vorhandenen Farben und Muster unterscheiden weiterhin Team gesamt, gewonnene und erwartete Projekte, höchste Einzelauslastung und die Kapazitätsgrenze. Die Legende bricht bei Platzmangel um. Die Planung und die dargestellten Werte bleiben unverändert.
+
+## Ergänzte Lessons Learned
+- Farbcodierungen müssen in einer Legende ausreichend lange und kräftige Muster verwenden, damit auch gestrichelte und gepunktete Linien erkennbar sind. Text und unterschiedliche Strichmuster ergänzen die Farbinformation.

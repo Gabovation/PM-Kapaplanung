@@ -58,3 +58,5 @@ Bei lokalen Schreibzugriffen gibt es maximal drei Dateiersatzversuche mit 25 ms 
 Projektgruppen und leere Zustände verwenden `--polytec-space-6`. Die Navigation verwendet für Einstellungen das vorhandene UI-Kit-Icon `parameters`, da das im lokalen Designsystem vorhandene `settings`-SVG einen fehlerhaften Pfad enthält. Die App ändert das vendorte Sprite nicht.
 
 `handleNavigationClick` ergänzt den bestehenden `hashchange`-Handler für den Fall, dass eine interne Detailansicht geöffnet ist, die Browseradresse aber bereits den Anker des angeklickten Navigationsziels enthält. Nur unmodifizierte linke Klicks auf gleichseitige Hauptnavigationslinks werden behandelt; abweichende Ziele und Browseraktionen bleiben nativ.
+
+Die Legende in `.kapa-forecast-panel` verwendet größere Schrift und längere Farbmuster. Die Klassen der Kapazitätskurven und ihrer Legendenmuster definieren kräftigere Strichstärken; Farb- und Strichmuster bleiben unverändert. Die Stundenverlaufslegende bleibt separat.

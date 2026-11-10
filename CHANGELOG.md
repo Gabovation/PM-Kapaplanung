@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.7 – 10.11.2026
+- Die Legende der Kapazitätsvorschau zeigt größere Beschriftungen und längere, kräftigere Farb- und Linienmuster. Auch die zugehörigen Diagrammlinien sind stärker gezeichnet.
+
 ## 0.9.6 – 10.11.2026
 - Die Navigation öffnet „Übersicht“ und die anderen Hauptseiten auch dann, wenn nach dem Anlegen oder Öffnen eines Projekts die Browseradresse bereits auf das angeklickte Ziel zeigt.
 
