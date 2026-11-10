@@ -41,4 +41,19 @@ for(const view of ['overview()','projects()','detail()']) {
   assert.match(html,/Gate 7(?:<[^>]+>)*(?: · )?(?:<[^>]+>)*01\.01\.2027/);
 }
 assert.match(run("gateStatusView({...project,dates:['2025-01-01','2025-02-01','2025-03-01','2025-04-01','2025-05-01']})"),/Kein weiteres Gate/);
+
+// Group by business status and sort by the next planned gate without changing storage order.
+run(`const late={...project,id:'late',name:'Spätes Gate',dates:['2026-01-01','2026-04-01','2026-07-01','2027-03-01','2027-07-01']};
+ const early={...project,id:'early',name:'Frühes Gate',dates:['2026-01-01','2026-04-01','2026-07-01','2026-12-01','2027-07-01']};
+ const ended={...project,id:'ended',name:'Ohne Gate',dates:['2025-01-01','2025-02-01','2025-03-01','2025-04-01','2025-05-01']};
+ const expected={...early,id:'expected',name:'Erwartetes Projekt',status:'Erwartet'};
+ state.projects=[late,expected,ended,early];`);
+assert.equal(run("sortedProjectsByNextGate([late,ended,early], '2026-11-10').map(p=>p.id).join(',')"),'early,late,ended');
+assert.equal(run("sortedProjectsByNextGate([{...early,id:'first'},{...early,id:'second'},{...early,id:'invalid',dates:[]}], '2026-11-10').map(p=>p.id).join(',')"),'first,second,invalid');
+const grouped=run('projects()');
+assert.ok(grouped.indexOf('<h3>Gewonnen</h3>')<grouped.indexOf('<h3>Erwartet</h3>'));
+assert.ok(grouped.indexOf('Frühes Gate')<grouped.indexOf('Spätes Gate'));
+assert.ok(grouped.indexOf('Spätes Gate')<grouped.indexOf('Ohne Gate'));
+assert.ok(grouped.indexOf('Ohne Gate')<grouped.indexOf('Erwartetes Projekt'));
+assert.equal(run("state.projects.map(p=>p.id).join(',')"),'late,expected,ended,early');
 console.log('Gate-Status: Plantermine, Grenztage, fehlende Termine und Anzeige in den Projektansichten geprüft.');

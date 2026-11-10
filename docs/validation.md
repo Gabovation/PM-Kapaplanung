@@ -56,3 +56,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.9.3
 41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Die JavaScript-Prüfung deckt die Verlängerung über zwölf Wochen hinaus, das exklusive Projektende, Wochen- und Monatsraster sowie die Begrenzungsmeldung ab. Der vormals separate Schieberegler wurde durch den nativen horizontalen Scrollcontainer ersetzt. Eine visuelle und interaktive Browserprüfung steht noch aus.
+
+## Prüfung Version 0.9.4
+41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. `tests/gate-status.test.js` prüft die Gruppenreihenfolge, aufsteigende nächste Gate-Termine, abgeschlossene Projekte und die unveränderte gespeicherte Reihenfolge. Die vorhandenen Linkprüfungen bestätigen die SharePoint-Links in der Projektliste. Die lokale UI-Kit-Kopie entspricht dem lokalen Designsystem-Repository. Eine visuelle Browserprüfung steht noch aus.

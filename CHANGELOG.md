@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.4 – 10.11.2026
+- Das Projektportfolio gruppiert Projekte nach „Gewonnen“ und „Erwartet“ und sortiert sie innerhalb jeder Gruppe nach dem nächsten geplanten Gate. Projekte ohne weiteres oder gültiges Gate stehen am Ende ihrer Gruppe.
+
 ## 0.9.3 – 10.11.2026
 - Die Vorschau verwendet wieder den normalen horizontalen Scrollbalken unter Diagramm und Tabelle. Die Zeitachse reicht mindestens über die gewählte Vorschau und bei längeren Projekten bis zum letzten Projektende. Der separate Schieberegler entfällt.
 - Die Engpassmeldung betrachtet den gesamten dargestellten Zeitraum. Zum Schutz der Darstellung gilt eine Grenze von 600 Zeiträumen; darüber erscheint ein Hinweis mit Datumsauswahl.

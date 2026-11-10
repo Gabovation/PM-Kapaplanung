@@ -52,3 +52,5 @@ Bei lokalen Schreibzugriffen gibt es maximal drei Dateiersatzversuche mit 25 ms 
 `teamCapacityLevel` klassifiziert den ungerundeten Teamquotienten mit inklusiven Grenzen bei 85 und 100 Prozent. Die CSS-Markierung gilt nur für die Teamzeile; die Berechnung individueller Überlastung bleibt unverändert. Datumsspalten und Teamwerte sind zentriert.
 
 `forecastHorizon` berechnet vom ausgewählten Start bis zum spätesten gültigen exklusiven Gate 8 mindestens die gewählte Anzahl Perioden, höchstens jedoch 600. Für Wochen verwendet die Funktion UTC-Kalendertage, um Sommerzeitverschiebungen zu vermeiden. Bei mehr als 600 Perioden zeigt die Oberfläche eine Begrenzungsmeldung und `setForecastStart` ermöglicht einen späteren Start. Ein gemeinsamer nativer Scrollcontainer bewegt Diagramm und Matrix horizontal; die Periodenbreite berücksichtigt die gewählte Mindestvorschau. Der separate Schieberegler wurde entfernt.
+
+`projects` gruppiert Projektkarten nach Status. `sortedProjectsByNextGate` berechnet den nächsten Termin mit `gateStatus` und sortiert eine Kopie stabil nach Datum; fehlende nächste Termine stehen zuletzt. Die gespeicherte Projektliste wird nicht umsortiert.

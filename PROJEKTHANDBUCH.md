@@ -162,3 +162,10 @@ Der Engpasshinweis bezieht sich auf den gesamten berechneten Zeitraum, auch wenn
 ## Ergänzte Lessons Learned
 - Ein horizontaler Scrollbalken kann nur zuvor berechnete Inhalte zeigen. Eine Projektvorschau muss deshalb weit genug bis zum tatsächlichen Projektende reichen und darf nicht bereits nach der gewählten Mindestlänge enden.
 - Der Engpasshinweis muss seinen Betrachtungszeitraum klar benennen. Bei einer technischen Begrenzung muss der ausgelassene Zeitraum sichtbar gemacht und erreichbar sein.
+
+## Projektportfolio nach Status und nächstem Gate
+Die Projektliste gliedert vorhandene Projekte in die Abschnitte „Gewonnen“, „Erwartet“ und gegebenenfalls „Weiterer Status“. Innerhalb jedes Abschnitts stehen Projekte mit dem frühesten nächsten geplanten Gate zuerst. Ein erreichtes Gate gilt ab seinem Kalendertag als aktueller Planstand; als nächstes Gate wird der folgende Termin verwendet. Projekte nach Gate 8 sowie Projekte mit fehlenden oder ungültigen Gate-Terminen stehen am Ende. Bei gleichen Terminen bleibt die ursprüngliche Reihenfolge erhalten. Die Sortierung verwendet eine Kopie und verändert die gespeicherte Reihenfolge nicht. Projektkarten behalten Status, SharePoint-Link, Gate-Angaben, zugewiesene Person und Budget.
+
+## Ergänzte Lessons Learned
+- Die Sortierung muss dieselbe Gate-Definition wie die sichtbare Statusanzeige verwenden, damit die Kartenreihenfolge und das angezeigte nächste Gate übereinstimmen.
+- Fehlende oder bereits abgeschlossene Gate-Termine dürfen weder andere Projekte verdrängen noch dazu führen, dass ein Projekt aus dem Portfolio verschwindet.

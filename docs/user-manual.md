@@ -16,6 +16,8 @@ In der Übersicht stehen Auslastung und Portfolio auf breiten Bildschirmen gleic
 
 Der Projektstatus „Gewonnen“ oder „Erwartet“ steht als beschriftete Markierung im Portfolio, in der Projektliste und im Projektdetail. Er lässt sich über „Bearbeiten“ ändern.
 
+In der Projektliste sind die Karten nach „Gewonnen“ und „Erwartet“ gruppiert. Innerhalb jeder Gruppe stehen Projekte mit dem frühesten nächsten geplanten Gate zuerst. Projekte ohne weiteres Gate oder ohne gültige Gate-Termine stehen am Ende ihrer Gruppe. Bei gleichen Terminen bleibt die bisherige Reihenfolge erhalten. Abweichende oder fehlende Projektstatus erscheinen in einer zusätzlichen Gruppe „Weiterer Status“.
+
 Bei jedem Projekt öffnet „SharePoint öffnen“ die Seite, deren Adresse aus `https://polytec.sharepoint.com/sites/m365-pep-` und der Projektnummer besteht. Der Link steht im Portfolio der Übersicht, in der Projektliste und im Projektdetail und öffnet einen neuen Browser-Tab.
 
 ## Feinplanung

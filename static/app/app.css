@@ -5,7 +5,11 @@
 .layout,.split {display:grid;gap:var(--polytec-space-4);margin-top:var(--polytec-space-4)}
 .layout {grid-template-columns:repeat(2,minmax(0,1fr))}
 .split {grid-template-columns:2fr 1fr}
-.projectcards {display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:var(--polytec-space-4)}
+.projectcards {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(18rem,100%),1fr));gap:var(--polytec-space-4)}
+.kapa-project-group {margin-top:var(--polytec-space-5)}
+.kapa-project-group-heading {display:flex;align-items:baseline;gap:var(--polytec-space-3);margin-bottom:var(--polytec-space-3)}
+.kapa-project-group-heading h3 {margin:0}
+.projectcard .bottom {display:flex;justify-content:space-between;gap:var(--polytec-space-3);margin-top:var(--polytec-space-3)}
 .formgrid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:var(--polytec-space-4)}
 .formgrid > *, .field {min-width:0}
 .field.full {grid-column:1/-1}
