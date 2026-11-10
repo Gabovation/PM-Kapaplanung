@@ -38,7 +38,7 @@ const KapaCapacity = (()=>{
       const cells=people.map(row=>row.cells[index]), load=total(cells.map(cell=>cell.load)), capacity=total(cells.map(cell=>cell.capacity));
       const peak=people.reduce((current,row)=>!current||row.cells[index].ratio>current.ratio?{...row.cells[index],person:row.person}:current,null);
       const wonLoad=total(cells.map(cell=>cell.wonLoad)), expectedLoad=total(cells.map(cell=>cell.expectedLoad));
-      return {...period,load,wonLoad,expectedLoad,wonRatio:ratio(wonLoad,capacity),expectedRatio:ratio(expectedLoad,capacity),capacity,ratio:ratio(load,capacity),peak:peak?.ratio||0,peakPerson:peak?.person,overloadedPeople:people.filter(row=>row.cells[index].overloaded).length,unassigned:total(period.days.map(day=>unassigned[day.key]||0))};
+      return {...period,load,wonLoad,expectedLoad,wonRatio:ratio(wonLoad,capacity),expectedRatio:ratio(expectedLoad,capacity),combinedRatio:ratio(wonLoad+expectedLoad,capacity),capacity,ratio:ratio(load,capacity),peak:peak?.ratio||0,peakPerson:peak?.person,overloadedPeople:people.filter(row=>row.cells[index].overloaded).length,unassigned:total(period.days.map(day=>unassigned[day.key]||0))};
     });
     const firstIndex=team.findIndex(period=>period.overloadedPeople>0);
     return {columns,people,team,firstBottleneck:firstIndex<0?null:{periodIndex:firstIndex,period:team[firstIndex],person:team[firstIndex].peakPerson},

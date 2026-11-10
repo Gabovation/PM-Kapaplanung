@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.8 – 10.11.2026
+- Die Kapazitätsvorschau vergleicht gewonnene Projekte mit der Summe aus gewonnenen und erwarteten Projekten. Eine zusätzliche Team-Gesamtkurve erscheint, wenn Projekte mit anderem Status zur Auslastung beitragen.
+
 ## 0.9.7 – 10.11.2026
 - Die Legende der Kapazitätsvorschau zeigt größere Beschriftungen und längere, kräftigere Farb- und Linienmuster. Auch die zugehörigen Diagrammlinien sind stärker gezeichnet.
 

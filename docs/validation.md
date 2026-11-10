@@ -68,3 +68,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.9.7
 Die Änderung betrifft ausschließlich die Darstellung der bestehenden Kapazitätslegende und Diagrammlinien. Die lokale UI-Kit-Kopie wurde gegen das lokale Designsystem geprüft. Eine visuelle Browserprüfung der neuen Strichstärken und Umbrüche steht noch aus.
+
+## Prüfung Version 0.9.8
+41 Python-Tests und sieben JavaScript-Prüfgruppen waren erfolgreich. `tests/forecast.test.js` prüft gemischte Projekte, ausschließlich gewonnene oder erwartete Projekte, die Summe und den gemeinsamen Nenner sowie die zusätzliche Teamkurve bei anderem Status. Eine visuelle Browserprüfung steht noch aus.
