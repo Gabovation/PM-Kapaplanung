@@ -87,7 +87,10 @@
 .kapa-capacity-table th strong,.kapa-capacity-table th .sub {display:block}
 .kapa-capacity-table tbody th {white-space:normal;overflow-wrap:anywhere}
 .kapa-capacity-table thead th {white-space:nowrap}
+.kapa-capacity-table thead th:not(:first-child),.kapa-capacity-table tfoot td {text-align:center}
 .kapa-capacity-table td {padding:var(--polytec-space-1)}
+.kapa-capacity-table tfoot td.kapa-team-warning {background:color-mix(in srgb,var(--polytec-chart-series-5) 55%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-warning);font-weight:700}
+.kapa-capacity-table tfoot td.kapa-team-critical {background:color-mix(in srgb,var(--polytec-color-status-danger) 18%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-danger);font-weight:700}
 .kapa-capacity-cell {width:100%;white-space:nowrap;flex-direction:column;gap:0}
 .kapa-capacity-split {display:block;font-size:.75rem;font-weight:400;white-space:normal;overflow-wrap:anywhere}
 .kapa-capacity-cell.is-planned {background:var(--polytec-color-surface-subtle)}

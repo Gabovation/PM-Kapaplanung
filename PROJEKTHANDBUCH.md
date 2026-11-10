@@ -146,3 +146,10 @@ Die Personenmatrix zeigt je Zelle Gesamtprozent sowie „G“ für gewonnene und
 ## Ergänzte Lessons Learned
 - Statusanteile in Prozent benötigen einen klar genannten gemeinsamen Nenner. Ein Vergleich der Anteile mit der Teamkapazität darf nicht als individuelle Auslastung oder Gewinnwahrscheinlichkeit ausgegeben werden.
 - Ein Statusfilter oder eine geänderte Gewichtung könnte Engpässe verdecken. Statuswerte daher ergänzend anzeigen und die bestehende Gesamtrechnung beibehalten; unbekannte Status nicht stillschweigend umdeuten.
+
+## Ausrichtung und Schwellen für Team gesamt
+In der Kapazitätsmatrix sind die Zeiträume im Tabellenkopf und die Werte der Zeile „Team gesamt“ zentriert. Teamwerte unter 85 % bleiben neutral, ab 85 % bis unter 100 % sind sie orange hinterlegt, ab 100 % rot. Die Schwellen werden vor der Rundung geprüft. Die Schwellenbeschreibung steht auch im Tooltip und für Screenreader zur Verfügung. Unendliche Auslastung bei Stunden ohne Kapazität erhält ebenfalls die rote Markierung. Die individuelle Engpassprüfung ist davon unabhängig und meldet weiterhin erst eine tatsächliche Überschreitung der Kapazität.
+
+## Ergänzte Lessons Learned
+- Die Farbgrenze muss fachlich getrennt von der bestehenden Engpassdefinition behandelt werden: Genau 100 % ist hier rot, aber noch keine individuelle Überlastung.
+- Eine vor der Anzeige gerundete Zahl kann an einer Grenze bereits 85 % oder 100 % anzeigen; die Einstufung darf dadurch nicht unbemerkt verändert werden.

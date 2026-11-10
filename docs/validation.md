@@ -47,3 +47,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.9.0
 41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. `tests/forecast.test.js` prüft Statusanteile bei gemischten Projekten, Wochen- und Monatsauswertung, Beibehaltung der Gesamtsumme und einen unbekannten Status. Die lokale UI-Kit-Kopie entspricht dem lokalen Designsystem-Repository. Eine visuelle Browserprüfung der neuen Grafik und Matrix steht noch aus. Verwendet wurden die oben genannten lokalen Referenzstände; der Remote-Abgleich war zuvor ohne GitHub-Anmeldung nicht möglich.
+
+## Prüfung Version 0.9.1
+41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Die Teamgrenzen wurden bei 84,999 %, 85 %, 99,999 %, 100 % und unendlicher Auslastung geprüft. Eine visuelle Browserprüfung der Ausrichtung und Farbflächen steht noch aus.

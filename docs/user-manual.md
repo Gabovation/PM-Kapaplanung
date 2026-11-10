@@ -39,6 +39,8 @@ Die zusätzliche Grafik „Kapazität und Engpässe“ zeigt Team- und höchste 
 
 Die höchste Einzelauslastung kann bereits 160 % erreichen, obwohl das Team nur bei 80 % liegt. Die Matrix zeigt deshalb jede Person getrennt. Ein Klick auf einen Diagrammpunkt oder eine Matrixzelle stellt die Personenübersicht auf den zugehörigen Zeitraum ein. Nicht zugeordnete Stunden erscheinen als separate Warnung.
 
+In der Zeile „Team gesamt“ sind Werte ab 85 % orange und ab 100 % rot hinterlegt. Grundlage für die Farbe ist der ungerundete Wert; die Anzeige kann daher durch Rundung bereits 85 % beziehungsweise 100 % zeigen, obwohl die nächste Farbstufe noch nicht erreicht ist. Die Markierung bei genau 100 % bedeutet volle Teamkapazität; als persönliche Überlastung gilt weiterhin erst ein Wert über 100 %.
+
 Zwei zusätzliche Kurven zeigen, welcher Anteil der gesamten Teamkapazität auf gewonnene beziehungsweise erwartete Projekte entfällt. Beispiel: Bei 80 h Teamkapazität entsprechen 24 h aus gewonnenen Projekten 30 % und 16 h aus erwarteten Projekten 20 %. In jeder Personenzelle stehen unter dem Gesamtprozentwert die Stunden als „G“ für gewonnen und „E“ für erwartet. Beim Darüberfahren werden die Werte ausgeschrieben. Beide Projektarten zählen vollständig zur Gesamtauslastung und zur Engpassprüfung; die Kurven sind keine Gewinnwahrscheinlichkeit.
 
 Die Vorschau startet im ausgewählten Zeitraum. Aktuelle FTE gelten für alle zukünftigen Perioden. Abwesenheiten und Feiertage sind nicht abgezogen. Monatswerte können einzelne Wochenengpässe glätten; bei Bedarf auf Woche umschalten.

@@ -5,6 +5,10 @@ function forecastGrainSelector() {
   return `<div class="pt-segmented" role="group" aria-label="Zeitraster der Übersicht">${[['week','Woche'],['month','Monat']].map(([value,label])=>`<label class="pt-segmented__option"><input class="pt-segmented__input" type="radio" name="overview-grain" value="${value}" ${mode===value?'checked':''} onchange="setMode(this.value)"><span class="pt-segmented__label">${label}</span></label>`).join('')}</div>`;
 }
 
+function teamCapacityLevel(value) {
+  return value>=100?'critical':value>=85?'warning':'normal';
+}
+
 function forecastChart(model) {
   const width=192+96*model.columns.length, left=192, top=24, bottom=196;
   const finite=model.team.flatMap(period=>[period.ratio,period.peak]).filter(Number.isFinite);
@@ -46,10 +50,13 @@ function capacityForecast(model) {
       const label=`${row.person.name} · ${model.columns[index].title}: ${cell.load.toLocaleString('de-AT')} / ${cell.capacity.toLocaleString('de-AT',{maximumFractionDigits:1})} h · ${KapaCapacity.percent(cell.ratio)} % · Gewonnen: ${cell.wonLoad} h · Erwartet: ${cell.expectedLoad} h${cell.overloaded?' · Überlastet':''}`;
       return `<td><button type="button" class="pt-button pt-button--subtle kapa-capacity-cell ${cell.overloaded?'is-overloaded':cell.load?'is-planned':'is-free'}" title="${esc(label)}" aria-label="${esc(label)}" onclick="focusForecastPeriod(${index})"><span>${cell.overloaded?'! ':''}${KapaCapacity.percent(cell.ratio)} %</span><span class="kapa-capacity-split" aria-hidden="true">G ${cell.wonLoad} h · E ${cell.expectedLoad} h</span></button></td>`;
     }).join('')}</tr>`).join('')}</tbody>
-    <tfoot><tr><th scope="row">Team gesamt</th>${model.team.map(period=>`<td>${KapaCapacity.percent(period.ratio)} %</td>`).join('')}</tr></tfoot></table>`;
+    <tfoot><tr><th scope="row">Team gesamt</th>${model.team.map(period=>{
+      const level=teamCapacityLevel(period.ratio), description=level==='critical'?'Ab 100 %':level==='warning'?'Ab 85 %':'Unter 85 %';
+      return `<td class="kapa-team-${level}" title="${description}">${KapaCapacity.percent(period.ratio)} % <span class="pt-visually-hidden">(${description})</span></td>`;
+    }).join('')}</tr></tfoot></table>`;
   return `<section class="panel kapa-forecast-panel">${header}${summary}${warning}<div class="kapa-hours-legend"><span><i class="kapa-capacity-team-key" aria-hidden="true"></i>Team gesamt</span><span><i class="kapa-capacity-won-key" aria-hidden="true"></i>Gewonnen · Anteil am Team</span><span><i class="kapa-capacity-expected-key" aria-hidden="true"></i>Erwartet · Anteil am Team</span><span><i class="kapa-capacity-peak-key" aria-hidden="true"></i>Höchste Einzelauslastung</span><span><i class="kapa-capacity-limit-key" aria-hidden="true"></i>100 % Kapazität</span></div>
     <div class="kapa-timeline-scroll" role="region" tabindex="0" aria-label="Kapazitätsvorschau und Auslastung je Person, horizontal scrollbar"><div class="kapa-timeline kapa-capacity-timeline" style="--kapa-period-count:${model.columns.length}">${forecastChart(model)}${heatmap}</div></div>
-    <p class="pt-field__help">Gewonnen und erwartet zeigen jeweils ihren Anteil an der gesamten Teamkapazität. In der Personenmatrix stehen G für gewonnen und E für erwartet. Beide zählen vollständig zur Gesamtauslastung und Engpassprüfung. Zeitraum anklicken, um die Personenübersicht darauf einzustellen. Aktuelle FTE gelten für alle dargestellten Zeiträume; Abwesenheiten sind noch nicht abgezogen.</p></section>`;
+    <p class="pt-field__help">Gewonnen und erwartet zeigen jeweils ihren Anteil an der gesamten Teamkapazität. In der Personenmatrix stehen G für gewonnen und E für erwartet. Beide zählen vollständig zur Gesamtauslastung und Engpassprüfung. „Team gesamt“: Orange ab 85 %, Rot ab 100 %. Zeitraum anklicken, um die Personenübersicht darauf einzustellen. Aktuelle FTE gelten für alle dargestellten Zeiträume; Abwesenheiten sind noch nicht abgezogen.</p></section>`;
 }
 
 function setForecastCount(value) {

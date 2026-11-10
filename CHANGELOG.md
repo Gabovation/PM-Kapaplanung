@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.1 – 10.11.2026
+- Die Zeiträume und Teamwerte in der Auswertungsmatrix sind zentriert. In „Team gesamt“ sind Werte ab 85 % orange und ab 100 % rot hinterlegt; die Einstufung erfolgt vor der Rundung.
+
 ## 0.9.0 – 10.11.2026
 - Gewonnene und erwartete Projekte sind im Portfolio, in der Projektliste und im Projektdetail mit beschrifteten Statusmarkierungen unterscheidbar.
 - Die Kapazitätsvorschau zeigt die Anteile gewonnener und erwarteter Projekte an der Teamkapazität als getrennte Kurven. Die Personenmatrix ergänzt die jeweiligen Stunden. Beide Projektarten bleiben vollständig in Gesamtauslastung und Engpassprüfung enthalten.

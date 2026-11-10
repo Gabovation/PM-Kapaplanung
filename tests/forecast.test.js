@@ -31,6 +31,12 @@ assert.equal(run('combined.people[0].cells[0].load'),80);
 assert.equal(run('combined.team[0].ratio'),100);
 assert.equal(run('combined.team[0].peak'),200);
 
+// The team thresholds are inclusive and use the unrounded ratio.
+for(const [value,level] of [[0,'normal'],[84.999,'normal'],[85,'warning'],[99.999,'warning'],[100,'critical'],[Infinity,'critical']]) {
+  assert.equal(run(`teamCapacityLevel(${value})`),level);
+}
+assert.match(run('capacityForecast(combined)'),/class="kapa-team-critical"[^>]*>100 %/);
+
 // Status contributions share the same team-capacity denominator and do not change total load.
 run(`const wonProject={...project,status:'Gewonnen',budget:24};
  const expectedProject={...project,id:'expected',status:'Erwartet',budget:16};
