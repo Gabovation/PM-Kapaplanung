@@ -12,6 +12,8 @@ Unter Einstellungen → Rollen mit „Rolle hinzufügen“ eine neue Bezeichnung
 ## Projekte
 Projektname, Projektnummer, Status, verantwortliche Person und Basisbudget eingeben. Die Termine von Gate 3, Gate 5, Gate 6, Gate 7 und Gate 8 müssen aufsteigend sein. Gate 8 ist das exklusive Ende. Die vier Prozentanteile ergeben zusammen 100 %. Der Favorit aus Einstellungen kann im Projektformular angewendet werden.
 
+In der Übersicht stehen Auslastung und Portfolio auf breiten Bildschirmen gleich breit nebeneinander, auf schmalen Bildschirmen untereinander. Das Portfolio zeigt die ersten fünf Projekte mit Person, Gate-Planstand, nächstem Gate und Budget in Spalten. Über „Alle ansehen“ öffnet sich die vollständige Projektliste. Falls die Tabelle nicht vollständig ins Fenster passt, kann sie horizontal verschoben werden.
+
 Bei jedem Projekt öffnet „SharePoint öffnen“ die Seite, deren Adresse aus `https://polytec.sharepoint.com/sites/m365-pep-` und der Projektnummer besteht. Der Link steht im Portfolio der Übersicht, in der Projektliste und im Projektdetail und öffnet einen neuen Browser-Tab.
 
 ## Feinplanung

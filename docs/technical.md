@@ -44,3 +44,5 @@ Bei lokalen Schreibzugriffen gibt es maximal drei Dateiersatzversuche mit 25 ms 
 
 ## Gate-Status
 `gateStatus` in `static/app/plan.js` prüft fünf gültige aufsteigende Kalendertage und berechnet den aktuellen Gate-Planstand sowie das nächste Gate mit ausschließlich späterem Datum. Standardmäßig verwendet die Funktion das lokale Tagesdatum; für deterministische Tests kann ein Stichtag übergeben werden. Ein Timer rendert die betroffenen Projektansichten kurz nach dem nächsten lokalen Mitternachtswechsel neu. Die Anzeige verwendet vorhandene Felder und verändert keine gespeicherten Daten.
+
+`portfolioTable` stellt die vorhandenen Projektdaten mit der Tabellenklasse des UI-Kits dar und nutzt `gateStatus`, `sharePointLink` und `totals`. Das Raster `.layout` verwendet zwei gleich große Spalten; `.split` für die Einstellungen behält seine bisherige Aufteilung. Bei höchstens 64 rem werden beide Raster einspaltig. Der bestehende Tabellencontainer erlaubt bei Bedarf horizontales Scrollen.

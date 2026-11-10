@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0 – 10.11.2026
+- Die Bereiche „Auslastung nach Person“ und „Projekte“ sind auf breiten Bildschirmen gleich breit. Bei schmalen Fenstern stehen sie untereinander.
+- Das Portfolio zeigt Projekt, verantwortliche Person, Gate-Status (Plan), nächstes Gate und Budget in einer Tabelle. Projektnummer und SharePoint-Link bleiben beim Projekt sichtbar.
+
 ## 0.7.0 – 10.11.2026
 - Im Portfolio, in der Projektliste und im Projektdetail werden der terminbasierte Gate-Status und das nächste Gate mit Datum angezeigt.
 - Grundlage ist das lokale Tagesdatum: Ab dem Tag eines Gate-Termins gilt dieses Gate als Planstand. Vor G3 erscheint „Vor Gate 3“, ab G8 „Ab Gate 8“ und „Kein weiteres Gate“.

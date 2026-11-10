@@ -128,3 +128,10 @@ Der Planstand ist keine dokumentierte tatsächliche Gate-Freigabe und sagt nicht
 
 ## Ergänzte Lessons Learned
 Geplante Gate-Termine sind keine tatsächlichen Freigaben. Ein automatisch ermittelter Gate-Status muss als Planstand gekennzeichnet werden und den Tag eines Gate-Wechsels eindeutig behandeln.
+
+## Gleich breite Übersichtsbereiche und Portfolio-Tabelle
+Auf breiten Bildschirmen teilen sich Personenübersicht und Portfolio den verfügbaren Platz gleichmäßig. Ab einer Fensterbreite von höchstens 64 rem stehen die Bereiche untereinander. Die Projektübersicht enthält die Spalten Projekt, Person, Gate-Status (Plan), nächstes Gate und Budget. Unter dem Projektnamen stehen Projektnummer und SharePoint-Link. Weiterhin werden die ersten fünf Projekte angezeigt; „Alle ansehen“ öffnet die vollständige Liste. Die Tabelle kann bei Platzmangel horizontal gescrollt werden. Gate-Status und nächster Termin verwenden die bestehende Berechnung, das Budget schließt Planwertänderungen ein. Es werden keine Planungsdaten verändert.
+
+## Ergänzte Lessons Learned
+- Vergleichbare Bereiche profitieren von einer gleichmäßigen Platzaufteilung und konsistenten Tabellenüberschriften. Bei kleineren Fenstern müssen Spalten trotzdem zugänglich bleiben.
+- Eine Änderung der Portfolio-Darstellung darf bestehende Projektlinks und die Kennzeichnung des Gate-Planstands nicht verlieren. Die Einstellungen besitzen ein eigenes Layout und bleiben von der Änderung ausgenommen.

@@ -35,10 +35,10 @@ assert.match(run('gateStatusView({...project,dates:[]})'),/Gate-Termine prüfen/
 run(`state={fte:40,roles:[],people:[],projects:[project]};selected='p1';`);
 for(const view of ['overview()','projects()','detail()']) {
   const html=run(view);
-  assert.match(html,/Gate-Status \(Plan\):/);
+  assert.match(html,/Gate-Status \(Plan\):?/);
   assert.match(html,/Gate 6/);
-  assert.match(html,/Nächstes Gate:/);
-  assert.match(html,/Gate 7 · 01\.01\.2027/);
+  assert.match(html,/Nächstes Gate:?/);
+  assert.match(html,/Gate 7(?:<[^>]+>)*(?: · )?(?:<[^>]+>)*01\.01\.2027/);
 }
 assert.match(run("gateStatusView({...project,dates:['2025-01-01','2025-02-01','2025-03-01','2025-04-01','2025-05-01']})"),/Kein weiteres Gate/);
 console.log('Gate-Status: Plantermine, Grenztage, fehlende Termine und Anzeige in den Projektansichten geprüft.');

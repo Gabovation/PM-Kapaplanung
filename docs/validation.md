@@ -41,3 +41,6 @@ Vor einer Plattformfreigabe: serverseitige Fachvalidierung, Rollen und Portal-An
 `tests/gate-status.test.js` deckt Status vor G3, an und zwischen Gates, ab G8, das nächste Datum, ungültige Daten sowie die Anzeige im Portfolio, der Projektliste und dem Projektdetail ab. Der Status ist als terminbasierter Planstand gekennzeichnet; eine tatsächliche Gate-Freigabe wird nicht behauptet.
 
 Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interaktive GitHub-Anmeldung nicht möglich. Verwendet wurden die oben genannten lokalen Commit-Stände.
+
+## Prüfung Version 0.8.0
+41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Die bestehenden Prüfungen decken die Gate-Anzeige und den SharePoint-Link auch im Portfolio ab. Die lokale UI-Kit-Kopie stimmt mit dem lokalen Designsystem-Repository überein. Der lokale Server liefert die aktualisierten Skripte und Styles aus. Eine visuelle Browserprüfung der neuen Aufteilung steht noch aus. Der erneute Remote-Abgleich der Referenz-Repositories war ohne GitHub-Anmeldung nicht möglich; verwendet wurden die oben genannten lokalen Commit-Stände.
