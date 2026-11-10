@@ -35,3 +35,9 @@ GMA 4.9.1 `d7adb792b663419eed2955d446a0203a231b9057`; Designsystem 2.21.0 `7ee91
 Der erneute Remote-Abgleich vor Version 0.6.0 war ohne interaktive GitHub-Anmeldung nicht möglich. Verwendet und lokal geprüft wurden die genannten vorhandenen Stände.
 
 Vor einer Plattformfreigabe: serverseitige Fachvalidierung, Rollen und Portal-Anmeldung, MongoDB, bestätigte Organisationsdaten, echte Betriebs- und Sicherungsparameter und vollständige manuelle Regelprüfung. SAP-Verarbeitung und mehrere Rollenzuordnungen je Projekt sind weitere fachliche Schritte. Die aktuelle Version ist eine lokale Vorführung.
+
+
+## Prüfung Version 0.7.0
+`tests/gate-status.test.js` deckt Status vor G3, an und zwischen Gates, ab G8, das nächste Datum, ungültige Daten sowie die Anzeige im Portfolio, der Projektliste und dem Projektdetail ab. Der Status ist als terminbasierter Planstand gekennzeichnet; eine tatsächliche Gate-Freigabe wird nicht behauptet.
+
+Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interaktive GitHub-Anmeldung nicht möglich. Verwendet wurden die oben genannten lokalen Commit-Stände.

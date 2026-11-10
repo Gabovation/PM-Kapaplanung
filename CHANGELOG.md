@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0 – 10.11.2026
+- Im Portfolio, in der Projektliste und im Projektdetail werden der terminbasierte Gate-Status und das nächste Gate mit Datum angezeigt.
+- Grundlage ist das lokale Tagesdatum: Ab dem Tag eines Gate-Termins gilt dieses Gate als Planstand. Vor G3 erscheint „Vor Gate 3“, ab G8 „Ab Gate 8“ und „Kein weiteres Gate“.
+- Die Anzeige aktualisiert sich beim lokalen Tageswechsel und ist als Planstand statt tatsächlicher Gate-Freigabe gekennzeichnet.
+
 ## 0.6.0 – 10.11.2026
 - Vertikale Mausradbewegungen über den horizontal scrollbaren Diagrammen werden wieder an den Arbeitsbereich beziehungsweise den Dialog weitergereicht. Horizontales Scrollen der Zeitachse bleibt möglich.
 - Portfolio, Projektliste und Projektdetail enthalten einen SharePoint-Link zur Adresse `https://polytec.sharepoint.com/sites/m365-pep-` plus Projektnummer. Der Link öffnet einen neuen Tab und löst in der Projektkarte keine zusätzliche Navigation aus.

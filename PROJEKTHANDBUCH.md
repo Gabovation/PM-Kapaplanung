@@ -117,3 +117,14 @@ Im Portfolio, in der Projektliste und im Projektdetail erzeugt „SharePoint öf
 ## Ergänzte Lessons Learned
 - `overscroll-behavior: contain` wirkt auf beide Achsen. Bei einer horizontalen Zeitachse kann dies das vertikale Mausrad blockieren, obwohl der umgebende Arbeitsbereich noch scrollen könnte. Die Achsen müssen getrennt konfiguriert werden.
 - Ein externer Link in einer anklickbaren Projektkarte muss sein Klickereignis abgrenzen, ohne die normale Linkaktion zu unterdrücken. Projektnummern müssen zudem als URL-Bestandteil und HTML-Text sicher behandelt werden.
+
+
+## Gate-Status und nächster Meilenstein
+Das Portfolio der Übersicht, die Projektliste und das Projektdetail zeigen den „Gate-Status (Plan)“ sowie das nächste Gate mit Datum. Grundlage sind ausschließlich die fünf hinterlegten, aufsteigenden Gate-Termine und das lokale Tagesdatum des Browsers. Die Anzeige ist unabhängig vom ausgewählten Vorschauzeitraum und wird beim lokalen Tageswechsel neu berechnet.
+
+Vor G3 lautet der Planstand „Vor Gate 3“ und G3 ist das nächste Gate. Ab einem Gate-Termin einschließlich dieses Kalendertages gilt das entsprechende Gate als angezeigter Planstand; das nächste Gate ist der nächste spätere Termin. Beispiel: Am Tag von G6 wird Gate 6 angezeigt und G7 ist das nächste Gate. Ab G8 lautet die Anzeige „Ab Gate 8“ und „Kein weiteres Gate“. Fehlen gültige aufsteigende Termine, liefert die Statusfunktion einen Prüfhinweis.
+
+Der Planstand ist keine dokumentierte tatsächliche Gate-Freigabe und sagt nicht aus, ob ein geplanter Meilenstein tatsächlich bestanden wurde. Für eine spätere Ist-Statusverwaltung wären gesonderte fachliche Eingaben beziehungsweise eine verlässliche Datenquelle erforderlich. Diese Anzeige verändert weder Gate-Daten noch den Stundenplan.
+
+## Ergänzte Lessons Learned
+Geplante Gate-Termine sind keine tatsächlichen Freigaben. Ein automatisch ermittelter Gate-Status muss als Planstand gekennzeichnet werden und den Tag eines Gate-Wechsels eindeutig behandeln.

@@ -10,6 +10,7 @@
 .card,.panel {background:var(--polytec-color-surface-panel);border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);padding:var(--polytec-space-4)}
 .projectcard {cursor:pointer}
 .kapa-project-link {display:inline-block;margin-inline-start:var(--polytec-space-2);white-space:nowrap}
+.kapa-gate-status {display:flex;align-items:center;flex-wrap:wrap;gap:var(--polytec-space-2);margin-top:var(--polytec-space-2)}
 .value {font-size:2rem;font-weight:700;margin:var(--polytec-space-3) 0}
 .label,.caption,.sub,.quiet,.muted,.section-kicker {color:var(--polytec-color-text-secondary)}
 .caption,.sub,.quiet,.section-kicker {font-size:.875rem}

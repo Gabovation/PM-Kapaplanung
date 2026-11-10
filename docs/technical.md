@@ -40,3 +40,7 @@ Horizontale Diagrammflächen verwenden `overscroll-behavior-x: contain` und `ove
 `sharePointLink` erzeugt die URL aus dem festen Host und der mit `encodeURIComponent` behandelten Projektnummer. Die Darstellung erfolgt im Portfolio, in der Projektliste und im Projektdetail. Die normale Linkaktion öffnet einen neuen Tab; das Klickereignis wird nicht an die umgebende Projektkarte weitergegeben.
 
 Bei lokalen Schreibzugriffen gibt es maximal drei Dateiersatzversuche mit 25 ms Abstand bei `PermissionError`. Temporäre Dateien werden anschließend entfernt. Ein dauerhafter Fehler liefert weiterhin HTTP 500 und ändert den gespeicherten Revisionsstand nicht.
+
+
+## Gate-Status
+`gateStatus` in `static/app/plan.js` prüft fünf gültige aufsteigende Kalendertage und berechnet den aktuellen Gate-Planstand sowie das nächste Gate mit ausschließlich späterem Datum. Standardmäßig verwendet die Funktion das lokale Tagesdatum; für deterministische Tests kann ein Stichtag übergeben werden. Ein Timer rendert die betroffenen Projektansichten kurz nach dem nächsten lokalen Mitternachtswechsel neu. Die Anzeige verwendet vorhandene Felder und verändert keine gespeicherten Daten.

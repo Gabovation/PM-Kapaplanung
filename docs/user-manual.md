@@ -42,3 +42,9 @@ In Einstellungen eine JSON-Sicherung exportieren. Wiederherstellen ersetzt die a
 
 ## SAP
 SAP-Buchungen, Ist- und Reststunden sind noch nicht enthalten.
+
+
+## Gate-Status und nächstes Gate
+Das Portfolio zeigt bei jedem Projekt den „Gate-Status (Plan)“ und das nächste Gate mit Datum. Dieselben Angaben stehen in der Projektliste und im Projektdetail. Grundlage sind die hinterlegten Gate-Termine und das lokale Tagesdatum des Browsers. Der gewählte Zeitraum der Kapazitätsvorschau beeinflusst diesen Status nicht.
+
+Am Tag eines Gate-Termins wird dieses Gate als aktueller Planstand angezeigt; das darauffolgende Gate ist das nächste. Vor Gate 3 erscheint „Vor Gate 3“. Ab dem Termin von Gate 8 erscheint „Ab Gate 8“ und „Kein weiteres Gate“. Die Anzeige aktualisiert sich beim lokalen Tageswechsel. Der Planstand bestätigt keine tatsächliche Gate-Freigabe.
