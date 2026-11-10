@@ -62,3 +62,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.9.5
 41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Alle in der App-CSS verwendeten POLYTEC-Tokens sind im lokalen UI-Kit definiert; die Icon-Prüfung bestätigt das vorhandene Parameter-Symbol. Das vendorte UI-Kit stimmt mit dem lokalen Designsystem-Repository überein. Eine visuelle Browserprüfung steht noch aus.
+
+## Prüfung Version 0.9.6
+41 Python-Tests und sieben JavaScript-Prüfgruppen waren erfolgreich. `tests/navigation.test.js` prüft für alle vier Hauptseiten den Klick aus einer Detailansicht bei gleichem Browseranker sowie Strg-Klick, mittlere Maustaste, neuen Tab, fremden Ursprung und andere Anker. Eine interaktive Browserprüfung des Ablaufs „Projekt anlegen → Übersicht“ steht noch aus. Die lokale UI-Kit-Kopie entspricht dem lokalen Designsystem-Repository.

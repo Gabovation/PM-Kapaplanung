@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.6 – 10.11.2026
+- Die Navigation öffnet „Übersicht“ und die anderen Hauptseiten auch dann, wenn nach dem Anlegen oder Öffnen eines Projekts die Browseradresse bereits auf das angeklickte Ziel zeigt.
+
 ## 0.9.5 – 10.11.2026
 - Der Abstand zwischen den Projektgruppen verwendet einen vorhandenen Abstandstoken. Auch leere Zustände nutzen denselben gültigen Token.
 - In der Desktop- und Mobilnavigation verwendet „Einstellungen“ das vorhandene Parameter-Symbol des UI-Kits; der Pfad des bisherigen Zahnrad-Symbols im zugrunde liegenden Designsystem ist fehlerhaft.

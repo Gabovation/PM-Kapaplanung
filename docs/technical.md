@@ -56,3 +56,5 @@ Bei lokalen Schreibzugriffen gibt es maximal drei Dateiersatzversuche mit 25 ms 
 `projects` gruppiert Projektkarten nach Status. `sortedProjectsByNextGate` berechnet den nächsten Termin mit `gateStatus` und sortiert eine Kopie stabil nach Datum; fehlende nächste Termine stehen zuletzt. Die gespeicherte Projektliste wird nicht umsortiert.
 
 Projektgruppen und leere Zustände verwenden `--polytec-space-6`. Die Navigation verwendet für Einstellungen das vorhandene UI-Kit-Icon `parameters`, da das im lokalen Designsystem vorhandene `settings`-SVG einen fehlerhaften Pfad enthält. Die App ändert das vendorte Sprite nicht.
+
+`handleNavigationClick` ergänzt den bestehenden `hashchange`-Handler für den Fall, dass eine interne Detailansicht geöffnet ist, die Browseradresse aber bereits den Anker des angeklickten Navigationsziels enthält. Nur unmodifizierte linke Klicks auf gleichseitige Hauptnavigationslinks werden behandelt; abweichende Ziele und Browseraktionen bleiben nativ.

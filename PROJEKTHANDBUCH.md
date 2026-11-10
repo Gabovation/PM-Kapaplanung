@@ -178,3 +178,9 @@ Das mitgelieferte Zahnrad-Symbol `settings` hat im lokalen Designsystem einen fe
 ## Ergänzte Lessons Learned
 - CSS-Variablen müssen im tatsächlich eingebundenen Tokenbestand existieren; ansonsten entfällt die gesamte betroffene CSS-Eigenschaft, ohne dass der Browser einen sichtbaren Fehler meldet.
 - Icon-Defekte im gemeinsamen Sprite dürfen nicht durch Änderungen an der vendorten Kopie verdeckt werden. Ein geeignetes, vorhandenes Symbol kann eine lokale Übergangslösung sein.
+
+## Navigation aus der Projektplanung
+Nach dem Anlegen oder Öffnen eines Projekts zeigt die Anwendung die Projektplanung. Die Browseradresse kann dabei noch den Anker der zuvor geöffneten Hauptseite enthalten. Ein Klick auf diese Hauptseite löst dann keinen `hashchange` aus. Die Navigation berücksichtigt deshalb zusätzlich normale Klicks auf einen Hauptseitenlink, dessen Anker bereits in der Adresse steht, und öffnet das Ziel, falls intern eine andere Ansicht aktiv ist. Dies gilt für Übersicht, Projekte, Personen und Einstellungen sowie für Desktop- und Mobilnavigation. Andere Ankerwechsel und Browseraktionen wie Strg-Klick bleiben dem Browser überlassen.
+
+## Ergänzte Lessons Learned
+- Ein interner Ansichtswechsel ohne Änderung der Adresse kann den Browseranker und die sichtbare Seite auseinanderlaufen lassen. Ein erneuter Klick auf denselben Anker erzeugt kein `hashchange`-Ereignis; dieser Fall muss gesondert behandelt werden.
