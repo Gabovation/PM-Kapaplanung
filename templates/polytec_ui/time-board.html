@@ -1,0 +1,91 @@
+{% import "polytec_ui/macros.html" as ui %}
+{% macro item_link(item, labels) -%}
+{% set url = item.url|default('') %}
+{% set safe_url = url and ':' not in url and '\\' not in url and not url.startswith('//') %}
+{% if safe_url %}<a href="{{ url }}" data-pt-time-edit aria-label="{{ labels.get('edit', 'Edit') }}: {{ item.title }}{% if item.meta|default('') %} {{ item.meta }}{% endif %}{% if item.description|default('') %} · {{ item.description }}{% endif %}" title="{{ item.description|default(item.title, true) }}">{{ item.title }}{% if item.meta|default('') %} <small>{{ item.meta }}</small>{% endif %}</a>{% else %}<span>{{ item.title }}</span>{% endif %}
+{%- endmacro %}
+
+{% macro item_handle(item, labels, can_move=true) -%}
+{% set url = item.url|default('') %}
+{% set safe_url = url and ':' not in url and '\\' not in url and not url.startswith('//') %}
+{% if can_move and safe_url and item.movable|default(false) %}<button type="button" class="pt-time-board__handle" data-pt-time-handle aria-label="{{ labels.get('move', 'Move') }}: {{ item.title }}" aria-pressed="false" hidden>{{ ui.icon('grip') }}</button>{% endif %}
+{%- endmacro %}
+
+{% macro board(label, start, end, ticks, lanes, backlog, step_minutes, timezone, locale, labels, options={}) -%}
+{% set valid_range = start is integer and end is integer and end > start and step_minutes is integer and step_minutes > 0 %}
+{% set first = start|int %}{% set last = end|int %}{% set duration = last - first %}
+<section class="pt-time-board{% if options.dense|default(false) %} pt-time-board--dense{% endif %}{% if options.backlog_position|default('side') == 'below' %} pt-time-board--below{% endif %}{% if options.fill|default(false) %} pt-time-board--fill{% endif %}" data-pt-time-board data-valid="{{ '1' if valid_range else '0' }}" data-start="{{ first }}" data-end="{{ last }}" data-step="{{ step_minutes|int }}" data-timezone="{{ timezone }}" data-locale="{{ locale }}" aria-label="{{ label }}"
+  data-picked-up="{{ labels.get('picked_up', 'Picked up') }}"
+  data-target="{{ labels.get('target', 'Target') }}"
+  data-reviewing="{{ labels.get('reviewing', 'Review requested; nothing has been moved.') }}"
+  data-cancelled="{{ labels.get('cancelled', 'Move cancelled; nothing has been moved.') }}"
+  data-invalid="{{ labels.get('invalid', 'Choose a resource and time; nothing has been moved.') }}"
+  data-configuration-error="{{ labels.get('configuration_error', 'The timeline configuration is invalid.') }}">
+  <div class="pt-time-board__toolbar">
+    <strong>{{ label }}</strong>{% if options.zoom|default(false) %}<label class="pt-time-board__view"><span>{{ labels.get('view', 'View') }}</span><select class="pt-select" data-pt-time-view>{% if options.zoom_levels|default([]) %}{% for level in options.zoom_levels %}<option value="{{ level.key }}" data-hours="{{ level.hours }}"{% if level.key == options.detail|default('week') %} selected{% endif %}>{{ level.label }}</option>{% endfor %}{% else %}<option value="week">{{ labels.get('week', 'Week') }}</option>{% for tick in ticks %}<option value="{{ tick.start }}" data-end="{{ tick.end }}">{{ tick.label }}</option>{% endfor %}{% endif %}</select></label>{% endif %}<p data-pt-time-status role="status" aria-live="polite" aria-atomic="true"></p>
+    <button class="pt-button pt-button--secondary" type="button" data-pt-time-cancel hidden>{{ labels.get('cancel', 'Cancel move') }}</button>
+  </div>
+  <p class="pt-visually-hidden" data-pt-time-instructions>{{ labels.get('instructions', 'Drag a Move handle to a resource and time. Or press Space, use arrows to choose, Enter to review and Escape to cancel. Edit opens the form without moving anything.') }}</p>
+  <div class="pt-time-board__legend">{% for entry in options.legend|default([]) %}<span data-tone="{{ entry.tone }}">{{ entry.label }}</span>{% endfor %}</div>
+  <div class="pt-time-board__body">
+    {% if backlog %}<aside class="pt-time-board__backlog" aria-label="{{ labels.get('backlog', 'Backlog') }}">
+      <div class="pt-time-board__backlog-heading"><strong>{{ labels.get('backlog', 'Backlog') }} · {{ backlog|length }}</strong>
+      {% if options.backlog_position|default('side') == 'below' %}<label class="pt-field"><span class="pt-visually-hidden">{{ labels.get('search', 'Find a demand') }}</span><input class="pt-input" type="search" placeholder="{{ labels.get('search', 'Find a demand') }}" data-pt-time-search></label>{% endif %}</div>
+      {% if options.backlog_columns|default([]) %}
+      <table class="pt-time-board__demands"><caption class="pt-visually-hidden">{{ labels.get('backlog', 'Backlog') }}</caption>
+        <thead><tr><th scope="col">{{ labels.get('backlog_item', 'Item') }}</th>{% for column in options.backlog_columns %}<th scope="col"{% if column.numeric|default(false) %} class="pt-time-board__number"{% endif %}>{{ column.label }}</th>{% endfor %}<th scope="col"><span class="pt-visually-hidden">{{ labels.get('move', 'Move') }}</span></th></tr></thead>
+        <tbody>{% for item in backlog %}<tr data-pt-time-item data-key="{{ item.key }}" data-url="{{ item.url|default('') }}" data-title="{{ item.title }}" data-preview-by-lane="{{ item.previewByLane|default({})|tojson|forceescape }}" data-duration="{{ item.duration|default(0) }}" data-work-centre="{{ item.workCentre|default('') }}">
+          <th scope="row">{% set url = item.url|default('') %}{% set safe_url = url and ':' not in url and '\\' not in url and not url.startswith('//') %}
+            {% if safe_url %}<a href="{{ url }}" data-pt-time-edit aria-label="{{ labels.get('edit', 'Edit') }}: {{ item.primary|default(item.title, true) }}{% if item.secondary|default('') %} {{ item.secondary }}{% endif %} · {{ item.description|default('') }}" title="{{ item.description|default(item.title, true) }}"><strong>{{ item.primary|default(item.title, true) }}</strong> {% if item.secondary|default('') %}<span>{{ item.secondary }}</span>{% endif %}</a>{% else %}{{ item.title }}{% endif %}
+          </th>{% for column in options.backlog_columns %}<td{% if column.numeric|default(false) %} class="pt-time-board__number"{% endif %}>{{ (item.cells|default({})).get(column.key, '—') }}</td>{% endfor %}<td>{{ item_handle(item, labels) }}</td>
+        </tr>{% endfor %}</tbody>
+      </table>
+      {% else %}
+      <ul>{% for item in backlog %}<li data-pt-time-item data-key="{{ item.key }}" data-url="{{ item.url|default('') }}" data-title="{{ item.title }}" data-preview-by-lane="{{ item.previewByLane|default({})|tojson|forceescape }}" data-duration="{{ item.duration|default(0) }}" data-work-centre="{{ item.workCentre|default('') }}">
+        <div>{{ item_link(item, labels) }}{% if not item.meta|default('') and item.description|default('') %}<small>{{ item.description }}</small>{% endif %}</div>{{ item_handle(item, labels) }}
+      </li>{% endfor %}</ul>
+      {% endif %}
+    </aside>{% endif %}
+    {% if valid_range and lanes %}
+    <div class="pt-time-board__scroll" role="region" aria-label="{{ labels.get('scroll', 'Scrollable timeline') }}" tabindex="0" data-pt-time-scroll>
+      <table class="pt-time-board__table" style="--pt-time-days:{{ [(duration / 86400000)|round(0, 'ceil')|int, 1]|max }}">
+        <caption class="pt-visually-hidden">{{ label }}</caption>
+        <thead><tr><th scope="col">{{ labels.get('resources', 'Resources') }}</th><th scope="col">
+          <div class="pt-time-board__axis">
+          {% for tick in ticks %}{% if tick.start is integer and tick.end is integer and tick.end > tick.start %}{% set a = [tick.start, first]|max %}{% set b = [tick.end, last]|min %}{% if b > a %}
+            <span class="pt-time-board__tick" style="--pt-time-left:{{ (a - first) * 100 / duration }}%;--pt-time-width:{{ (b - a) * 100 / duration }}%" title="{{ tick.description|default(tick.label, true) }}">{{ tick.label }}</span>
+          {% endif %}{% else %}<span class="pt-time-board__invalid" role="status">{{ labels.get('invalid_item', 'Invalid interval') }}: {{ tick.label }}</span>{% endif %}{% endfor %}
+          </div>
+          {% if options.sub_ticks|default([]) %}<div class="pt-time-board__axis pt-time-board__axis--sub">
+          {% for tick in options.sub_ticks %}<span title="{{ tick.description|default(tick.label, true) }}" class="pt-time-board__tick" style="--pt-time-left:{{ (tick.start - first) * 100 / duration }}%;--pt-time-width:{{ (tick.end - tick.start) * 100 / duration }}%">{{ tick.label }}</span>{% endfor %}
+          </div>{% endif %}
+        </th></tr></thead>
+        <tbody>{% for lane in lanes %}<tr>
+          <th scope="row" title="{{ lane.description|default(lane.label, true) }}"><span>{{ lane.label }}</span>{% if lane.description|default('') %}<small>{{ lane.description }}</small>{% endif %}
+            {% if lane.get('items', []) %}<details class="pt-time-board__item-list"><summary aria-label="{{ labels.get('items', 'Items') }} · {{ lane.get('items')|length }}"><span class="pt-time-board__item-word">{{ labels.get('items', 'Items') }} · </span>{{ lane.get('items')|length }}</summary>
+              <ul>{% for item in lane.get('items', []) %}<li data-pt-time-item data-key="{{ item.key }}" data-url="{{ item.url|default('') }}" data-title="{{ item.title }}" data-item-start="{{ item.start|int }}" data-item-end="{{ item.end|int }}" data-preview-by-lane="{{ item.previewByLane|default({})|tojson|forceescape }}" data-duration="{{ item.end|int - item.start|int }}">
+                {{ item_link(item, labels) }}{{ item_handle(item, labels, item.start is integer and item.end is integer and item.end > item.start) }}
+              </li>{% endfor %}</ul>
+            </details>{% endif %}
+          </th>
+          <td><div class="pt-time-board__track" data-pt-time-track data-lane-key="{{ lane.key }}" data-lane-label="{{ lane.label }}" data-capacity="{{ lane.capacity|default(1) }}" style="--pt-time-stacks:{{ lane.stacks|default(1) }}">
+            {% for tick in options.sub_ticks|default([]) %}<span class="pt-time-board__gridline" style="--pt-time-left:{{ (tick.start - first) * 100 / duration }}%"></span>{% endfor %}
+            {% for band in lane.bands|default([]) %}{% if band.start is integer and band.end is integer and band.end > band.start %}{% set a = [band.start, first]|max %}{% set b = [band.end, last]|min %}{% if b > a %}
+              <span class="pt-time-board__band" style="--pt-time-left:{{ (a - first) * 100 / duration }}%;--pt-time-width:{{ (b - a) * 100 / duration }}%" title="{{ band.description|default(band.label, true) }}">{{ band.label }}</span>
+            {% endif %}{% else %}<span class="pt-time-board__invalid" role="status">{{ labels.get('invalid_item', 'Invalid interval') }}: {{ band.label }}</span>{% endif %}{% endfor %}
+            {% for item in lane.get('items', []) %}{% if item.start is integer and item.end is integer and item.end > item.start %}{% set item_start = item.start %}{% set item_end = item.end %}{% set a = [item_start, first]|max %}{% set b = [item_end, last]|min %}
+              {% if b > a %}
+              <div class="pt-time-board__block{% if item.tone|default('') in ['info', 'success', 'warning', 'danger'] %} pt-time-board__block--{{ item.tone }}{% endif %}" data-pt-time-item data-pt-time-visual data-key="{{ item.key }}" data-url="{{ item.url|default('') }}" data-title="{{ item.title }}" data-item-start="{{ item_start }}" data-item-end="{{ item_end }}" data-preview-by-lane="{{ item.previewByLane|default({})|tojson|forceescape }}" data-duration="{{ item_end - item_start }}" data-work-centre="{{ item.workCentre|default('') }}" data-movable="{{ '1' if item.movable|default(false) else '0' }}" style="--pt-time-left:{{ (a - first) * 100 / duration }}%;--pt-time-width:{{ (b - a) * 100 / duration }}%;--pt-time-stack:{{ item.stack|default(0) }};--pt-time-setup:{{ item.setupPercent|default(0) }}%" title="{{ item.description|default(item.title, true) }}">
+                {% if item_start < first %}<span aria-hidden="true">‹</span>{% endif %}{{ item_link(item, labels) }}{% if item_end > last %}<span aria-hidden="true">›</span>{% endif %}
+              </div>
+              {% endif %}{% else %}<span class="pt-time-board__invalid" role="status">{{ labels.get('invalid_item', 'Invalid interval') }}: {{ item.title }}</span>{% endif %}{% endfor %}
+          </div></td>
+        </tr>{% endfor %}</tbody>
+        {% if options.summaries|default([]) %}<tfoot>{% for summary in options.summaries %}<tr><th scope="row">{{ summary.label }}</th><td><div class="pt-time-board__axis">{% for cell in summary.cells %}<span class="pt-time-board__tick" style="--pt-time-left:{{ (cell.start - first) * 100 / duration }}%;--pt-time-width:{{ (cell.end - cell.start) * 100 / duration }}%" title="{{ cell.description }}">{{ cell.label }}</span>{% endfor %}</div></td></tr>{% endfor %}</tfoot>{% endif %}
+      </table>
+    </div>
+    {% elif not valid_range %}<p role="status">{{ labels.get('configuration_error', 'The timeline configuration is invalid.') }}</p>
+    {% else %}<p role="status">{{ labels.get('empty', 'No resources or time range.') }}</p>{% endif %}
+  </div>
+</section>
+{%- endmacro %}

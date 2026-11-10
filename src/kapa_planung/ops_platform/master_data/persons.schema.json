@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/persons.v1",
+  "title": "Person",
+  "description": "One person across all apps: contact, notification target and - when enabled - login. Field names follow the portal implementation (moved from Process Data's alert_users).",
+  "x-collection": "persons",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "id",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "active"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable person id (UUID); person groups and modules reference it (IAM-06)."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name - the only stored name."
+    },
+    "email": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Company e-mail; directory-owned after Entra binding, used for notifications and as second first-login match (people bound to another account are ignored)."
+    },
+    "upn": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Entra ID user principal name. Directory-owned after binding; before it an administrator may enter it to name the account to connect. Matched first on a Microsoft or card sign-in (IAM-07)."
+    },
+    "identities": {
+      "type": "array",
+      "description": "External identities, bound exactly once; preserve other providers.",
+      "items": {
+        "type": "object",
+        "required": [
+          "provider"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string",
+            "description": "Entra tenant UUID."
+          },
+          "subject": {
+            "type": "string",
+            "description": "Immutable Entra object UUID."
+          },
+          "boundAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "provider": {
+                  "const": "entra"
+                }
+              },
+              "required": [
+                "provider"
+              ]
+            },
+            "then": {
+              "required": [
+                "tenantId",
+                "subject",
+                "boundAt"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "notificationChannel": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Personal delivery preference: 'mail' or 'teams'. Portal new-person default is mail; missing/invalid values are delivery configuration failures, not a fallback to another channel."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Contact activity, independent of login_enabled; inactive contacts are excluded from notifications. Disabling a person disables login too; reactivation does not restore login. Never delete (references stay valid)."
+    },
+    "login_enabled": {
+      "type": "boolean",
+      "description": "Login allowed; a login needs active and login_enabled. Active contacts can receive notifications without login; removing/disabling login preserves contact activity and group membership. The portal sets it at the first Microsoft or card sign-in of a person that is not blocked."
+    },
+    "login_blocked": {
+      "type": "boolean",
+      "description": "Explicit sign-in block set by an administrator (Sign-in allowed unticked, Remove login) or for a directory leaver. Only this, or an inactive person, refuses a Microsoft or card sign-in; a login that was never enabled does not. Portal only."
+    },
+    "last_login_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last successful personal sign-in (any method). Portal only."
+    },
+    "last_login_method": {
+      "type": "string",
+      "enum": [
+        "entra",
+        "card",
+        "password"
+      ],
+      "description": "Method of last_login_at. Portal only."
+    },
+    "username": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Login name."
+    },
+    "username_key": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Case-folded username, unique."
+    },
+    "password_hash": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "scrypt hash; never returned by any API."
+    },
+    "must_change_password": {
+      "type": "boolean",
+      "description": "Force a password change at the next login."
+    },
+    "session_version": {
+      "type": "integer",
+      "description": "Incremented to revoke all sessions of the person."
+    },
+    "role_ids": {
+      "type": "array",
+      "description": "Protected platform capability markers (ROLE-systemadministrator, ROLE-admin) only; app grants live in person_app_access@1. Module role IDs were removed with portal 1.19."
+    },
+    "preferred_plant_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Last plant chosen in the plant switcher."
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "en",
+        "de",
+        "sk",
+        "cs",
+        "nl",
+        "hu"
+      ],
+      "description": "UI language chosen by the person (LNG-05); default en."
+    },
+    "entra_identity_key": {
+      "type": "string",
+      "description": "Unique tenant UUID + colon + object UUID; partial unique string index. Portal only."
+    },
+    "rfid_card_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Card number: Graph onPremisesExtensionAttributes.extensionAttribute9 for bound persons (formatting/leading zeros preserved), else entered by an administrator. Authenticates only on registered card terminals (IAM-17); never a grant or generic identity payload field."
+    },
+    "directory_synced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last successful Graph profile synchronization."
+    },
+    "rfid_card_source": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "directory",
+        "manual",
+        null
+      ],
+      "description": "Where rfid_card_id comes from. directory: extensionAttribute9, read-only in People. manual: entered by an administrator for a person without a directory card (e.g. externals); a directory card replaces it, an empty attribute keeps it. Missing: directory for bound persons, else manual. Portal only."
+    },
+    "rfid_card_key": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Comparable card number (letters/digits, upper case) for terminal lookup; portal only, never in identity payloads."
+    },
+    "cost_center": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Graph extensionAttribute1: SAP cost center. Directory-owned; data only."
+    },
+    "department_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Graph extensionAttribute3: SAP department (org unit) ID. Directory-owned; data only."
+    },
+    "job_title": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Graph jobTitle. Directory-owned; data only."
+    },
+    "job_title_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Graph extensionAttribute7: SAP job (position) ID. Directory-owned; data only."
+    },
+    "employee_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Graph employeeId: group-wide personnel number. Directory-owned; data only."
+    },
+    "personnel_number": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Current local personnel number (not the group-wide employee_id), typed on card terminals (decision 0034). Unique among persons that have one. Portal-owned until the directory provides it; never an authorization input."
+    },
+    "employee_type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Graph employeeType. Directory-owned; data only."
+    },
+    "company": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Graph companyName. Directory-owned; data only."
+    },
+    "directory_account_enabled": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Graph accountEnabled at the last sync. false disables login (IAM-18)."
+    },
+    "directory_licensed": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "A licence is assigned in Entra: the practical hint that the person uses Microsoft sign-in. Never an authorization input."
+    },
+    "provisioned_by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "How the portal created this person: from the directory by login, card or admin, or personnel_number (typed on a card terminal, not verified; decision 0034)."
+    },
+    "screen_navigation": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Full navigation on screens: with a card sign-in on a registered screen the person may leave the board (sidebar, other apps). Missing means true; the portal sets false for people created by a card. Microsoft and password sessions are never locked. Navigation only, never a grant."
+    },
+    "merged_into": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Person id this automatically created duplicate was merged into; the entry is inactive."
+    }
+  }
+}

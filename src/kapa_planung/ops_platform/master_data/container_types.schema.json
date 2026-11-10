@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/container_types.v1",
+  "title": "Container type",
+  "description": "Kind of load carrier, e.g. KLT 6415 or GLT.",
+  "x-collection": "container_types",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "structure",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "containerClass",
+    "name"
+  ],
+  "properties": {
+    "name": {
+      "description": "Display name.",
+      "type": "string"
+    },
+    "containerClass": {
+      "description": "e.g. 'KLT', 'GLT'.",
+      "type": "string"
+    },
+    "active": {
+      "description": "False instead of delete.",
+      "type": "boolean"
+    }
+  }
+}

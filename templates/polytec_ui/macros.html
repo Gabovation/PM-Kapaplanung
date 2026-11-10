@@ -1,0 +1,448 @@
+{% macro icon(name, label=None) -%}
+<svg class="pt-icon"{% if label %} role="img" aria-label="{{ label }}"{% else %} aria-hidden="true" focusable="false"{% endif %}>
+  <use href="#pt-icon-{{ name }}"></use>
+</svg>
+{%- endmacro %}
+
+{% macro button(label, variant="secondary", type="button", icon_name=None, id=None, name=None, value=None, disabled=false, action=None, confirm=None, confirm_title=None, loading_label=None, extra_class=None) -%}
+<button class="pt-button pt-button--{{ variant }}{% if extra_class %} {{ extra_class }}{% endif %}" type="{{ type }}"{% if id %} id="{{ id }}"{% endif %}{% if name %} name="{{ name }}"{% endif %}{% if value is not none %} value="{{ value }}"{% endif %}{% if disabled %} disabled{% endif %}{% if action %} data-pt-action="{{ action }}"{% endif %}{% if confirm %} data-pt-confirm="{{ confirm }}"{% endif %}{% if confirm_title %} data-pt-confirm-title="{{ confirm_title }}"{% endif %}{% if loading_label %} data-pt-loading-label="{{ loading_label }}"{% endif %}>
+  {% if icon_name %}{{ icon(icon_name) }}{% endif %}<span data-pt-button-label>{{ label }}</span>
+</button>
+{%- endmacro %}
+
+{% macro icon_button(label, icon_name, variant="subtle", id=None, disabled=false, dialog_open=None) -%}
+<button class="pt-icon-button pt-icon-button--{{ variant }}" type="button" aria-label="{{ label }}" title="{{ label }}"{% if id %} id="{{ id }}"{% endif %}{% if disabled %} disabled{% endif %}{% if dialog_open %} data-pt-dialog-open="{{ dialog_open }}"{% endif %}>{{ icon(icon_name) }}</button>
+{%- endmacro %}
+
+{% macro field(label, field_id, help=None, error=None, required=false) -%}
+<div class="pt-field">
+  <label class="pt-field__label" for="{{ field_id }}">{{ label }}{% if required %} <span aria-hidden="true">*</span><span class="pt-visually-hidden"> required</span>{% endif %}</label>
+  {{ caller() }}
+  {% if help %}<div class="pt-field__help" id="{{ field_id }}-help">{{ help }}</div>{% endif %}
+  {% if error %}<div class="pt-field__error" id="{{ field_id }}-error" role="alert">{{ error }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{# icon_only=true (needs icon_name): only the icon is drawn, for tight places such as cards; the label stays as
+   tooltip and for screen readers. #}
+{% macro status(label, tone="neutral", icon_name=None, icon_only=false) -%}
+{% set compact = icon_only and icon_name %}
+<span class="pt-status pt-status--{{ tone }}{% if compact %} pt-status--icon{% endif %}"{% if compact %} title="{{ label }}"{% endif %}>{% if icon_name %}{{ icon(icon_name) }}{% endif %}<span{% if compact %} class="pt-visually-hidden"{% endif %}>{{ label }}</span></span>
+{%- endmacro %}
+
+{# A real on/off control. Renders a checkbox so it is keyboard and form friendly; the visible
+   track and knob are drawn from the input's checked state. #}
+{% macro switch(label, id=None, name=None, checked=false, disabled=false, hide_label=false, extra_class=None) -%}
+<label class="pt-switch{% if extra_class %} {{ extra_class }}{% endif %}"{% if id %} for="{{ id }}"{% endif %}>
+  <input class="pt-switch__input" type="checkbox"{% if id %} id="{{ id }}"{% endif %}{% if name %} name="{{ name }}"{% endif %}{% if checked %} checked{% endif %}{% if disabled %} disabled{% endif %}>
+  <span class="pt-switch__track" aria-hidden="true"></span>
+  <span class="pt-switch__label{% if hide_label %} pt-visually-hidden{% endif %}">{{ label }}</span>
+</label>
+{%- endmacro %}
+
+{# One-click choice between a few mutually exclusive options. `options` is a list of
+   (value, label) pairs, or (value, label, tone) to colour the selected option. `name` must be
+   unique per group on the page; the rendered radios make arrow-key navigation work natively. #}
+{% macro segmented(label, name, options, selected=None, id=None, compact=false, full=false, disabled=false) -%}
+<div class="pt-segmented{% if compact %} pt-segmented--compact{% endif %}{% if full %} pt-segmented--full{% endif %}" role="group" aria-label="{{ label }}"{% if id %} id="{{ id }}"{% endif %}>
+  {%- for option in options %}
+  <label class="pt-segmented__option"{% if option|length > 2 and option[2] %} data-pt-tone="{{ option[2] }}"{% endif %}>
+    <input class="pt-segmented__input" type="radio" name="{{ name }}" value="{{ option[0] }}"{% if option[0] == selected %} checked{% endif %}{% if disabled %} disabled{% endif %}>
+    <span class="pt-segmented__label">{{ option[1] }}</span>
+  </label>
+  {%- endfor %}
+</div>
+{%- endmacro %}
+
+{% macro alert(message, tone="info", title=None) -%}
+<div class="pt-alert pt-alert--{{ tone }}" role="{% if tone == 'danger' %}alert{% else %}status{% endif %}">{% if title %}<strong>{{ title }}</strong>{% endif %}<span>{{ message }}</span></div>
+{%- endmacro %}
+
+{# size: "confirm" (default), "form", "wide" or "side" (drawer at the right edge for editing one
+   record beside its list). close_label adds a header close button; give it for "side". #}
+{% macro dialog(dialog_id, title, description=None, form=false, size=None, close_label=None) -%}
+{%- set _size = size or ("form" if form else "confirm") -%}
+{%- set _title %}<h2 class="pt-dialog__title" id="{{ dialog_id }}-title">{{ title }}</h2>{% endset -%}
+<dialog class="pt-dialog{% if _size != 'confirm' %} pt-dialog--{{ _size }}{% endif %}" id="{{ dialog_id }}" aria-labelledby="{{ dialog_id }}-title"{% if description %} aria-describedby="{{ dialog_id }}-description"{% endif %}>
+  <div class="pt-dialog__body">{% if close_label %}<div class="pt-dialog__header">{{ _title }}<button class="pt-icon-button pt-icon-button--subtle" type="button" aria-label="{{ close_label }}" title="{{ close_label }}" data-pt-dialog-close>{{ icon("close") }}</button></div>{% else %}{{ _title }}{% endif %}{% if description %}<p id="{{ dialog_id }}-description">{{ description }}</p>{% endif %}{{ caller() }}</div>
+</dialog>
+{%- endmacro %}
+
+{# address=true: the address keeps the open tab (#panel-id), so reload and Back return to it, and a link to an
+   element inside a hidden panel opens that panel first. Use it for the tabs of a record page. #}
+{% macro tabs(label, id=None, address=false) -%}
+<div class="pt-tabs" role="tablist" aria-label="{{ label }}"{% if id %} id="{{ id }}"{% endif %} data-pt-tabs{% if address %} data-pt-tabs-address{% endif %}>{{ caller() }}</div>
+{%- endmacro %}
+
+{# The bar of a record page: its tabs and, beside them, an optional scope_select(). #}
+{% macro record_bar() -%}
+<div class="pt-record-bar">{{ caller() }}</div>
+{%- endmacro %}
+
+{# One record shown for one of several scopes at a time (e.g. the SAP plant of an article). Blocks marked
+   data-pt-scope="<value>" show only for the chosen value; without JavaScript all of them show. Render it only
+   when there is more than one scope. `options` are (value, label) pairs. #}
+{% macro scope_select(label, options, id="record-scope") -%}
+<label class="pt-scope-select" for="{{ id }}"><span class="pt-scope-select__label">{{ label }}</span><select class="pt-select" id="{{ id }}" data-pt-scope-select data-pt-search="off">{% for value, text in options %}<option value="{{ value }}">{{ text }}</option>{% endfor %}</select></label>
+{%- endmacro %}
+
+{# A hierarchy path (16016203 › 16013494 › 16012102) of quiet links. Each item: text, href, optional title
+   (shown on hover, e.g. the short text) and current=true for the item the row is about. #}
+{% macro path(items, label="Path") -%}
+<span class="pt-path" role="group" aria-label="{{ label }}">{% for item in items %}{% if not loop.first %}<span class="pt-path__sep" aria-hidden="true">›</span>{% endif %}<a class="pt-link-quiet{% if item.current %} pt-link-quiet--current{% endif %}" href="{{ item.href }}"{% if item.title %} title="{{ item.title }}"{% endif %}{% if item.current %} aria-current="true"{% endif %}>{{ item.text }}</a>{% endfor %}</span>
+{%- endmacro %}
+
+{# Search terms of a list search: the committed terms as hidden inputs `name`, next to an
+   <input type="search" data-pt-search-terms="name">. Enter turns the typed text into a term; "quoted" parts
+   become terms of their own. The server combines all terms with AND and shows each as a filter chip. #}
+{% macro search_terms(name, terms) -%}
+{%- for term in terms %}<input type="hidden" name="{{ name }}" value="{{ term }}">{% endfor -%}
+{%- endmacro %}
+
+{% macro tab(label, panel_id, active=false, icon_name=None, id=None) -%}
+<button class="pt-tab" type="button" role="tab" id="{{ id or panel_id ~ '-tab' }}" aria-controls="{{ panel_id }}" aria-selected="{{ 'true' if active else 'false' }}" tabindex="{{ '0' if active else '-1' }}">{% if icon_name %}{{ icon(icon_name) }}{% endif %}<span>{{ label }}</span></button>
+{%- endmacro %}
+
+{% macro tab_panel(panel_id, active=false, labelled_by=None) -%}
+<div class="pt-tab-panel" role="tabpanel" id="{{ panel_id }}" aria-labelledby="{{ labelled_by or panel_id ~ '-tab' }}"{% if not active %} hidden{% endif %}>{{ caller() }}</div>
+{%- endmacro %}
+
+{# cards=true: below 64rem (phones, tablets) every row becomes a card. Cells say their place with
+   data-pt-card: "key" (top left; its first link opens the row), "badge" (top right), "title" (full width),
+   "meta" (small labelled value, label from data-label), "actions" (bottom right), "hide" (not shown).
+   Structured card: instead of "meta", "line" (full width, one child per line: an icon and a text that is cut with an
+   ellipsis when too long) and "foot" (small footer: any children, the last one at the end), with "actions" beside it. #}
+{% macro table(label, fit_content=false, cards=false, scroll=false) -%}
+<div class="pt-table-wrap{% if fit_content %} pt-table-wrap--content{% endif %}{% if cards %} pt-table-wrap--cards{% endif %}{% if scroll %} pt-table-wrap--scroll{% endif %}" role="region" aria-label="{{ label }}" tabindex="0"><table class="pt-table">{{ caller() }}</table></div>
+{%- endmacro %}
+
+{# A full work area. Place heading/filters in __toolbar and table/count/paging in __results.
+   The shell owns the outer viewport; only scroll=true tables inside the results scroll. #}
+{% macro table_workspace(label) -%}
+<section class="pt-table-workspace" aria-label="{{ label }}">{{ caller() }}</section>
+{%- endmacro %}
+
+{# One action position for every full list. The editor moves its single toolbar into this slot. #}
+{% macro table_heading(title, level=1) -%}
+{% set level = level if level in [1, 2, 3, 4, 5, 6] else 1 %}
+<div class="pt-table-heading"><h{{ level }} class="pt-table-heading__title">{{ title }}</h{{ level }}><div class="pt-table-heading__actions"><span data-pt-table-actions></span><span data-pt-table-create>{{ caller() }}</span></div></div>
+{%- endmacro %}
+
+{# Header of every page below a navigation destination (detail, form, sub-page): Back top left, the caller's
+   actions top right, the title below. Navigation destinations themselves have no back_url. #}
+{% macro page_header(title, back_url=None, back_label="Back", level=1) -%}
+{% set level = level if level in [1, 2, 3, 4, 5, 6] else 1 %}
+<header class="pt-page-header">
+  {% if back_url or caller %}<div class="pt-page-header__bar">
+    {% if back_url %}<a class="pt-button pt-button--subtle pt-page-header__back" href="{{ back_url }}">{{ icon("back") }}<span>{{ back_label }}</span></a>{% endif %}
+    {% if caller %}<div class="pt-page-header__actions">{{ caller() }}</div>{% endif %}
+  </div>{% endif %}
+  <h{{ level }} class="pt-page-header__title">{{ title }}</h{{ level }}>
+</header>
+{%- endmacro %}
+
+{# Rarely needed actions of a page behind one "More" (⋯) button, last in the page header's actions. The caller
+   supplies links and forms with button(); destructive ones keep their confirm. #}
+{% macro action_menu(label="More", id=None) -%}
+<details class="pt-action-menu"{% if id %} id="{{ id }}"{% endif %} data-pt-action-menu>
+  <summary class="pt-button pt-button--secondary pt-action-menu__toggle" aria-label="{{ label }}" title="{{ label }}">{{ icon("more") }}</summary>
+  <div class="pt-action-menu__panel">{{ caller() }}</div>
+</details>
+{%- endmacro %}
+
+{# Active filters above a list: one removable chip per value, grouped by filter. `chips` is the result of
+   ops_platform.list_views.filter_chips(). The region refreshes with the list (stable id). #}
+{% macro filter_chips(id, chips, label="Active filters") -%}
+<div class="pt-list-chips" id="{{ id }}" role="group" aria-label="{{ label }}" data-pt-live-results>
+{%- for group in chips.groups %}<span class="pt-list-chips__group"><span class="pt-list-chips__label">{{ group.label }}:</span>{% for item in group['items'] %}<a class="pt-list-chip" href="{{ item.remove_url }}" aria-label="{{ item.remove_label }}" title="{{ item.remove_label }}">{{ item.text }}{{ icon('close') }}</a>{% endfor %}</span>{% endfor -%}
+{%- if chips.groups %}<a class="pt-button pt-button--subtle" href="{{ chips.clear_url }}">Clear filters</a>{% endif -%}
+</div>
+{%- endmacro %}
+
+{% macro view_manager(id, view) -%}
+{% include 'polytec_ui/list-views.html' %}
+{%- endmacro %}
+
+{% macro column_header(label, key, href=none, direction=none) -%}
+<th data-pt-column="{{ key }}"{% if direction %} aria-sort="{{ 'descending' if direction == 'desc' else 'ascending' }}"{% endif %}>{% if href %}<a class="pt-table__sort" href="{{ href }}">{{ label }}{% if direction %}{{ icon('arrow-down' if direction == 'desc' else 'arrow-up') }}{% endif %}</a>{% else %}{{ label }}{% endif %}</th>
+{%- endmacro %}
+
+{# Progressive enhancement: detail links remain available without JS. Edit controls are rendered only
+   in edit mode (editing=true, editable_cell(editable=...) for the rows a person may change); read mode
+   stays plain text. mode_url renders the same list page in the other mode: with edit mode on from read
+   mode, without it from edit mode. Each editable row supplies a same-origin data-pt-row-url,
+   data-pt-row-etag and an error node in both modes; apps still own validation. #}
+{% macro table_editor(id, csrf_token, mode_url, editing=false) -%}
+<form id="{{ id }}" class="pt-table-editor" data-pt-table-editor data-pt-table-editing="{{ 'true' if editing else 'false' }}" data-pt-table-mode-url="{{ mode_url }}" data-pt-guard-dirty novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="pt-table-editor__toolbar" data-pt-ignore-dirty>
+    <button class="pt-button pt-button--secondary" type="button" data-pt-table-toggle aria-pressed="false" hidden>{{ icon("edit") }}<span>Edit mode</span></button>
+    <button class="pt-button pt-button--secondary" type="button" data-pt-table-cancel data-pt-action="cancel" data-pt-guard-form="{{ id }}" hidden>Cancel</button>
+    <button class="pt-button pt-button--primary" type="button" data-pt-table-save hidden>{{ icon("save") }}<span data-pt-button-label>Save changes</span></button>
+    <span class="pt-table-editor__status" data-pt-table-status role="status" aria-live="polite"></span>
+  </div>
+  {{ caller() }}
+</form>
+{%- endmacro %}
+
+{% macro editable_cell(field, label, value, editable=true, display=none, kind="text", options=[], required=false, maxlength=240) -%}
+<span data-pt-cell-read>{{ display if display is not none else (value if value is not none else '—') }}</span>
+{% if editable %}<span class="pt-table-editor__control" data-pt-cell-edit hidden>
+{% if kind == 'select' or kind == 'multiple' %}
+<select class="pt-select" name="{{ field }}" data-pt-row-field="{{ field }}" aria-label="{{ label }}"{% if kind == 'multiple' %} multiple data-pt-search{% endif %}{% if required %} required{% endif %} disabled>{% for key, text in options %}<option value="{{ key }}"{% if (kind == 'multiple' and key in value) or (kind == 'select' and key|string == value|string) %} selected{% endif %}>{{ text }}</option>{% endfor %}</select>
+{% elif kind == 'switch' %}<label class="pt-switch"><input class="pt-switch__input" type="checkbox" name="{{ field }}" data-pt-row-field="{{ field }}" aria-label="{{ label }}" value="on"{% if value %} checked{% endif %} disabled><span class="pt-switch__track" aria-hidden="true"></span></label>
+{% elif kind == 'textarea' %}<textarea class="pt-textarea pt-textarea--compact" name="{{ field }}" data-pt-row-field="{{ field }}" aria-label="{{ label }}" rows="2" maxlength="{{ maxlength }}"{% if required %} required{% endif %} disabled>{{ value if value is not none else '' }}</textarea>
+{% else %}<input class="pt-input" name="{{ field }}" data-pt-row-field="{{ field }}" aria-label="{{ label }}" value="{{ value if value is not none else '' }}" type="{{ kind }}" maxlength="{{ maxlength }}"{% if required %} required{% endif %} disabled>{% endif %}
+</span>{% endif %}
+{%- endmacro %}
+
+{# Column head that sorts the table on the server: a link to the list sorted by this column. `direction` is "asc" or
+   "desc" for the column the list is sorted by now (it shows an arrow and sets aria-sort), else none. `href` already
+   asks for the opposite direction. Tables shown as cards have no heads; offer a sort select there. #}
+{% macro sort_header(label, href, direction=None) -%}
+<th aria-sort="{{ 'ascending' if direction == 'asc' else 'descending' if direction == 'desc' else 'none' }}"><a class="pt-table__sort" href="{{ href }}">{{ label }}{% if direction %}{{ icon("arrow-up" if direction == "asc" else "arrow-down") }}{% endif %}</a></th>
+{%- endmacro %}
+
+{% macro filter_bar(label) -%}
+<div class="pt-filter-bar" role="group" aria-label="{{ label }}" data-pt-ignore-dirty>{{ caller() }}</div>
+{%- endmacro %}
+
+{# All filters of a list (filter bars, filter_more). On phones they stay behind a Filters button until
+   opened; the choice is kept for the browser session so an autosubmitted list stays open. `active` is
+   the number of set filters, shown on the button. `id` must be unique on the page. #}
+{% macro filter_panel(id="filters", active=0, toggle_label="Filters") -%}
+<div class="pt-filter-panel" id="{{ id }}" data-pt-filter-panel>
+  <button class="pt-button pt-button--secondary pt-filter-panel__toggle" type="button" aria-expanded="false" aria-controls="{{ id }}-body">{{ icon("filter") }}<span>{{ toggle_label }}</span>{% if active %}<span class="pt-filter-panel__count">{{ active }}</span>{% endif %}</button>
+  <div class="pt-filter-panel__body" id="{{ id }}-body">{{ caller() }}</div>
+</div>
+{%- endmacro %}
+
+{# Rarely used filters of a list, folded below the filter bar; open while one of them is set (`active`).
+   `popover=true` floats the fields over the page in a compact grid instead (closes on a click outside or Escape,
+   never opens by itself; `active` only counts on the button), so a full-height board does not move. #}
+{% macro filter_more(label="More filters", active=0, popover=false, align="end") -%}
+<details class="pt-filter-more{% if popover %} pt-filter-more--popover{% if align == "start" %} pt-filter-more--start{% endif %}{% endif %}"{% if popover %} data-pt-action-menu{% elif active %} open{% endif %}>
+  <summary class="pt-button pt-button--secondary">{{ icon("filter") }}<span>{{ label }}{% if active %} ({{ active }}){% endif %}</span></summary>
+  <div class="pt-filter-bar" role="group" aria-label="{{ label }}" data-pt-ignore-dirty>{{ caller() }}</div>
+</details>
+{%- endmacro %}
+
+{# Matrix contents and valid choices belong to the app; filtering and bulk selection do not. #}
+{% macro access_matrix(label) -%}
+<div class="pt-access-matrix" data-pt-matrix aria-label="{{ label }}">{{ caller() }}</div>
+{%- endmacro %}
+
+{# Rows the person can reorder by dragging the handle or with the arrows (behaviour: data-pt-sortable).
+   `data-pt-sortable` goes on the table, `data-pt-sort-list="<group>"` on each tbody that holds items,
+   `data-pt-sort-item` on the movable rows. Hidden inputs in a row keep the result for the form:
+   `data-pt-sort-order-output` (position) and `data-pt-sort-group-output` (the tbody's group). A group head row
+   (`data-pt-sort-list-head`) may carry `sort_controls(list=true)` and `data-pt-sort-list-output` to move the group. #}
+{% macro sort_controls(drag="Drag to move", up="Move up", down="Move down", list=false) -%}
+<span class="pt-sort-controls">{% if not list %}<button class="pt-icon-button pt-icon-button--subtle" type="button" data-pt-sort-handle aria-label="{{ drag }}" title="{{ drag }}">{{ icon("grip") }}</button>{% endif %}<button class="pt-icon-button pt-icon-button--subtle" type="button" data-pt-sort-move="up" aria-label="{{ up }}" title="{{ up }}">{{ icon("arrow-up") }}</button><button class="pt-icon-button pt-icon-button--subtle" type="button" data-pt-sort-move="down" aria-label="{{ down }}" title="{{ down }}">{{ icon("arrow-down") }}</button></span>
+{%- endmacro %}
+
+{# Grid of icon toggles where one click sets a cell and a drag across cells fills a range, like in a spreadsheet
+   (behaviour: data-pt-grid). `toggles` is a list of `(state, label, icon, tone)` with tone "primary" or "neutral";
+   pressing the active toggle again returns the cell to `default`. Put a `.pt-table` inside; mark each row
+   `data-pt-grid-row` and add `grid_cell(column, state)` per column: the script puts the toggles into the cells, so
+   large grids stay small in the page. Buttons in a row head or column head (`data-pt-grid-row-head`,
+   `data-pt-grid-col-head`, `grid_toggles(toggles)`) set the whole row or column. Each row needs
+   `<input type="hidden" data-pt-grid-output name="...">`; after a change it holds `column=state` for every cell
+   that differs from `default`, separated by spaces. Give the grid an `id` and a `<select multiple
+   data-pt-grid-columns="<id>">` (options = column ids) anywhere on the page to let people choose the columns that
+   are shown; row and column actions then only reach the shown columns. #}
+{% macro grid(label, default, toggles, id=None) -%}
+<div class="pt-table-wrap pt-grid"{% if id %} id="{{ id }}"{% endif %} data-pt-grid data-pt-grid-default="{{ default }}" role="region" aria-label="{{ label }}" tabindex="0"><template data-pt-grid-toggles>{{ grid_toggles(toggles) }}</template>{{ caller() }}</div>
+{%- endmacro %}
+
+{% macro grid_toggles(toggles) -%}
+<span class="pt-grid__toggles">{% for state, label, icon_name, tone in toggles %}<button class="pt-icon-button pt-grid__toggle pt-grid__toggle--{{ tone }}" type="button" data-pt-grid-set="{{ state }}" aria-pressed="false" aria-label="{{ label }}" title="{{ label }}">{{ icon(icon_name) }}</button>{% endfor %}</span>
+{%- endmacro %}
+
+{% macro grid_cell(column, state) -%}
+<td class="pt-grid__cell" data-pt-grid-cell data-pt-grid-col="{{ column }}" data-pt-grid-state="{{ state }}"></td>
+{%- endmacro %}
+
+{# Record views (master data, equipment, orders): a white card per field group with a heading, and inside it
+   properties() - a fixed number of columns (2, 3 or 4) that only collapses at the tablet and phone breakpoints,
+   so every field keeps its place on wide screens. property(label, value) or {% call property(label) %}. Empty
+   values show a muted "–". `wide` spans the whole row (long texts). `meta` is short text or a status after the title. #}
+{% macro record_section(title, id=None, level=2, meta=None) -%}
+<section class="pt-card pt-record-section"{% if id %} id="{{ id }}" aria-labelledby="{{ id }}-title"{% endif %}>
+  <h{{ level }} class="pt-record-section__title"{% if id %} id="{{ id }}-title"{% endif %}>{{ title }}{% if meta %} <span class="pt-record-section__meta">{{ meta }}</span>{% endif %}</h{{ level }}>
+  {{ caller() }}
+</section>
+{%- endmacro %}
+
+{% macro properties(columns=4) -%}
+<dl class="pt-properties pt-properties--{{ columns if columns in (2, 3, 4) else 4 }}">{{ caller() }}</dl>
+{%- endmacro %}
+
+{% macro property(label, value=None, wide=false) -%}
+{%- if caller is defined -%}{%- set content = caller() -%}{%- else -%}{%- set content = value -%}{%- endif -%}
+<div class="pt-property{% if wide %} pt-property--wide{% endif %}"><dt class="pt-property__label">{{ label }}</dt><dd class="pt-property__value">{% if content is none or (content|string|trim) == "" %}<span class="pt-property__empty">–</span>{% else %}{{ content }}{% endif %}</dd></div>
+{%- endmacro %}
+
+{% macro empty_state(title, message, icon_name="info") -%}
+<section class="pt-empty-state">{{ icon(icon_name) }}<h2>{{ title }}</h2><p>{{ message }}</p>{{ caller() if caller is defined else '' }}</section>
+{%- endmacro %}
+
+{# Short explanation behind a "?" button: shown on hover and keyboard focus, closed with Escape.
+   Working screens explain figures here instead of in sentences on the page. `help_id` must be
+   unique on the page. `icon_name` swaps the "?" for another sign, e.g. "comment" for a note
+   shown on hover in a table row. #}
+{% macro help(text, help_id, label="Help", icon_name="help") -%}
+<span class="pt-help"><button class="pt-help__trigger" type="button" aria-label="{{ label }}" aria-describedby="{{ help_id }}">{{ icon(icon_name) }}</button><span class="pt-help__bubble" role="tooltip" id="{{ help_id }}">{{ text }}</span></span>
+{%- endmacro %}
+
+{# accent: "brand", "neutral" or "success" - the colour the page's charts use for the same figure.
+   detail: (label, value) of a second figure that belongs to the main one; use it or trend, not both. #}
+{% macro kpi_card(label, value, unit=None, trend=None, trend_tone="neutral", icon_name=None, help_text=None, help_id=None, accent=None, detail=None) -%}
+<div class="pt-kpi-card{% if accent %} pt-kpi-card--accent-{{ accent }}{% endif %}">
+  <div class="pt-kpi-card__head">{% if icon_name %}{{ icon(icon_name) }}{% endif %}<span>{{ label }}</span>{% if help_text %}{{ help(help_text, help_id or "kpi-help-" ~ (label|lower|replace(" ", "-"))) }}{% endif %}</div>
+  <strong class="pt-kpi-card__value">{{ value }}{% if unit %}<small class="pt-kpi-card__unit">{{ unit }}</small>{% endif %}</strong>
+  {% if trend %}<span class="pt-kpi-card__trend pt-kpi-card__trend--{{ trend_tone }}">{{ trend }}</span>{% endif %}
+  {% if detail %}<span class="pt-kpi-card__detail"><span>{{ detail[0] }}</span><strong>{{ detail[1] }}</strong></span>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro board(title, id=None) -%}
+<section class="pt-board"{% if id %} id="{{ id }}"{% endif %}>
+  <div class="pt-board__header"><h2 class="pt-board__title">{{ title }}</h2><div class="pt-board__actions">{{ caller("actions") }}</div></div>
+  {{ caller("body") }}
+</section>
+{%- endmacro %}
+
+{% macro tile(title, id=None, centered=false, out_of_bounds=false, tone=None) -%}
+<article class="pt-tile{% if tone in ("success", "danger", "warning") %} pt-tile--{{ tone }}{% endif %}{% if out_of_bounds %} is-out-of-bounds{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+  <div class="pt-tile__header"><span class="pt-tile__title" title="{{ title }}">{{ title }}</span><div class="pt-tile__actions">{{ caller("actions") }}</div></div>
+  <div class="pt-tile__body{% if centered %} pt-tile__body--centered{% endif %}">{{ caller("body") }}</div>
+</article>
+{%- endmacro %}
+
+{% macro tile_action(label, icon_name, extra_class=None) -%}
+<button class="pt-tile__action{% if extra_class %} {{ extra_class }}{% endif %}" type="button" aria-label="{{ label }}" title="{{ label }}">{{ icon(icon_name) }}</button>
+{%- endmacro %}
+
+{# Static gauge for server-rendered pages. Applications animate the same markup by updating
+   the value arc's stroke-dasharray, the reading text and the markers' rotate() transforms.
+   low/high draw the alarm bounds; setpoint the target. #}
+{% macro gauge(value, min, max, setpoint=None, low=None, high=None, label=None, out_of_bounds=false) -%}
+{%- set span = (max - min) if max > min else 1 -%}
+{%- set fraction = ((value - min) / span) if value is not none else 0 -%}
+{%- set fraction = 0 if fraction < 0 else (1 if fraction > 1 else fraction) -%}
+{%- set direction = ('↓' if low is not none and value < low else ('↑' if high is not none and value > high else ('!' if out_of_bounds else ''))) if value is not none else '' -%}
+<div class="pt-gauge{% if direction %} is-out-of-bounds{% endif %}{% if value is none %} is-empty{% endif %}"{% if label %} role="img" aria-label="{{ label }}: {{ (direction ~ ' ') if direction else '' }}{{ value if value is not none else 'no value' }}"{% endif %}>
+  <svg class="pt-gauge__svg" viewBox="0 0 200 124" aria-hidden="true" focusable="false">
+    <path class="pt-gauge__track" d="M20 100 A80 80 0 0 1 180 100"></path>
+    <path class="pt-gauge__value" d="M20 100 A80 80 0 0 1 180 100" stroke-dasharray="{{ '%.2f'|format(fraction * 251.33) }} 251.33"></path>
+    {%- if low is not none and low >= min and low <= max %}
+    <line class="pt-gauge__marker pt-gauge__marker--min" x1="100" y1="28" x2="100" y2="10" transform="rotate({{ '%.1f'|format(-90 + 180 * (low - min) / span) }} 100 100)"></line>
+    {%- endif %}
+    {%- if high is not none and high >= min and high <= max %}
+    <line class="pt-gauge__marker pt-gauge__marker--max" x1="100" y1="28" x2="100" y2="10" transform="rotate({{ '%.1f'|format(-90 + 180 * (high - min) / span) }} 100 100)"></line>
+    {%- endif %}
+    {%- if setpoint is not none and setpoint >= min and setpoint <= max %}
+    <line class="pt-gauge__marker" x1="100" y1="32" x2="100" y2="8" transform="rotate({{ '%.1f'|format(-90 + 180 * (setpoint - min) / span) }} 100 100)"></line>
+    {%- endif %}
+    <text class="pt-gauge__reading" x="100" y="98" text-anchor="middle">{{ (direction ~ ' ') if direction else '' }}{{ value if value is not none else '--' }}</text>
+    <text class="pt-gauge__bound" x="12" y="118" text-anchor="start">{{ min }}</text>
+    <text class="pt-gauge__bound" x="188" y="118" text-anchor="end">{{ max }}</text>
+  </svg>
+</div>
+{%- endmacro %}
+
+{# Large selectable cards to choose one of a few records on a touch screen, e.g. one of the last
+   three shots. `options` is a list of dicts: value, title, lines (list of short texts), status
+   ((label, tone[, icon])) and disabled. Real radio inputs: arrow keys move, the form posts `name`.
+   The chosen card shows a thicker border and a check mark, never colour alone. #}
+{% macro choice_cards(label, name, options, selected=None, id=None, compact=false) -%}
+<div class="pt-choice-cards{% if compact %} pt-choice-cards--compact{% endif %}" role="radiogroup" aria-label="{{ label }}"{% if id %} id="{{ id }}"{% endif %}>
+  {%- for option in options %}
+  <label class="pt-choice-card">
+    <input class="pt-choice-card__input" type="radio" name="{{ name }}" value="{{ option.value }}"{% if option.value == selected %} checked{% endif %}{% if option.disabled %} disabled{% endif %}>
+    <span class="pt-choice-card__body">
+      <span class="pt-choice-card__title">{{ option.title }}</span>
+      {%- for line in option.lines|default([]) %}<span class="pt-choice-card__line">{{ line }}</span>{% endfor %}
+      {%- if option.status %}{{ status(option.status[0], option.status[1], option.status[2] if option.status|length > 2 else None) }}{% endif %}
+    </span>
+    <span class="pt-choice-card__check" aria-hidden="true">{{ icon("check") }}</span>
+  </label>
+  {%- endfor %}
+</div>
+{%- endmacro %}
+
+{# Outcome of an action that keeps the page (printed, saved, failed). Script fills it with
+   showPolytecResult(element, message, {tone, title, timeout}); success hides itself again. #}
+{% macro result_banner(id) -%}
+<div class="pt-result" id="{{ id }}" data-pt-result role="status" aria-live="polite" hidden></div>
+{%- endmacro %}
+
+{# The messages Flask flashed for this page (flash(message, category)), once in the layout instead of
+   an own loop per app. "error"/"danger" and "warning" stay as alerts in the page until it changes;
+   "success" and "info" (and uncategorised "message") appear as toasts at the top right that hide
+   after 5 s or on click (polytec-ui.js). #}
+{% macro flash_messages() -%}
+{%- set _messages = get_flashed_messages(with_categories=true) -%}
+{%- for category, message in _messages if category in ("error", "danger", "warning") %}{{ alert(message, "warning" if category == "warning" else "danger") }}{% endfor -%}
+{%- set _brief = _messages|rejectattr(0, "in", ["error", "danger", "warning"])|list -%}
+{%- if _brief %}<div class="pt-toasts" data-pt-toasts role="status" aria-live="polite">{% for category, message in _brief %}{% set _tone = "success" if category == "success" else "info" %}<div class="pt-toast pt-toast--{{ _tone }}" data-pt-toast>{{ icon("check" if _tone == "success" else "info") }}<span>{{ message }}</span></div>{% endfor %}</div>{% endif -%}
+{%- endmacro %}
+
+{# What a widget or tile shows instead of data: kind is loading, empty, stale, error, forbidden or
+   signed-out. Fills the tile; the icon names the state, the message says what to do. #}
+{% macro widget_state(kind, message, title=None) -%}
+{%- set _icons = {"loading": "refresh", "empty": "info", "stale": "history", "error": "warning", "forbidden": "eye-off", "signed-out": "user"} -%}
+<section class="pt-widget-state pt-widget-state--{{ kind }}" role="{{ 'alert' if kind == 'error' else 'status' }}"{% if kind == 'loading' %} aria-busy="true"{% endif %}>{{ icon(_icons.get(kind, "info")) }}{% if title %}<strong>{{ title }}</strong>{% endif %}<span>{{ message }}</span>{{ caller() if caller is defined else '' }}</section>
+{%- endmacro %}
+
+{# Age of a reading ("2 min ago"), kept current by script in the page language. `value` is an ISO
+   8601 time with offset; `text` is shown until script runs and as tooltip. stale_after (seconds)
+   marks the time as stale (warning colour and icon) once it is older. #}
+{% macro relative_time(value, text, stale_after=None) -%}
+<time class="pt-relative-time" datetime="{{ value }}" title="{{ text }}" data-pt-relative-time{% if stale_after %} data-pt-stale-after="{{ stale_after|int }}"{% endif %}>{{ icon("history") }}<span>{{ text }}</span></time>
+{%- endmacro %}
+
+{# The current time, 24 h with seconds, ticking every second - for screens where people compare
+   it with the times of events (e.g. the last shots). Format event times with
+   formatPolytecClockTime() so both read the same. #}
+{% macro clock(label="Now", id=None) -%}
+<div class="pt-clock"{% if id %} id="{{ id }}"{% endif %}><span class="pt-clock__label">{{ label }}</span><time class="pt-clock__time" data-pt-clock>--:--:--</time></div>
+{%- endmacro %}
+
+{# A small whole number set with - and + on a touch screen (e.g. labels per print). Real number
+   input inside, so typing and forms work; the buttons stay within min/max and fire input/change.
+   decrease_label/increase_label name the buttons for screen readers. #}
+{% macro stepper(label, name, value=1, min=1, max=10, id=None, decrease_label="Fewer", increase_label="More") -%}
+{%- set _id = id or "stepper-" ~ name -%}
+<div class="pt-stepper" data-pt-stepper>
+  <label class="pt-stepper__label" for="{{ _id }}">{{ label }}</label>
+  <div class="pt-stepper__control">
+    <button class="pt-stepper__button" type="button" data-pt-stepper-step="-1" aria-label="{{ decrease_label }}" aria-controls="{{ _id }}">−</button>
+    <input class="pt-input pt-stepper__input" id="{{ _id }}" name="{{ name }}" type="number" inputmode="numeric" min="{{ min|int }}" max="{{ max|int }}" step="1" value="{{ value|int }}">
+    <button class="pt-stepper__button" type="button" data-pt-stepper-step="1" aria-label="{{ increase_label }}" aria-controls="{{ _id }}">+</button>
+  </div>
+</div>
+{%- endmacro %}
+{% macro keypad(label, name, id=None, maxlength=None, pattern=None, required=false, clear_label="Clear", delete_label="Delete") -%}
+{%- set _id = id or "keypad-" ~ name -%}
+<div class="pt-keypad" data-pt-keypad>
+  <label class="pt-keypad__label" for="{{ _id }}">{{ label }}</label>
+  <input class="pt-input pt-keypad__display" id="{{ _id }}" name="{{ name }}" type="text" inputmode="none" autocomplete="off"{% if maxlength %} maxlength="{{ maxlength|int }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}{% if required %} required{% endif %}>
+  <div class="pt-keypad__keys" role="group" aria-label="{{ label }}">
+    {%- for digit in "123456789" %}<button class="pt-keypad__key" type="button" data-pt-keypad-key="{{ digit }}" aria-controls="{{ _id }}">{{ digit }}</button>{% endfor -%}
+    <button class="pt-keypad__key pt-keypad__key--secondary" type="button" data-pt-keypad-clear aria-controls="{{ _id }}">{{ clear_label }}</button>
+    <button class="pt-keypad__key" type="button" data-pt-keypad-key="0" aria-controls="{{ _id }}">0</button>
+    <button class="pt-keypad__key pt-keypad__key--secondary" type="button" data-pt-keypad-delete aria-label="{{ delete_label }}" aria-controls="{{ _id }}">⌫</button>
+  </div>
+</div>
+{%- endmacro %}
+{% macro schedule_board(label, days, lanes, backlog=[], empty_text="No items", labels={}, backlog_position='top', drag_surface='default', dense=false, show_label=true, fill=false) -%}
+{% from "polytec_ui/schedule-board.html" import board %}{{ board(label, days, lanes, backlog, empty_text, labels, backlog_position, drag_surface, dense, show_label, fill) }}
+{%- endmacro %}
+{% macro time_board(label, start, end, ticks, lanes, backlog=[], step_minutes=15, timezone="UTC", locale="en", labels={}, options={}) -%}
+{% from "polytec_ui/time-board.html" import board %}{{ board(label, start, end, ticks, lanes, backlog, step_minutes, timezone, locale, labels, options) }}
+{%- endmacro %}
+{% macro planning_grid(id, title, days, rows, labels={}, caller=none) -%}
+{% from "polytec_ui/planning-grid.html" import grid %}{{ grid(id, title, days, rows, labels, caller) }}
+{%- endmacro %}

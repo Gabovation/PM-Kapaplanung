@@ -1,10 +1,10 @@
-﻿# Projekthandbuch – Kapazitätsplanung
+# Projekthandbuch – Kapazitätsplanung
 
 ## Zweck und Umfang
 Die lokale Anwendung unterstützt die projektübergreifende Kapazitätsplanung. Projekte besitzen eine Nummer, einen Namen, den Status gewonnen oder erwartet, eine verantwortliche Person, ein Basisbudget und fünf Gate-Termine. Rollen sind frei beschreibbar; zunächst ist je Projekt eine Person zugeordnet. Weitere Fachbereiche und mehrere Zuordnungen je Projekt benötigen eine spätere Erweiterung.
 
 ## Start
-Python 3.11 oder neuer ist erforderlich, zusätzliche Pakete sind nicht nötig. Im Projektordner `python server.py` ausführen. Der Browser öffnet sich automatisch; das Terminal muss geöffnet bleiben. Beenden mit Strg+C. Standardmäßig wählt das Betriebssystem einen freien lokalen Port. Optional kann mit `KAPA_PORT` ein fester Port eingestellt werden (PowerShell: `$env:KAPA_PORT=5123; python server.py`). Der Server bindet ausschließlich an 127.0.0.1. Bei fest eingestelltem belegtem Port schlägt der Start sichtbar fehl. Mehrere verschiedene Apps können so parallel laufen. Die Anwendung ist für einen lokalen Benutzer gedacht, nicht für gleichzeitige Bearbeitung durch mehrere Browser oder Benutzer.
+Python 3.11 oder neuer ist erforderlich. Die Abhängigkeiten stehen in `requirements.txt` und werden mit `python -m pip install -r requirements.txt` installiert. In dieser Arbeitsumgebung liegen sie bereits in `.local_packages`, das vom Startprogramm berücksichtigt wird. Im Projektordner `python server.py` ausführen. Der Browser öffnet sich automatisch; das Terminal muss geöffnet bleiben. Beenden mit Strg+C. Standardmäßig wählt das Betriebssystem einen freien lokalen Port. Optional kann mit `KAPA_PORT` ein fester Port eingestellt werden (PowerShell: `$env:KAPA_PORT=5123; python server.py`). Der Server bindet ausschließlich an 127.0.0.1. Bei fest eingestelltem belegtem Port schlägt der Start sichtbar fehl. Mehrere verschiedene Apps können so parallel laufen. Die Anwendung ist für die lokale Vorführung ausgelegt. Schreibzugriffe verwenden einen Revisionsvergleich. Bei einem veralteten Browserstand wird das Speichern mit einem sichtbaren Fehler abgelehnt. Nach einem Serverneustart müssen bereits geöffnete Browserfenster neu geladen werden.
 
 ## Bedienung
 1. Unter Personen die Teammitglieder, ihre Rolle und den Beschäftigungsgrad anlegen. In Einstellungen beträgt die Wochenkapazität bei 100 % FTE zunächst 40 Stunden.
@@ -17,16 +17,16 @@ Python 3.11 oder neuer ist erforderlich, zusätzliche Pakete sind nicht nötig. 
 ## Rechenregeln
 Gate-Intervalle beginnen am jeweiligen Gate und enden vor dem folgenden Gate. Zuerst werden die Basisstunden per größtem Rest auf die vier Prozentanteile verteilt. Anschließend werden die Stunden jeder Phase nach überlappenden Kalendertagen und den Wochengewichten auf Wochen aufgeteilt. Dieselbe Rundungsmethode verteilt jede Planwertänderung auf die ab ihrem Datum verbleibenden Tage und Gewichte. So bleiben Wochenwerte und Summen ganzzahlig und jedes Budget geht exakt auf. Nullgewichte sind zulässig, solange jede belegte Phase und Änderung mindestens ein positives Gewicht hat.
 
-Die Wochenkapazität ist FTE × Wochenstunden. Für Monate wird sie anhand der Werktage Montag bis Freitag anteilig berechnet. Für die Monatsansicht werden Wochenstunden nach Kalendertagen auf Monatsgrenzen verteilt und auf ganze Stunden angezeigt; interne Monatswerte können Bruchteile enthalten. Feiertage, Urlaub und andere Abwesenheiten werden nicht abgezogen. Projektstunden werden nicht automatisch auf Personen aufgeteilt. Prozentwerte sind keine Eintrittswahrscheinlichkeiten.
+Die Wochenkapazität ist FTE × Wochenstunden. Für Monate wird sie anhand der Werktage Montag bis Freitag anteilig berechnet. Die ganzzahligen Wochenanteile jeder Gate-Phase und Planwertänderung werden auf ihre tatsächlich belegten Kalendertage verteilt. Der größte Rest gleicht die Rundung aus. Monatswerte summieren diese Tageswerte. Vor G3, ab G8 und vor dem Datum einer Planwertänderung entstehen keine zusätzlichen Stunden. Wochen- und Monatssummen stimmen mit dem Gesamtbudget überein. Feiertage, Urlaub und andere Abwesenheiten werden nicht abgezogen. Projektstunden werden nicht automatisch auf Personen aufgeteilt. Prozentwerte sind keine Eintrittswahrscheinlichkeiten.
 
 ## Daten und Sicherheit
-`planung.json` wird im Projektverzeichnis atomar gespeichert und durch `.gitignore` von Git ausgeschlossen. Das JSON-Backup enthält sämtliche personenbezogenen Planungsdaten und muss entsprechend geschützt werden. Kein Login, keine Rechteverwaltung, keine Verschlüsselung und keine gemeinsame Bearbeitung. Browserfenster laden jeweils einen eigenen Stand: paralleles Bearbeiten kann Änderungen überschreiben. Nicht über das Netzwerk freigeben oder als produktiven Mehrbenutzerdienst einsetzen.
+`planung.json` wird im Projektverzeichnis atomar gespeichert und durch `.gitignore` von Git ausgeschlossen. Das JSON-Backup enthält sämtliche personenbezogenen Planungsdaten und muss entsprechend geschützt werden. Kein Login, keine Rechteverwaltung, keine Verschlüsselung und keine gemeinsame Bearbeitung. Browserfenster laden jeweils einen eigenen Stand. Ein Revisionsvergleich im selben Serverprozess verhindert das stille Überschreiben eines neueren Stands. Nach einem Konflikt bleiben die lokalen Eingaben erhalten und können als Sicherung exportiert werden. Zum Weiterarbeiten ist ein Neuladen nötig. Mehrere Serverprozesse dürfen nicht dieselbe Datendatei bearbeiten. Nicht über das Netzwerk freigeben oder als produktiven Mehrbenutzerdienst einsetzen.
 
 ## SAP und spätere Entwicklung
 Die bereitgestellte Datei `SAP INPUT.xlsx` wurde lediglich hinsichtlich Aufbau und Beispielen geprüft; keine Buchungen wurden importiert. Die Ausleitung enthält Person, Personalnummer, PSP-Element, Datum und Stunden. Ein späterer Import benötigt Zuordnungsregeln für Personalnummer und Projektnummer, Umgang mit PSP-Abteilungssuffixen, Duplikaten, negativen Buchungen und Korrekturen. Bis dahin gibt es keine Ist-Stunden, Reststunden oder automatische Verschiebung. MongoDB ist noch nicht angebunden; die Berechnungslogik und Datenhaltung müssen vor einer Mehrbenutzerlösung serverseitig und transaktionssicher umgesetzt werden.
 
 ## Prüfung und bekannte Grenzen
-Tests: `python -m unittest discover -s tests`. Sichtprüfung im Browser ist gesondert durchzuführen. Eine Person pro Projekt, keine Ferien-/Feiertagskalender, keine Historisierung von Änderungen am Basisplan, keine SAP-Verarbeitung und kein Konfliktschutz. Port und Datenpfad sind unabhängig, sodass der freie Port beim Neustart die gespeicherten Daten nicht verändert.
+Tests: `python -m pytest -p no:cacheprovider -o addopts="" tests`. Wenn die Abhängigkeiten nur im Projekt liegen, zuvor in PowerShell `$env:PYTHONPATH=".local_packages;src"` setzen. Die JavaScript-Rechentests liegen unter `tests/plan.test.js`. Sichtprüfung im Browser ist gesondert durchzuführen. Eine Person pro Projekt, keine Ferien-/Feiertagskalender, keine Historisierung von Änderungen am Basisplan, keine SAP-Verarbeitung und keine gemeinsame Mehrbenutzerbearbeitung. Port und Datenpfad sind unabhängig, sodass der freie Port beim Neustart die gespeicherten Daten nicht verändert.
 
 ## Lessons Learned
 - Gate-Termine benötigen eindeutige inklusive/exklusive Grenzen, damit an Übergängen keine Tage doppelt gezählt werden.
@@ -34,3 +34,24 @@ Tests: `python -m unittest discover -s tests`. Sichtprüfung im Browser ist geso
 - Ein zufälliger Port darf nicht als Speicheridentität verwendet werden: Browser-LocalStorage wäre beim Neustart unter einem anderen Port leer.
 - Wochengewichte bieten eine einfache Spitzenplanung; ihre Bedeutung und die unterschiedliche Monatsaggregation müssen transparent sein.
 - SAP-Buchungen und erwartete Projekte dürfen nicht stillschweigend als bestätigte Ist- oder Wahrscheinlichkeitswerte interpretiert werden.
+
+
+## Referenz-Repositories und Oberfläche (10.11.2026)
+- GMA App Standards 4.9.1: `d7adb792b663419eed2955d446a0203a231b9057`.
+- POLYTEC Designsystem 2.21.0: `7ee9123e3a03e54f4399ac30cf76c4c8a9dc7435`.
+- Beide Referenz-Repositories wurden per `git pull --ff-only` abgeglichen. Die vier Ordner des UI-Kits werden unverändert über das offizielle Sync-Werkzeug verteilt. Vendorte Dateien dürfen in der App nicht verändert werden.
+- Die App erweitert `ops_platform_ui/base.html`. Logo, Quicksand, Sprite, Header, Footer und Navigation stammen aus dem UI-Kit. Der Header ist 56 px hoch, auf kleinen Bildschirmen 52 px. Die Standardsymbole sind 20 px groß; Navigations-Klickflächen mindestens 44 px.
+- Die linke Navigation lässt sich mit dem Pfeil ein- und ausklappen. Auf dem Smartphone erscheinen die Hauptziele in der unteren Navigation.
+- Jinja liest Vorlagen mit `utf-8-sig`. Dadurch wird ein UTF-8-BOM beim Laden entfernt. Der alte laufende Server hatte zwei unsichtbare Zeichen vor dem Dokumenttyp im Vorlagencache. Diese verschoben das Seitenraster und vergrößerten den Header. Lokale Vorlagen werden jetzt neu geladen und HTML erhält `Cache-Control: no-store`.
+
+## Abweichungen des lokalen Prototyps
+Die Plattformstruktur ist noch keine Freigabe für einen produktiven Betrieb. `server.py` startet Waitress auf Loopback mit freier Portwahl. Die Dienstskripte und das Manifest stammen aus der offiziellen Vorlage. Ihre Organisationseinträge, Port 5123 und Datenbankdeklaration sind für eine spätere Integration zu bestätigen. Kein Dienst und kein Portal wurden eingerichtet.
+
+MongoDB und Portal-Anmeldung sind nicht angebunden. Die lokale Speicherung und deutsche Oberfläche folgen dem ausdrücklichen Auftrag. DB-01/DB-04 und LNG-01/LNG-02 bleiben deshalb für einen späteren Plattformbetrieb gesondert zu behandeln. Fachberechnung und Formularausgabe liegen überwiegend im Browser. Eine produktive Version benötigt serverseitige Fachvalidierung und eine vollständige manuelle Regelprüfung.
+
+## Ergänzte Lessons Learned
+- Ein synchronisiertes UI-Kit beweist noch keine korrekte Darstellung. Auch die tatsächlich ausgelieferte Antwort des laufenden Servers muss geprüft werden.
+- Unsichtbare Zeichen vor dem Dokumenttyp können den Browser in den Quirks-Modus versetzen und als zusätzliche Rasterelemente wirken. Ein CSS-Höhenpatch würde die Ursache verdecken.
+- Icon-Namen sind Teil des Komponentenvertrags. `folder`, `users` und `plus` fehlen in diesem Sprite. Verwendet werden jetzt `work-order`, `user` und `add`.
+- Ein geändertes Template reicht bei deaktiviertem Auto-Reload nicht aus: Ein alter Prozess kann weiter den fehlerhaften Stand ausliefern.
+- Deutsche Texte müssen durchgängig als UTF-8 geschrieben werden. Bei Windows PowerShell muss auch für an Python übergebene Skripte die UTF-8-Ausgabe eingestellt sein.

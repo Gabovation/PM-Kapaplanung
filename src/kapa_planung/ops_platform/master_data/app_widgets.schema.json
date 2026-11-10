@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "$id": "polytec-ops/master-data/app_widgets.v1",
+  "title": "Board widget",
+  "description": "Widget catalogue imported from the [[widgets]] of module manifests (decision 0021). Boards read it to build templates and iframe URLs; the owning module renders the widget and checks its permission. Never a grant.",
+  "x-collection": "app_widgets",
+  "required": [
+    "_id",
+    "appId",
+    "widgetId",
+    "version",
+    "title",
+    "permission",
+    "url",
+    "context",
+    "options",
+    "actions",
+    "importedAt"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,30}/[a-z][a-z0-9-]{1,40}@[1-9][0-9]*$",
+      "description": "<appId>/<widgetId>@<version>"
+    },
+    "appId": {
+      "type": "string"
+    },
+    "widgetId": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string"
+    },
+    "permission": {
+      "type": "string",
+      "description": "Permission the module checks for this widget; shown to template authors, not enforced by the board."
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^/[a-z][a-z0-9-]{1,30}/[a-z0-9][a-z0-9/_-]*$",
+      "description": "Same-host path including the app path, e.g. /maintenance/widgets/open-tasks."
+    },
+    "context": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "plantId",
+          "workCenterNumber",
+          "assetCode",
+          "toolCode",
+          "personId"
+        ]
+      }
+    },
+    "options": {
+      "type": "object",
+      "description": "Option name -> {type: enum|int|number|bool|string|list, default, values?, value_labels?, value_icons?, choices?, min?, max?, max_length?, label?, group?, when?}. choices is the same-host path of the module endpoint that lists the values for a board context.",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "type",
+          "default"
+        ]
+      }
+    },
+    "actions": {
+      "type": "boolean",
+      "description": "True when the widget writes (e.g. prints a label)."
+    },
+    "minCols": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "minRows": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "retired": {
+      "type": "boolean",
+      "description": "Set by the portal when a re-imported manifest no longer declares this version."
+    },
+    "importedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

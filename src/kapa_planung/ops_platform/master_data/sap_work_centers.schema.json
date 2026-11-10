@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_work_centers.v1",
+  "title": "SAP work centre",
+  "description": "One work centre (machine or manual station) of one SAP plant with its standard value key and capacity.",
+  "x-collection": "sap_work_centers",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "erp:work_centers",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "sapSystem",
+    "plant",
+    "workCenterNumber",
+    "active"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "<sapSystem>-<plant>-<workCenterNumber>, e.g. P10-1000-42210."
+    },
+    "sapSystem": {
+      "type": "string",
+      "description": "Source system: P01, P10 or PP4."
+    },
+    "plant": {
+      "type": "string"
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "plants@1"
+    },
+    "workCenterNumber": {
+      "type": "string",
+      "description": "SAP work centre; in P10 equal to the cost centre."
+    },
+    "objectId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Internal SAP object id (CRHD.OBJID), referenced by routing operations."
+    },
+    "text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "standardValueKey": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "VGWTS: decides how routing standard values are read (ZAP1 machine, ZAP2 manual, ...)."
+    },
+    "category": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "capacityUnits": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Number of parallel individual capacities (AZNOR)."
+    },
+    "utilisationPct": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "shiftStart": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "hh:mm"
+    },
+    "shiftEnd": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "hh:mm"
+    },
+    "breakMin": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "factoryCalendar": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "costCenterNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "sap_cost_centers@1; filled once CRCO is available."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False instead of delete (MD-07)."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "description": "Version of the derivation rules applied by data-sync."
+    },
+    "syncRunId": {
+      "type": "string",
+      "description": "data_sync_runs@1 _id of the run that last wrote the document."
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "description": "SHA-256 of the prepared content; the sync writes only when it changes."
+    }
+  }
+}

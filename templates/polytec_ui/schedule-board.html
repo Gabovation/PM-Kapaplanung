@@ -1,0 +1,115 @@
+{% import "polytec_ui/macros.html" as ui %}
+{% macro chip_tag(chip) -%}
+<span class="pt-schedule-card__chip{% if chip.tone|default('') in ['warning', 'danger'] %} pt-schedule-card__chip--{{ chip.tone }}{% endif %}{% if chip.emphasis|default(false) %} pt-schedule-card__chip--emphasis{% endif %}"{% if chip.title|default('') %} title="{{ chip.title }}"{% endif %}>{% if chip.icon|default('') %}{{ ui.icon(chip.icon) }}{% endif %}<span>{{ chip.text }}</span></span>
+{%- endmacro %}
+{% macro card(item, labels, can_move, allow_compact=true, surface=false) -%}
+{% set url = item.url|default('') %}
+{% set safe_url = url and ':' not in url and '\\' not in url and not url.startswith('//') %}
+{% set compact = allow_compact and item.compact|default(false) %}
+{% set details = item.tooltip|default('', true) or ([item.side|default(''), item.description|default(''), item.report|default(''), item.instructions|default(item.planning_instructions|default(''))] + (item.chips|default([])|map(attribute='text')|list) + [item.metadata|default(''), item.creator|default(''), item.created_at|default('')])|select|join(' · ') %}
+{% set hover = item.tooltip|default('', true) or (item.title ~ (' · ' ~ details if details else '')) %}
+<article class="pt-schedule-card{% if compact %} pt-schedule-card--compact{% if item.join_before|default(false) %} pt-schedule-card--join-before{% endif %}{% if item.join_after|default(false) %} pt-schedule-card--join-after{% endif %}{% endif %}{% if item.tone|default('') in ['neutral', 'success', 'warning', 'danger'] %} pt-schedule-card--{{ item.tone }}{% endif %}" data-pt-schedule-card{% if compact and item.span|default(1) > 1 %} style="--pt-span:{{ item.span|int }}"{% endif %} data-key="{{ item.key }}" data-url="{{ url if safe_url else '' }}"{% if details %} title="{{ details }}" aria-description="{{ details }}"{% endif %}>
+  {% if compact %}
+  {% if item.before|default('') %}<span class="pt-schedule-card__edge" title="{{ item.before }}">{{ ui.icon('chevron-left') }}<small>{{ item.before }}</small></span>{% endif %}
+  {% if item.icon|default('') %}<span class="pt-schedule-card__kind"{% if item.icon_label|default('') %} title="{{ item.icon_label }}"{% endif %}>{{ ui.icon(item.icon) }}</span>{% endif %}
+  {% if safe_url %}<a class="pt-schedule-card__link pt-schedule-card__title-link" href="{{ url }}" draggable="false" aria-label="{{ labels.get('schedule', 'Schedule / Edit') }}: {{ item.title }}" title="{{ hover }}"{% if details %} aria-description="{{ details }}"{% endif %}><strong class="pt-schedule-card__title">{{ item.title }}</strong></a>
+  {% else %}<strong class="pt-schedule-card__title" title="{{ item.title }}{% if details %} · {{ details }}{% endif %}">{{ item.title }}</strong>{% endif %}
+  {% if item.detail|default('') %}<span class="pt-schedule-card__detail">{{ item.detail }}</span>{% endif %}
+  {% if item.side|default('') %}<span class="pt-schedule-card__side">{{ item.side }}</span>{% endif %}
+  {% if item.after|default('') %}<span class="pt-schedule-card__edge" title="{{ item.after }}"><small>{{ item.after }}</small>{{ ui.icon('chevron-right') }}</span>{% endif %}
+  {% else %}
+  {% if item.eyebrow|default('') or item.badges|default([]) %}<div class="pt-schedule-card__top"><span class="pt-schedule-card__eyebrow">{{ item.eyebrow|default('') }}</span>{% if item.badges|default([]) %}<span class="pt-schedule-card__badges">{% for badge in item.badges %}{% if badge.short|default('') %}<span class="pt-status pt-status--{{ badge.tone|default('neutral') }}" title="{{ badge.label }}" role="img" aria-label="{{ badge.label }}">{% if badge.icon|default('') %}{{ ui.icon(badge.icon) }}{% endif %}<span aria-hidden="true">{{ badge.short }}</span></span>{% else %}{{ ui.status(badge.label, badge.tone|default('neutral'), badge.icon|default(none), badge.icon_only|default(false)) }}{% endif %}{% endfor %}</span>{% endif %}</div>{% endif %}
+  <div class="pt-schedule-card__head">{% if surface and safe_url %}<a class="pt-schedule-card__link pt-schedule-card__title-link" href="{{ url }}" draggable="false" aria-label="{{ labels.get('schedule', 'Schedule / Edit') }}: {{ item.title }}" title="{{ hover }}"><strong class="pt-schedule-card__title">{{ item.title }}</strong></a>{% else %}<strong class="pt-schedule-card__title">{{ item.title }}</strong>{% endif %}{% if item.side|default('') %}<span class="pt-schedule-card__side">{{ item.side }}</span>{% endif %}</div>
+  {% if item.description|default('') %}<span class="pt-schedule-card__description">{{ item.description }}</span>{% endif %}
+  {% if item.report|default('') %}<span class="pt-schedule-card__report">{{ item.report }}</span>{% endif %}
+  {% if item.rows|default([]) %}<div class="pt-schedule-card__rows">{% for row in item.rows %}<div class="pt-schedule-card__row{% if row.clamp|default(false) %} pt-schedule-card__row--clamp{% endif %}{% if not row.text|default('') %} is-empty{% endif %}{% if row.tone|default('') in ['warning', 'danger'] %} pt-schedule-card__row--{{ row.tone }}{% endif %}"{% if row.title|default('') %} title="{{ row.title }}"{% endif %}>{% if row.icon|default('') %}{{ ui.icon(row.icon) }}{% endif %}<span>{{ row.text|default('', true) or '–' }}</span></div>{% endfor %}</div>{% endif %}
+  {% if item.chips|default([]) %}<div class="pt-schedule-card__chips">{% for chip in item.chips %}{{ chip_tag(chip) }}{% endfor %}</div>{% endif %}
+  {% endif %}
+  {% if details %}<span class="pt-visually-hidden" data-pt-schedule-description>{{ details }}</span>{% endif %}
+  {% set open_url = item.open_url|default('') %}
+  {% set safe_open = open_url and ':' not in open_url and '\\' not in open_url and not open_url.startswith('//') %}
+  <div class="pt-schedule-card__footer">
+  {% if not compact and (item.metadata|default('') or item.creator|default('') or item.created_at|default('')) %}<div class="pt-schedule-card__creation">{% if item.metadata|default('') %}<span>{{ item.metadata }}</span>{% else %}{% if item.creator|default('') %}<span>{{ item.creator }}</span>{% endif %}{% if item.created_at|default('') %}<span>{{ item.created_at }}</span>{% endif %}{% endif %}</div>{% endif %}
+  <div class="pt-schedule-card__actions">
+    {% if safe_open %}<a class="pt-schedule-card__link pt-schedule-card__open" href="{{ open_url }}" draggable="false" aria-label="{{ labels.get('open', 'Open') }}: {{ item.title }}" title="{{ labels.get('open', 'Open') }}">{{ ui.icon('external-link') }}</a>{% endif %}
+    {% if safe_url and not compact and not surface %}<a class="pt-schedule-card__link" href="{{ url }}" draggable="false" aria-label="{{ labels.get('schedule', 'Schedule / Edit') }}: {{ item.title }}" title="{{ labels.get('schedule', 'Schedule / Edit') }}">{{ ui.icon('edit') }}</a>{% endif %}
+    {% if safe_url and item.movable|default(false) and can_move %}<button type="button" class="pt-schedule-card__handle" data-pt-schedule-handle aria-label="{{ labels.get('move', 'Move') }}: {{ item.title }}" aria-pressed="false"{% if details %} title="{{ details }}" aria-description="{{ details }}"{% endif %} hidden>{{ ui.icon('grip') }}</button>{% endif %}
+  </div>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro board(label, days, lanes, backlog, empty_text, labels, backlog_position='top', drag_surface='default', dense=false, show_label=true, fill=false) -%}
+{% set surface = drag_surface == 'card' %}
+{% set grouped = days and days[0].month_key is defined and days[0].week_key is defined %}
+{% set heads = namespace(on=false) %}{% for lane in lanes %}{% for key, c in lane.cells|default({})|dictsort %}{% if c.badge|default(none) or c.meter|default(none) %}{% set heads.on = true %}{% endif %}{% endfor %}{% endfor %}
+<section class="pt-schedule-board{% if backlog_position == 'left' %} pt-schedule-board--backlog-left{% endif %}{% if surface %} pt-schedule-board--surface{% endif %}{% if dense %} pt-schedule-board--dense{% endif %}{% if not show_label %} pt-schedule-board--bare{% endif %}{% if fill %} pt-schedule-board--fill{% endif %}{% if grouped %} pt-schedule-board--grouped{% endif %}" data-pt-schedule-board{% if surface %} data-drag-surface="card"{% endif %} aria-label="{{ label }}"
+  data-instructions="{{ labels.get('instructions', 'Use a Move handle: drag to a cell, or press Space to pick up, arrows to choose a lane and day, Enter to review, Escape to cancel. Schedule / Edit opens the form without dragging.') }}"
+  data-picked-up="{{ labels.get('picked_up', 'Picked up') }}"
+  data-target="{{ labels.get('target', 'Target') }}"
+  data-reviewing="{{ labels.get('reviewing', 'Reviewing schedule; nothing has been moved.') }}"
+  data-cancelled="{{ labels.get('cancelled', 'Move cancelled; nothing has been moved.') }}"
+  data-invalid="{{ labels.get('invalid', 'Choose a lane and day; nothing has been moved.') }}">
+  <div class="pt-schedule-board__toolbar">
+    <strong{% if not show_label %} class="pt-visually-hidden"{% endif %}>{{ label }}</strong>
+    <p class="pt-schedule-board__status" data-pt-schedule-status role="status" aria-live="polite" aria-atomic="true"></p>
+    <button type="button" class="pt-button pt-button--secondary pt-schedule-board__cancel" data-pt-schedule-cancel aria-label="{{ labels.get('cancel', 'Cancel move') }}" title="{{ labels.get('cancel', 'Cancel move') }}" hidden>{{ ui.icon('close') }}</button>
+  </div>
+  <p class="pt-schedule-board__instructions pt-visually-hidden" data-pt-schedule-instructions>{{ labels.get('instructions', 'Use a Move handle: drag to a cell, or press Space to pick up, arrows to choose a lane and day, Enter to review, Escape to cancel. Schedule / Edit opens the form without dragging.') }}</p>
+  <div class="pt-schedule-board__body">
+  {% if backlog %}
+  <aside class="pt-schedule-board__backlog" aria-label="{{ label }} — {{ labels.get('unplanned', 'Unplanned') }}">
+    <strong>{{ labels.get('unplanned', 'Unplanned') }} · {{ backlog|length }}</strong>
+    <div class="pt-schedule-board__backlog-items">{% for item in backlog %}{{ card(item, labels, days and lanes, false, surface) }}{% endfor %}</div>
+  </aside>
+  {% endif %}
+  {% if days and lanes %}
+  <div class="pt-schedule-board__scroll" role="region" aria-label="{{ label }} — {{ labels.get('scroll', 'Scrollable schedule') }}" tabindex="0" data-pt-schedule-scroll>
+    <table class="pt-schedule-board__table" style="--pt-days:{{ days|length }}">
+      <caption class="pt-visually-hidden">{{ label }}</caption>
+      <thead>{% if grouped %}
+        <tr class="pt-schedule-board__months"><th scope="col" rowspan="3" class="pt-schedule-board__corner">{{ labels.get('lanes', 'Lanes') }}</th>
+        {% for day in days %}{% if loop.first or day.month_key != days[loop.index0 - 1].month_key %}
+          {% set count = namespace(value=0, done=false) %}{% for next in days[loop.index0:] %}{% if not count.done and next.month_key == day.month_key %}{% set count.value = count.value + 1 %}{% else %}{% set count.done = true %}{% endif %}{% endfor %}
+          <th scope="colgroup" colspan="{{ count.value }}">{{ day.month }}</th>{% endif %}{% endfor %}</tr>
+        <tr class="pt-schedule-board__weeks">{% for day in days %}{% if loop.first or day.week_key != days[loop.index0 - 1].week_key %}
+          {% set count = namespace(value=0, done=false) %}{% for next in days[loop.index0:] %}{% if not count.done and next.week_key == day.week_key %}{% set count.value = count.value + 1 %}{% else %}{% set count.done = true %}{% endif %}{% endfor %}
+          <th scope="colgroup" colspan="{{ count.value }}" class="pt-schedule-board__week-start">{{ day.week }}</th>{% endif %}{% endfor %}</tr>
+        {% endif %}<tr class="pt-schedule-board__days">{% if not grouped %}<th scope="col">{{ labels.get('lanes', 'Lanes') }}</th>{% endif %}
+        {% for day in days %}<th scope="col" data-day-heading="{{ day.key }}" class="{% if day.week_start|default(false) %}pt-schedule-board__week-start {% endif %}{% if day.weekend|default(false) %}pt-schedule-board__weekend{% endif %}">{{ day.label }}{% if day.description|default('') %}<small>{{ day.description }}</small>{% endif %}</th>{% endfor %}
+      </tr></thead>
+      <tbody>{% for lane in lanes %}
+        {% set group_key = lane.group_key|default('') %}
+        {% if group_key and (loop.first or group_key != lanes[loop.index0 - 1].group_key|default('')) %}<tr class="pt-schedule-board__group" data-pt-schedule-group><th scope="rowgroup" colspan="{{ days|length + 1 }}"><span>{{ lane.group_label|default(group_key, true) }}</span></th></tr>{% endif %}
+        <tr>
+        <th scope="row">{{ lane.label }}{% if lane.description|default('') %}<small>{{ lane.description }}</small>{% endif %}</th>
+        {% for day in days %}
+        {% set cell = lane.cells|default({}) %}
+        {% set cell = cell.get(day.key, {}) %}
+        {% set tone = cell.tone|default('neutral') %}
+        {% set status = labels.get(tone, {'neutral': 'Available', 'success': 'Within capacity', 'warning': 'Warning', 'danger': 'Attention required'}.get(tone, '')) %}
+        <td class="pt-schedule-board__cell{% if tone in ['neutral', 'success', 'warning', 'danger'] %} pt-schedule-board__cell--{{ tone }}{% endif %}{% if day.week_start|default(false) %} pt-schedule-board__week-start{% endif %}{% if day.weekend|default(false) %} pt-schedule-board__weekend{% endif %}{% if cell.nonworking|default(false) %} pt-schedule-board__cell--nonworking{% endif %}"
+          {% if cell.title|default('') %}title="{{ cell.title }}" {% endif %}data-pt-schedule-cell data-lane-key="{{ lane.key }}" data-day-key="{{ day.key }}" data-lane-label="{{ lane.label }}" data-day-label="{{ day.label }}">
+          {% set badge = cell.badge|default(none) %}
+          {% if badge or cell.meter|default(none) %}<div class="pt-schedule-board__cell-head">
+          {% if badge %}<span class="pt-schedule-board__badge{% if badge.tone|default('') in ['neutral', 'info', 'success', 'warning', 'danger'] %} pt-schedule-board__badge--{{ badge.tone }}{% endif %}"{% if badge.title|default('') %} title="{{ badge.title }}" aria-label="{{ badge.title }}" role="img"{% endif %}>{{ badge.text }}</span>{% endif %}
+          {% if cell.meter|default(none) %}
+          {% set percent = cell.meter.percent|default(0)|float %}
+          {% set percent = percent if percent == percent else 0 %}
+          {% set width = [[percent, 0]|max, 100]|min %}
+          {% set capacity = [cell.meta|default(''), cell.meter.label|default(''), status]|select|join(' · ') %}
+          {% set meter_tone = cell.meter.tone|default('') %}
+          <div class="pt-schedule-board__meter{% if meter_tone in ['warning', 'danger'] %} pt-schedule-board__meter--{{ meter_tone }}{% endif %}" role="img" aria-label="{{ capacity }}" title="{{ capacity }}">{% if cell.meter.percent|default(none) is not none %}<span class="pt-schedule-board__meter-bar"><span style="inline-size:{{ width }}%"></span></span>{% endif %}{% if cell.meter.label|default('') %}<small>{{ cell.meter.label }}</small>{% endif %}</div>
+          {% endif %}
+          </div>
+          {% elif heads.on and cell.get('items') %}<div class="pt-schedule-board__cell-head"></div>
+          {% elif cell.meta|default('') %}<small class="pt-schedule-board__meta">{{ cell.meta }}</small>{% elif tone in ['success', 'warning', 'danger'] %}<small class="pt-schedule-board__meta">{{ status }}</small>{% endif %}
+          <div class="pt-schedule-board__items">{% for item in cell.get('items', []) %}{% if item.kind|default('') == 'spacer' %}<span class="pt-schedule-board__slot" aria-hidden="true"></span>{% elif item.kind|default('') == 'bridge' %}<span class="pt-schedule-board__bridge"{% if item.title|default('') %} title="{{ item.title }}"{% endif %}>{% if item.before|default('') %}<span class="pt-schedule-card__edge">{{ ui.icon('chevron-left') }}<small>{{ item.before }}</small></span>{% endif %}{% if item.after|default('') %}<span class="pt-schedule-card__edge pt-schedule-card__edge--end"><small>{{ item.after }}</small>{{ ui.icon('chevron-right') }}</span>{% endif %}</span>{% else %}{{ card(item, labels, true, true, surface) }}{% endif %}{% else %}<span class="pt-schedule-board__empty">{{ empty_text }}</span>{% endfor %}</div>
+        </td>{% endfor %}
+      </tr>{% endfor %}</tbody>
+    </table>
+  </div>
+  {% else %}<p class="pt-schedule-board__empty">{{ empty_text }}</p>{% endif %}
+  </div>
+</section>
+{%- endmacro %}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/roles.v1",
+  "title": "Role",
+  "description": "The two platform levels: ROLE-systemadministrator (Platform administrator) and ROLE-admin (People administrator). They grant no app permission except the platform administrator bypass; app roles are defined in app_access_catalogues@1 (decision 0014).",
+  "x-collection": "roles",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "name"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Display name, unique."
+    },
+    "name_key": {
+      "type": "string",
+      "description": "Case-folded name, unique."
+    },
+    "protected": {
+      "type": "boolean",
+      "description": "Built-in role that cannot be deleted (both roles)."
+    }
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_sales_actuals.v1",
+  "title": "Actual sales per material and customer",
+  "description": "Invoiced quantity and value per plant, material, customer and revenue account over a reporting window (aggregated from billing line items).",
+  "x-collection": "sap_sales_actuals",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "external:group-sales-line-items",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "plantCode",
+    "windowFrom",
+    "windowTo",
+    "account",
+    "active",
+    "ruleVersion"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deterministic key from the natural key; see title."
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Platform plant (plants@1) resolved from the source plant code or name; null when unresolved (reported)."
+    },
+    "plantCode": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Plant code or name exactly as the source states it."
+    },
+    "materialNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source material number without leading zeros; null for rows without a material."
+    },
+    "articleId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "articles@1 _id (<sapSystem>-<materialNumber>) when the plant's SAP system is known and the article exists; otherwise null."
+    },
+    "companyCode": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "customer": {
+      "type": "object",
+      "required": [
+        "number"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "customerMaterial": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "account": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adjustment": {
+      "type": "boolean",
+      "description": "True for source correction rows without a real material."
+    },
+    "windowFrom": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "windowTo": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "lineCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "quantity": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "valueLocal": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "localCurrency": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{3}$"
+    },
+    "valueGroup": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Value in group currency (EUR)."
+    },
+    "netPricePerUnit": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "valueGroup / quantity when quantity is not zero."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False when no longer present in the complete global source snapshot."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "syncRunId": {
+      "type": "string"
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

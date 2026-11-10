@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_scrap_actuals.v1",
+  "title": "Actual scrap per material",
+  "description": "Actual scrap quantity and production cost (HK2) per plant and material over a reporting window, with the planned assembly scrap for comparison.",
+  "x-collection": "sap_scrap_actuals",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "external:group-scrap-report",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "plantCode",
+    "windowFrom",
+    "windowTo",
+    "active",
+    "ruleVersion"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deterministic key from the natural key; see title."
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Platform plant (plants@1) resolved from the source plant code or name; null when unresolved (reported)."
+    },
+    "plantCode": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Plant code or name exactly as the source states it."
+    },
+    "materialNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source material number without leading zeros; null for rows without a material."
+    },
+    "articleId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "articles@1 _id (<sapSystem>-<materialNumber>) when the plant's SAP system is known and the article exists; otherwise null."
+    },
+    "materialType": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source material text; kept for plants without SAP articles."
+    },
+    "windowFrom": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "windowTo": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "scrapQuantity": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "goodQuantity": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Quantity delivered/confirmed as good."
+    },
+    "totalQuantity": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "scrapCost": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "HK2 cost of scrap in currency."
+    },
+    "goodCost": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "totalCost": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "scrapRate": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "scrapQuantity / totalQuantity as a fraction."
+    },
+    "plannedScrapRate": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Planned assembly scrap from the material master, as a fraction."
+    },
+    "plannedScrapCost": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "excessScrapCost": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Scrap cost above the planned assembly scrap."
+    },
+    "adjustedScrapRate": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "currency": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{3}$",
+      "description": "Currency of the cost fields (plant local currency)."
+    },
+    "scrapCostEur": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "scrapCost converted with eurRate; null when no rate exists."
+    },
+    "eurRate": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "EUR per currency unit used: latest actual monthly group rate (version AC, type M) up to windowTo; 1 for EUR."
+    },
+    "eurRatePeriod": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{4}$",
+      "description": "YYMM period of eurRate."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False when no longer present in the complete global source snapshot."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "syncRunId": {
+      "type": "string"
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/data_sync_runs.v1",
+  "title": "Data-sync run",
+  "description": "One execution of the data-sync job: source, extraction date, rule version and counts. Consumers read SAP data only when the latest run is completed.",
+  "x-collection": "data_sync_runs",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "platform",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "source",
+    "asOf",
+    "status",
+    "startedAt"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "Run id, e.g. 20261030T073000Z-ab12cd."
+    },
+    "source": {
+      "type": "string",
+      "description": "Snapshot folder or OneLake path."
+    },
+    "manifestHash": {
+      "type": "string"
+    },
+    "snapshotHash": {
+      "type": "string",
+      "description": "Hash of the manifest plus every declared collection file."
+    },
+    "systems": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "asOf": {
+      "type": "string",
+      "description": "Extraction date of the source (YYYYMMDD); validity checks use it, not the run date."
+    },
+    "ruleVersion": {
+      "type": "integer"
+    },
+    "dryRun": {
+      "type": "boolean"
+    },
+    "startedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "finishedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "running",
+        "completed",
+        "failed"
+      ]
+    },
+    "writeStarted": {
+      "type": "boolean",
+      "description": "Set before any source collection is modified."
+    },
+    "writeScopes": {
+      "type": "object",
+      "description": "Collections and system scopes that must be replayed after a partial write.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "description": "Per collection.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "integer"
+          },
+          "new": {
+            "type": "integer"
+          },
+          "changed": {
+            "type": "integer"
+          },
+          "deactivated": {
+            "type": "integer"
+          },
+          "unchanged": {
+            "type": "integer"
+          },
+          "bySystem": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

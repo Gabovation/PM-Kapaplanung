@@ -1,0 +1,72 @@
+{% extends "polytec_ui/base.html" %}
+{% import "polytec_ui/macros.html" as ui %}
+{% import "ops_platform_ui/macros.html" as ops_shell %}
+
+{% block head %}{{ super() }}
+<script src="{{ url_for('ops_platform_ui.static', filename='ops_platform_ui/js/sidebar-state.js') }}"></script>
+{% if ops_display_connection|default(none) %}
+<meta name="ops-display-connection" content='{{ ops_display_connection|tojson }}'>
+<script src="{{ url_for('ops_platform_ui.static', filename='ops_platform_ui/js/display-connection.js') }}" defer></script>
+{% endif %}
+{% endblock %}
+
+{% block styles %}{{ super() }}
+<link rel="stylesheet" href="{{ url_for('ops_platform_ui.static', filename='ops_platform_ui/css/connected-operations-tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('ops_platform_ui.static', filename='ops_platform_ui/css/ops-platform.css') }}">
+{% endblock %}
+{% block body_class %}ops-app{% endblock %}
+
+{% block header %}
+<header class="ops-header">
+  <div class="ops-header__leading">
+    <a class="ops-header__brand" href="{{ app_home_url|default('/') }}" aria-label="{{ _app_title }} home">
+      <img class="ops-header__logo-full" src="{{ url_for('polytec_ui.static', filename='polytec_ui/img/polytec-logo.png') }}" alt="POLYTEC">
+      <img class="ops-header__logo-mark" src="{{ url_for('polytec_ui.static', filename='polytec_ui/img/polytec-mark.jpg') }}" alt="" aria-hidden="true">
+    </a>
+    {% if environment_label is defined %}<span class="ops-environment ops-environment--{{ environment_state|default('online') }}"><span class="ops-environment__dot" aria-hidden="true"></span><span>{{ environment_label }}</span></span>{% endif %}
+  </div>
+  <div class="ops-header__title" title="{{ _app_title }}">{{ _app_title }}</div>
+  {# Default for every app: the account menu of the signed-in person (current_person comes from the platform
+     kit). Apps with their own header actions and the portal override the block. #}
+  {# Installed web apps have no browser reload: every app gets this button, also where the block below is overridden. #}
+  <div class="ops-header__actions"><button class="pt-icon-button pt-icon-button--subtle ops-header__refresh" type="button" data-ops-refresh aria-label="Refresh" title="Refresh">{{ ui.icon("refresh") }}</button>{% block header_actions %}
+    {%- set _person = current_person() if current_person is defined else none -%}
+    {%- if _person and _person.principal_type|default("person") == "person" and _person.name -%}
+    {%- set _parts = _person.name.split() -%}
+    {%- call ops_shell.user_menu((_parts[0][0] ~ (_parts[-1][0] if _parts|length > 1 else ""))|upper, _person.name) -%}
+      <a href="{{ account_url|default('/account') }}">{{ ui.icon("user") }}My account</a>
+      {%- if platform_home_url|default("/") %}<a href="{{ platform_home_url|default('/') }}">{{ ui.icon("home") }}Operations Platform</a>{% endif -%}
+    {%- endcall -%}
+    {%- endif -%}
+  {% endblock %}</div>
+</header>
+{% endblock %}
+
+{% block app_main %}
+{# Collapsed is the rendered default so the sidebar never flashes open on load; polytec-ui.js
+   re-expands it when this browser session already chose expanded. #}
+<div class="ops-workspace is-collapsed" data-ops-workspace>
+  <aside class="ops-sidebar" id="ops-sidebar" aria-label="Application navigation">
+    <div class="ops-sidebar__header"><button class="ops-sidebar__toggle" type="button" data-ops-sidebar-toggle aria-controls="ops-sidebar-navigation" aria-expanded="false" aria-label="Expand navigation" title="Expand navigation">{{ ui.icon("back") }}<span aria-hidden="true">Expand navigation</span></button></div>
+    <nav class="ops-sidebar__navigation" id="ops-sidebar-navigation">{% block sidebar_navigation %}{{ self.footer_navigation() }}{% endblock %}</nav>
+    {# Pinned to the bottom of every app: its user manual (when the platform kit found one) and the way
+       back to the platform start page. platform_home_url overrides "/"; false hides the link (portal). #}
+    <nav class="ops-sidebar__footer" aria-label="Platform navigation">{% block sidebar_footer %}
+      {%- if app_help_url|default(none) %}{{ ops_shell.navigation_item("Help", app_help_url, "help", app_help_active|default(false)) }}{% endif -%}
+      {%- if platform_home_url|default("/") %}{{ ops_shell.navigation_item("Operations Platform", platform_home_url|default("/"), "home") }}{% endif -%}
+    {% endblock %}</nav>
+  </aside>
+  <main class="pt-standalone-main" id="main-content" tabindex="-1">
+    {% if ops_display_connection|default(none) %}<div class="pt-alert pt-alert--warning" data-ops-display-status hidden role="status" aria-live="polite" data-message="{{ _('Display connection interrupted. Data may be out of date. Retrying automatically…') if _ is defined else 'Display connection interrupted. Data may be out of date. Retrying automatically…' }}"></div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="ops-footer">
+  <nav class="ops-footer__navigation" aria-label="Application navigation">{% block footer_navigation %}{% endblock %}</nav>
+  <nav class="ops-mobile-navigation" aria-label="Primary mobile navigation">{% block mobile_navigation %}{% endblock %}<details class="ops-mobile-navigation__more"><summary>{{ ui.icon("menu") }}<span>Menu</span></summary><div>{{ self.sidebar_navigation() }}<hr class="ops-navigation-divider">{{ self.sidebar_footer() }}</div></details></nav>
+  <div class="ops-footer__actions">{% block footer_actions %}{% endblock %}</div>
+</footer>
+{% endblock %}

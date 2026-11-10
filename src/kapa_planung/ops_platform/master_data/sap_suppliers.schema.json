@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_suppliers.v1",
+  "title": "SAP supplier",
+  "description": "One supplier (vendor) account of one SAP system.",
+  "x-collection": "sap_suppliers",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "erp:suppliers",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "sapSystem",
+    "supplierNumber",
+    "active"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "<sapSystem>-<supplierNumber>, e.g. P10-345787."
+    },
+    "sapSystem": {
+      "type": "string",
+      "description": "Source system: P01, P10 or PP4."
+    },
+    "supplierNumber": {
+      "type": "string"
+    },
+    "name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "country": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "city": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "accountGroup": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tradingPartner": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Group company number (VBUND) for intercompany suppliers."
+    },
+    "intercompany": {
+      "type": "boolean"
+    },
+    "blocked": {
+      "type": "boolean"
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False instead of delete (MD-07)."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "description": "Version of the derivation rules applied by data-sync."
+    },
+    "syncRunId": {
+      "type": "string",
+      "description": "data_sync_runs@1 _id of the run that last wrote the document."
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "description": "SHA-256 of the prepared content; the sync writes only when it changes."
+    }
+  }
+}

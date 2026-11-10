@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/display_default_roles.v1",
+  "title": "Default roles on screens",
+  "description": "The one portal-managed document (_id 'default') with the app roles every person signed in on a card terminal holds there, in addition to the screen's and their own (decision 0034). Never applied to the screen itself or to any other session.",
+  "x-collection": "display_default_roles",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "revision",
+    "apps"
+  ],
+  "properties": {
+    "_id": {
+      "const": "default"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "apps": {
+      "type": "object",
+      "description": "Same shape and role rules as display_devices@1 apps: only roles the app allows on screens (catalogue display_roles) take effect.",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "assignments"
+        ],
+        "properties": {
+          "assignments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "scope_type",
+                "scope_id",
+                "role_id"
+              ],
+              "properties": {
+                "scope_type": {
+                  "enum": [
+                    "corporate",
+                    "plant",
+                    "org_unit"
+                  ]
+                },
+                "scope_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "role_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "persons@1 id of the administrator who saved last."
+    }
+  }
+}

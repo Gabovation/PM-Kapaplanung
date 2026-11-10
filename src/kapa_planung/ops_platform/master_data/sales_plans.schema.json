@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sales_plans.v1",
+  "title": "Sales plan line",
+  "description": "One planned quantity and value per plan version, plant, material or text line, customer, project and period (budget and business updates); source rows with the same key are summed.",
+  "x-collection": "sales_plans",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "external:group-sales-budget",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "version",
+    "plantCode",
+    "period",
+    "granularity",
+    "active",
+    "ruleVersion"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deterministic key from the natural key; see title."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_-]{2,20}$",
+      "description": "Plan version, e.g. 'B26' (budget) or 'BU27' (business update)."
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Platform plant (plants@1) resolved from the source plant code or name; null when unresolved (reported)."
+    },
+    "plantCode": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Plant code or name exactly as the source states it."
+    },
+    "materialNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source material number without leading zeros; null for rows without a material."
+    },
+    "articleId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "articles@1 _id (<sapSystem>-<materialNumber>) when the plant's SAP system is known and the article exists; otherwise null."
+    },
+    "period": {
+      "type": "string",
+      "pattern": "^[0-9]{4}(-(0[1-9]|1[0-2]))?$",
+      "description": "YYYY-MM for monthly plan values, YYYY for yearly ones."
+    },
+    "granularity": {
+      "type": "string",
+      "enum": [
+        "month",
+        "year"
+      ]
+    },
+    "text": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source line text; identifies lines without a material number."
+    },
+    "customer": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "End customer as named in the plan."
+    },
+    "projectNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "PEP project number (pep_projects@1) when stated."
+    },
+    "productLine": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "salesCategory": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source revenue category, e.g. third-party or intercompany production."
+    },
+    "businessType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source business type code, e.g. booked or potential."
+    },
+    "planSource": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source plan status, e.g. 'Booked' or 'Potential'."
+    },
+    "quantity": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Planned pieces; null when the source has only a value."
+    },
+    "valueEur": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Planned sales in EUR."
+    },
+    "valueLocal": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "localCurrency": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{3}$"
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False when no longer present in the complete global source snapshot."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "syncRunId": {
+      "type": "string"
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

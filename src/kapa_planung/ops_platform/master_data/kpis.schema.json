@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/kpis.v1",
+  "title": "KPI definition",
+  "description": "Versioned KPI formula, e.g. cycle-time deviation.",
+  "x-collection": "kpis",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "kpiId",
+  "type": "object",
+  "required": [
+    "kpiId",
+    "name",
+    "version"
+  ],
+  "properties": {
+    "kpiId": {
+      "description": "Key, e.g. 'ZZAbweichung'.",
+      "type": "string"
+    },
+    "name": {
+      "description": "Display name.",
+      "type": "string"
+    },
+    "unit": {
+      "description": "Unit.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "formula": {
+      "description": "{expression}.",
+      "type": "object"
+    },
+    "version": {
+      "description": "Stored with every computed value.",
+      "type": "integer"
+    },
+    "active": {
+      "description": "False instead of delete.",
+      "type": "boolean"
+    }
+  }
+}

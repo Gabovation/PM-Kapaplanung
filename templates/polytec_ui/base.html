@@ -1,0 +1,70 @@
+{% import "polytec_ui/macros.html" as ui %}
+{% set _app_title = app_title|default("POLYTEC Application") %}
+{#- List refreshes (X-PT-Partial: content) replace regions of the current page: send the content only,
+    without shell, navigation and icon sprite. Full page loads are unchanged. -#}
+{% if request is defined and request.headers.get('X-PT-Partial') == 'content' %}<!doctype html>
+<html lang="{{ document_language|default('en') }}"><body>{{ self.content() }}</body></html>
+{%- else %}
+<!doctype html>
+<html lang="{{ document_language|default('en') }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="polytec-ui-version" content="{{ polytec_ui_version }}">
+  <title>{% block title %}{{ _app_title }}{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('polytec_ui.static', filename='polytec_ui/img/polytec-favicon.svg') }}">
+  {# Home-screen icon (iOS ignores the SVG above) and, when the app serves a web manifest, the installed web app. #}
+  <link rel="apple-touch-icon" href="{{ url_for('polytec_ui.static', filename='polytec_ui/img/polytec-app-icon-180.png') }}">
+  {% if web_manifest_endpoint|default(none) %}<link rel="manifest" href="{{ url_for(web_manifest_endpoint) }}">{% endif %}
+  {# Fetched together with the stylesheets, so the first paint already uses Quicksand. Same URL as the
+     @font-face rule in polytec-ui.css (crossorigin, as fonts are always fetched in CORS mode). #}
+  <link rel="preload" href="{{ url_for('polytec_ui.static', filename='polytec_ui/fonts/Quicksand-Variable.ttf') }}" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('polytec_ui.static', filename='polytec_ui/css/polytec-tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('polytec_ui.static', filename='polytec_ui/css/polytec-ui.css') }}">
+  <link rel="stylesheet" href="{{ url_for('polytec_ui.static', filename='polytec_ui/css/planning-grid.css') }}">
+  <link rel="stylesheet" href="{{ url_for('polytec_ui.static', filename='polytec_ui/css/time-board.css') }}">
+  {% block styles %}{% endblock %}
+  <script type="module" src="{{ url_for('polytec_ui.static', filename='polytec_ui/js/polytec-ui.js') }}"></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="pt-standalone-shell {% block body_class %}{% endblock %}">
+  <svg id="polytec-icon-sprite" aria-hidden="true" style="display:none">{{ polytec_icon_sprite }}</svg>
+  <a class="pt-skip-link" href="#main-content">Skip to content</a>
+  {% block header %}
+  <header class="pt-standalone-header">
+    <a class="pt-standalone-header__brand" href="{{ app_home_url|default('/') }}" aria-label="{{ _app_title }} home">
+      <img class="pt-standalone-header__logo-full" src="{{ url_for('polytec_ui.static', filename='polytec_ui/img/polytec-logo.png') }}" alt="POLYTEC">
+      <img class="pt-standalone-header__logo-mark" src="{{ url_for('polytec_ui.static', filename='polytec_ui/img/polytec-mark.jpg') }}" alt="" aria-hidden="true">
+    </a>
+    <div class="pt-standalone-header__title" title="{{ _app_title }}">{{ _app_title }}</div>
+    <div class="pt-standalone-header__action">{% block header_actions %}{% endblock %}</div>
+  </header>
+  {% endblock %}
+  {% block app_main %}
+  <main class="pt-standalone-main" id="main-content" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+  {% endblock %}
+  {% block footer %}
+  <footer class="pt-standalone-footer">
+    <nav aria-label="Application navigation">{% block footer_navigation %}{% endblock %}</nav>
+    <div>{% block footer_actions %}{% endblock %}</div>
+  </footer>
+  {% endblock %}
+
+  <dialog class="pt-dialog" aria-labelledby="pt-confirm-title" aria-describedby="pt-confirm-message" data-pt-confirm-dialog>
+    <form method="dialog">
+      <div class="pt-dialog__body">
+        <h2 class="pt-dialog__title" id="pt-confirm-title" data-pt-confirm-title>Confirm action</h2>
+        <p class="pt-dialog__message" id="pt-confirm-message" data-pt-confirm-message>Do you want to continue?</p>
+      </div>
+      <div class="pt-dialog__actions">
+        {{ ui.button("Cancel", variant="secondary", type="submit", value="cancel") }}
+        {{ ui.button("Confirm", variant="primary", type="submit", value="confirm") }}
+      </div>
+    </form>
+  </dialog>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
+{% endif %}

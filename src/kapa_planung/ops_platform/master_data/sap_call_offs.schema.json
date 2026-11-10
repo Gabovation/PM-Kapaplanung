@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_call_offs.v1",
+  "title": "Monthly sales view per material",
+  "description": "Budget, actual and customer call-off value and quantity per material and month from the group sales report; release history is not yet available.",
+  "x-collection": "sap_call_offs",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "external:group-sales-report",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "materialNumber",
+    "month",
+    "granularity",
+    "active",
+    "ruleVersion"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deterministic key from the natural key; see title."
+    },
+    "materialNumber": {
+      "type": "string",
+      "minLength": 1
+    },
+    "articleIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Candidate articles@1 ids with this material number in a mapped production plant; one entry = unambiguous."
+    },
+    "plantIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Platform plants of the candidate articles."
+    },
+    "customerMaterial": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "month": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "granularity": {
+      "type": "string",
+      "enum": [
+        "month"
+      ]
+    },
+    "releaseNumber": {
+      "type": "null",
+      "description": "Reserved for the call-off release once release history is available."
+    },
+    "budgetValue": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "actualValue": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "callOffValue": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "actualQuantity": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "forecastQuantity": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "const": "EUR"
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False when no longer present in the complete global source snapshot."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "syncRunId": {
+      "type": "string"
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

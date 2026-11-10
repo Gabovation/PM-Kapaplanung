@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_cost_centers.v1",
+  "title": "SAP cost centre",
+  "description": "SAP reference data, synchronised read-only by the SAP interface job (MD-06).",
+  "x-collection": "sap_cost_centers",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (SAP interface)",
+  "x-source": "erp:cost_centers",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "costCenterNumber",
+  "type": "object",
+  "required": [
+    "costCenterNumber",
+    "active"
+  ],
+  "properties": {
+    "plantId": {
+      "description": "Plant (plants@1).",
+      "type": "string"
+    },
+    "costCenterNumber": {
+      "description": "SAP Kostenstelle.",
+      "type": "string"
+    },
+    "text": {
+      "description": "Description.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "plantIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "Plants where this exact key is known, including historical references."
+    },
+    "activePlantIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "For legacy-bootstrap rows, only plants where the current CO Object export lists this exact typed key. Equipment/history evidence never activates it."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False keeps a historical key resolvable without offering it for new assignments."
+    },
+    "source": {
+      "type": "string",
+      "description": "legacy-bootstrap identifies unverified Power App references; absent/SAP source remains SAP-managed."
+    },
+    "legacySources": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Bootstrap provenance with source system, SHA-256 hashes and evidence; never implies live SAP validation."
+    },
+    "sapSystem": {
+      "type": "string"
+    },
+    "syncRunId": {
+      "type": "string",
+      "description": "data_sync_runs@1 run that last wrote the record."
+    },
+    "syncedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "description": "Hash of the prepared source-owned content, excluding sync metadata."
+    }
+  }
+}

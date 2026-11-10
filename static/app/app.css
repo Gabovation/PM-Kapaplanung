@@ -1,0 +1,29 @@
+/* Domain layout. Common controls, colours, typography and shell come from the UI kit. */
+.kapa-heading,.hero,.panelhead,.detailtop,.actions,.row,.toolbar,.modalhead,.modalfoot {display:flex;align-items:center;justify-content:space-between;gap:var(--polytec-space-3)}
+.kapa-heading,.hero,.panelhead,.detailtop {margin-bottom:var(--polytec-space-4)}
+.grid,.phasegrid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--polytec-space-4)}
+.layout,.split {display:grid;grid-template-columns:2fr 1fr;gap:var(--polytec-space-4);margin-top:var(--polytec-space-4)}
+.projectcards {display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:var(--polytec-space-4)}
+.formgrid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--polytec-space-4)}
+.field {display:grid;gap:var(--polytec-space-1)}
+.field.full {grid-column:1/-1}
+.card,.panel {background:var(--polytec-color-surface-panel);border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);padding:var(--polytec-space-4)}
+.projectcard {cursor:pointer}
+.value {font-size:2rem;font-weight:700;margin:var(--polytec-space-3) 0}
+.label,.caption,.sub,.quiet,.muted,.section-kicker {color:var(--polytec-color-text-secondary)}
+.caption,.sub,.quiet,.section-kicker {font-size:.875rem}
+.spacer {height:var(--polytec-space-4)}
+.tablewrap {overflow:auto}
+.tablewrap table {width:100%}
+.person {display:flex;align-items:center;gap:var(--polytec-space-2)}
+.avatar {display:grid;place-items:center;min-width:2rem;min-height:2rem;background:var(--polytec-color-surface-subtle);border-radius:50%}
+.bar {width:5rem;height:.5rem;background:var(--polytec-color-surface-subtle)}
+.bar span {display:block;height:100%;background:var(--polytec-color-status-success)}
+.bar span.over {background:var(--polytec-color-status-danger)}
+.notice {padding:var(--polytec-space-3);border-left:var(--polytec-space-1) solid var(--polytec-color-status-warning);background:var(--polytec-color-surface-subtle)}
+.empty {padding:var(--polytec-space-5);text-align:center;color:var(--polytec-color-text-secondary)}
+.modalhead,.modalfoot {padding-block:var(--polytec-space-3)}
+.modalbody {max-height:65vh;overflow:auto}
+.weights input {max-width:7rem}
+@media(max-width:64rem){.layout,.split{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:40rem){.kapa-heading,.hero,.detailtop{align-items:flex-start;flex-wrap:wrap}.phasegrid,.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.panelhead{flex-wrap:wrap}}

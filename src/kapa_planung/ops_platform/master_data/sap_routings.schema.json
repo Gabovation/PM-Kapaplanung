@@ -1,0 +1,383 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_routings.v1",
+  "title": "SAP routing",
+  "description": "One routing alternative (task list type, group, counter) with its operations and harmonised standard values.",
+  "x-collection": "sap_routings",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "erp:routings",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "$defs": {
+    "sourceState": {
+      "type": "object",
+      "properties": {
+        "changeState": {"type": ["string", "null"]},
+        "validFrom": {"type": ["string", "null"], "format": "date-time"},
+        "deleted": {"type": "boolean"}
+      }
+    }
+  },
+  "required": [
+    "_id",
+    "sapSystem",
+    "group",
+    "counter",
+    "active"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "<sapSystem>-<type>-<group>-<counter>."
+    },
+    "sapSystem": {
+      "type": "string",
+      "description": "Source system: P01, P10 or PP4."
+    },
+    "plant": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "plants@1"
+    },
+    "routingType": {
+      "type": "string"
+    },
+    "group": {
+      "type": "string"
+    },
+    "counter": {
+      "type": "string"
+    },
+    "usage": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Y3 = costing routing, never used for capacity."
+    },
+    "status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "headerStates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "changeState": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "validFrom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "validTo": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "deleted": {"type": "boolean"},
+          "status": {"type": ["string", "null"]},
+          "changeNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "mcpRelevant": {
+      "type": "boolean"
+    },
+    "materials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "articleId",
+          "plant",
+          "isPrimary"
+        ],
+        "properties": {
+          "articleId": {
+            "type": "string",
+            "description": "articles@1 _id."
+          },
+          "plant": {
+            "type": "string",
+            "description": "Plant of the assignment (MAPL)."
+          },
+          "materialActive": {
+            "type": "boolean",
+            "description": "False if the material is flagged for deletion; the routing still counts when demand exists."
+          },
+          "assignmentActive": {
+            "type": "boolean",
+            "description": "Validity and deletion state of the material assignment at extraction."
+          },
+          "assignmentStates": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/sourceState"}
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "This alternative is the one the capacity calculation uses for the material in the plant."
+          },
+          "primaryReason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "productionVersion | fallback"
+          },
+          "ruleVersion": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "operation"
+        ],
+        "properties": {
+          "node": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operation": {
+            "type": "string"
+          },
+          "sequence": {
+            "type": "string",
+            "description": "SAP sequence; non-standard sequences remain with mcpRelevant false."
+          },
+          "validFrom": {"type": ["string", "null"], "format": "date-time"},
+          "deleted": {"type": "boolean"},
+          "selectionStates": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/sourceState"}
+          },
+          "changeState": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ZAEHL; more than one only in PP4."
+          },
+          "workCenterId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "sap_work_centers@1 _id; null if the work centre is missing."
+          },
+          "text": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "controlKey": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "baseQty": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "standardValues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "VGW01..VGW06."
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "unit": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "activityType": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "userFields": {
+            "type": "object",
+            "properties": {
+              "usr04": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "usr05": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "usr06": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          },
+          "standardValueKey": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "VGWTS of the work centre at extraction."
+          },
+          "machineCycleS": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Seconds per base quantity, harmonised per standard value key."
+          },
+          "personCycleS": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "machineSetupMin": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "personSetupMin": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "cavities": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Base quantity x user fields usr04 x usr05 (1 if zero)."
+          },
+          "mcpRelevant": {
+            "type": "boolean",
+            "description": "False for operations the Machine Capacity Planning report leaves out (e.g. PP4 control key other than Y001)."
+          },
+          "subOperations": {
+            "type": "array",
+            "description": "SAP sub-operations of this operation (PLPO rows whose SUMNR points to its node), including deleted ones. Absent when there are none. They have no mcpRelevant flag and never count towards capacity.",
+            "items": {
+              "type": "object",
+              "required": [
+                "operation"
+              ],
+              "properties": {
+                "node": {"$ref": "#/properties/operations/items/properties/node"},
+                "operation": {
+                  "type": "string",
+                  "description": "VORNR of the sub-operation; unique only below its operation."
+                },
+                "changeState": {"$ref": "#/properties/operations/items/properties/changeState"},
+                "validFrom": {"$ref": "#/properties/operations/items/properties/validFrom"},
+                "deleted": {"type": "boolean"},
+                "workCenterId": {"$ref": "#/properties/operations/items/properties/workCenterId"},
+                "text": {"$ref": "#/properties/operations/items/properties/text"},
+                "controlKey": {"$ref": "#/properties/operations/items/properties/controlKey"},
+                "baseQty": {"$ref": "#/properties/operations/items/properties/baseQty"},
+                "standardValues": {"$ref": "#/properties/operations/items/properties/standardValues"},
+                "userFields": {"$ref": "#/properties/operations/items/properties/userFields"},
+                "standardValueKey": {"$ref": "#/properties/operations/items/properties/standardValueKey"},
+                "machineCycleS": {"$ref": "#/properties/operations/items/properties/machineCycleS"},
+                "personCycleS": {"$ref": "#/properties/operations/items/properties/personCycleS"},
+                "machineSetupMin": {"$ref": "#/properties/operations/items/properties/machineSetupMin"},
+                "personSetupMin": {"$ref": "#/properties/operations/items/properties/personSetupMin"},
+                "cavities": {"$ref": "#/properties/operations/items/properties/cavities"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False instead of delete (MD-07)."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "description": "Version of the derivation rules applied by data-sync."
+    },
+    "syncRunId": {
+      "type": "string",
+      "description": "data_sync_runs@1 _id of the run that last wrote the document."
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "description": "SHA-256 of the prepared content; the sync writes only when it changes."
+    }
+  }
+}

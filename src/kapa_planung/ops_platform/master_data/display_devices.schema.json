@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "$id": "polytec-ops/master-data/display_devices.v1",
+  "title": "Registered display",
+  "description": "Portal-managed browser principal with existing app-role assignments. Modules never read the credential hash into UI or write this collection.",
+  "x-collection": "display_devices",
+  "required": [
+    "_id",
+    "name",
+    "enabled",
+    "revision",
+    "credential_hash",
+    "apps",
+    "start_app",
+    "start_path",
+    "createdAt"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "credential_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 of the random portal-only device cookie. Raw credential never stored."
+    },
+    "apps": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "assignments"
+        ],
+        "properties": {
+          "assignments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "scope_type",
+                "scope_id",
+                "role_id"
+              ],
+              "properties": {
+                "scope_type": {
+                  "enum": [
+                    "corporate",
+                    "plant",
+                    "org_unit"
+                  ]
+                },
+                "scope_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "role_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Existing app role ID chosen for screens by an access administrator (catalogue display_roles), or explicit block. No kiosk role catalogue."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "start_app": {
+      "type": "string"
+    },
+    "start_path": {
+      "type": "string",
+      "description": "Same-host URL within an assigned module, navigation only; never resource authorization."
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional home plant (plants@1 plantId) for navigation; access comes only from apps assignments."
+    },
+    "language": {
+      "enum": [
+        "en",
+        "de"
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastSeenAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "card_sign_in": {
+      "type": "boolean",
+      "description": "Card terminal: people sign in here with their card for a short personal session (IAM-17). Default false. Changes nothing for the display's own access."
+    },
+    "workCenters": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "required": [
+          "plantId",
+          "workCenterNumber"
+        ],
+        "properties": {
+          "plantId": {
+            "type": "string"
+          },
+          "workCenterNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Optional SAP work centers (sap_work_centers@1, plant + number) the screen belongs to; board context for navigation only, never a grant (IAM-13, decision 0021)."
+    }
+  }
+}

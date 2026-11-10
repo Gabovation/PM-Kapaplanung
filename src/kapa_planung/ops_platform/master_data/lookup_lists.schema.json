@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/lookup_lists.v1",
+  "title": "Lookup list",
+  "description": "List of allowed values with stable codes, e.g. asset types, manufacturers, customers, field groups.",
+  "x-collection": "lookup_lists",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "maintenance",
+  "x-sync": null,
+  "x-key": "listKey",
+  "type": "object",
+  "required": [
+    "listKey",
+    "values"
+  ],
+  "properties": {
+    "listKey": {
+      "description": "Stable key, e.g. 'asset_types', 'manufacturers'.",
+      "type": "string"
+    },
+    "labels": {
+      "description": "Text per language, e.g. {en, de}.",
+      "type": "object"
+    },
+    "perPlant": {
+      "description": "True when values belong to one plant (e.g. lines, halls).",
+      "type": "boolean"
+    },
+    "values": {
+      "description": "[{code, labels, plantId?, active, order}]; records store the code.",
+      "type": "array"
+    }
+  }
+}

@@ -1,4 +1,17 @@
-﻿__pycache__/
+__pycache__/
 *.pyc
 SAP INPUT.xlsx
 planung.json
+.venv/
+__pycache__/
+*.pyc
+.env
+logs/
+*.log
+.coverage
+coverage.xml
+.pytest_cache/
+.local_packages/
+platform_neu/
+
+pytest-cache-files-*/

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/<collection>.v1",
+  "title": "<Entity name>",
+  "description": "One sentence: what one document represents.",
+  "x-collection": "<collection>",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity | structure | production | sap",
+  "x-owner": "TBD",
+  "x-source": "platform",
+  "x-writer": "portal | data-sync",
+  "x-sync": null,
+  "x-key": "<businessKeyField>",
+  "type": "object",
+  "required": [
+    "<businessKeyField>"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "<businessKeyField>": {
+      "type": "string",
+      "description": "Stable business key."
+    }
+  }
+}

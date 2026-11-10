@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/assets.v1",
+  "title": "Asset",
+  "description": "Physical machine, installation or real production workplace. measurements reference assetCode.",
+  "x-collection": "assets",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "maintenance",
+  "x-sync": null,
+  "x-key": "assetCode",
+  "type": "object",
+  "required": [
+    "assetCode",
+    "name",
+    "plantId"
+  ],
+  "properties": {
+    "assetCode": {
+      "description": "Stable business key, e.g. 'LOH-01591' (plant of origin + number); Process Data measurements.machine refers to it. Never changes, also not on a transfer.",
+      "type": "string"
+    },
+    "plantId": {
+      "description": "Plant where the asset is now (plants@1).",
+      "type": "string"
+    },
+    "name": {
+      "description": "Display name.",
+      "type": "string"
+    },
+    "assetType": {
+      "description": "Code of the list 'asset_types' (lookup_lists@1).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sapReferences": {
+      "description": "SAP keys, unchanged (MD-04): {costObject: {type: 'cc'|'wbs', number}, workCenterNumber, equipmentNumber}. costObject is where maintenance time and material are booked.",
+      "type": "object"
+    },
+    "attributes": {
+      "description": "Further values by field key; meaning, unit, list and applicability per type and plant are defined in equipment_fields@1.",
+      "type": "object"
+    },
+    "originPlantId": {
+      "description": "Plant where the record was created; stays after a transfer (plantId is the current plant).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "isActive": {
+      "description": "False once decommissioned or scrapped; never delete.",
+      "type": "boolean"
+    },
+    "source": {
+      "description": "'manual', 'import' or 'migration'.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "legacyId": {
+      "description": "Id in the previous system (Power App list item), for migration and lookup.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "updatedAt": {
+      "description": "Last change (UTC).",
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "description": "Person id (persons@1) of the last change.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

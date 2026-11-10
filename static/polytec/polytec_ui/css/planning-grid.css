@@ -1,0 +1,46 @@
+@layer components {
+  .pt-planning-grid { min-inline-size:0; max-inline-size:100%; display:grid; gap:var(--polytec-space-2); font-size:var(--polytec-schedule-font-size); }
+  .pt-planning-grid__toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:var(--polytec-space-2); min-block-size:var(--polytec-touch-target-min); }
+  .pt-planning-grid__extras { display:flex; flex-wrap:wrap; align-items:center; gap:var(--polytec-space-2); }
+  .pt-planning-grid__toolbar [role="status"] { margin-inline-start:auto; color:var(--polytec-color-text-secondary); }
+  .pt-planning-grid__scroll { min-inline-size:0; max-inline-size:100%; max-block-size:min(var(--polytec-schedule-scroll-height), 65dvh); overflow:auto; overscroll-behavior:contain; border:1px solid var(--polytec-color-border-default); background:var(--polytec-color-surface-panel); }
+  .pt-planning-grid__table { table-layout:fixed; border-collapse:separate; border-spacing:0; inline-size:calc(var(--polytec-planning-label-width) + var(--polytec-planning-day-width) * var(--pt-planning-days)); min-inline-size:100%; font-size:var(--polytec-schedule-meta-size); }
+  .pt-planning-grid__employee-col { inline-size:var(--polytec-planning-label-width); }
+  .pt-planning-grid__day-col { inline-size:var(--polytec-planning-day-width); }
+  .pt-planning-grid__table th, .pt-planning-grid__cell { padding:0; border-inline-end:1px solid var(--polytec-color-border-default); border-block-end:1px solid var(--polytec-color-border-default); }
+  .pt-planning-grid__cell { border-inline-end:1px dashed var(--pt-grid-line); }
+  .pt-planning-grid__table thead th { position:sticky; inset-block-start:0; z-index:2; block-size:var(--polytec-planning-header-height); background:var(--pt-grid-head); color:var(--polytec-color-text-primary); font-weight:700; text-align:center; white-space:nowrap; }
+  .pt-planning-grid__table thead th:not(:first-child) { border-inline-end-color:color-mix(in srgb, var(--polytec-color-text-secondary) 40%, var(--polytec-color-border-default)); }
+  .pt-planning-grid__table .pt-planning-grid__days th { border-block-end:2px solid var(--polytec-color-text-secondary); }
+  .pt-planning-grid__table .pt-planning-grid__weeks th { inset-block-start:var(--polytec-planning-header-height); }
+  .pt-planning-grid__table .pt-planning-grid__days th { inset-block-start:calc(var(--polytec-planning-header-height) * 2); block-size:calc(var(--polytec-planning-header-height) * 2); }
+  .pt-planning-grid__days th span { display:block; line-height:calc(var(--polytec-planning-header-height) - 1px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pt-planning-grid__table [data-pt-planning-row] > th, .pt-planning-grid__table .pt-planning-grid__corner { position:sticky; inset-inline-start:0; z-index:3; background:var(--polytec-color-surface-subtle); text-align:start; padding-inline:var(--polytec-space-2); max-inline-size:var(--polytec-planning-label-width); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .pt-planning-grid__table .pt-planning-grid__corner { z-index:4; }
+  .pt-planning-grid__table [data-pt-planning-row] > th a { display:flex; align-items:center; min-block-size:calc(var(--polytec-planning-row-height) - 1px); color:inherit; }
+  .pt-planning-grid__group th { block-size:var(--polytec-planning-header-height); background:var(--pt-grid-head); font-weight:700; text-align:start; }
+  .pt-planning-grid__group th > span { position:sticky; inset-inline-start:0; display:inline-block; padding-inline:var(--polytec-space-2); }
+  .pt-planning-grid__cell { --pt-planning-surface:var(--polytec-color-surface-panel); background:var(--pt-planning-surface); position:relative; inline-size:var(--polytec-planning-day-width); min-inline-size:var(--polytec-planning-day-width); block-size:var(--polytec-planning-row-height); }
+  .pt-planning-grid__cell input { display:block; inline-size:100%; min-inline-size:0; block-size:calc(var(--polytec-planning-row-height) - 1px); padding:0; border:0; border-radius:0; color:var(--polytec-color-text-primary); background:transparent; text-align:center; font-weight:500; }
+  .pt-planning-grid__cell input:focus-visible { outline:2px solid var(--polytec-color-focus-ring); outline-offset:-2px; }
+  .pt-planning-grid__scroll, .pt-planning-grid__cell input { transition-property:none; }
+  .pt-planning-grid__cell input[data-pt-planning-tone="neutral"] { background:color-mix(in srgb, var(--polytec-color-text-secondary) 8%, var(--pt-planning-surface)); }
+  .pt-planning-grid__cell input[data-pt-planning-tone="info"] { background:color-mix(in srgb, var(--polytec-color-status-info) 30%, var(--pt-planning-surface)); color:var(--polytec-color-status-info); }
+  .pt-planning-grid__cell input[data-pt-planning-tone="success"] { background:color-mix(in srgb, var(--polytec-color-status-success) 30%, var(--pt-planning-surface)); color:var(--polytec-color-status-success); }
+  .pt-planning-grid__cell input[data-pt-planning-tone="warning"] { background:color-mix(in srgb, var(--polytec-color-status-warning) 30%, var(--pt-planning-surface)); color:var(--polytec-color-status-warning); }
+  .pt-planning-grid__cell input[data-pt-planning-tone="danger"] { background:color-mix(in srgb, var(--polytec-color-status-danger) 30%, var(--pt-planning-surface)); color:var(--polytec-color-status-danger); }
+  .pt-planning-grid__cell--nonworking, .pt-planning-grid__cell--weekend { --pt-planning-surface:var(--pt-grid-off); }
+  .pt-planning-grid__cell--today { --pt-planning-surface:color-mix(in srgb, var(--polytec-color-action-primary) 8%, var(--polytec-color-surface-panel)); }
+  .pt-planning-grid__table .pt-planning-grid__week-start { border-inline-start:1px solid var(--polytec-color-text-secondary); }
+  .pt-planning-grid__table .pt-planning-grid__cell.pt-planning-grid__week-start { border-inline-start:0; box-shadow:inset 1px 0 var(--polytec-color-text-secondary); }
+  .pt-planning-grid__table thead .pt-planning-grid__weekend { background:color-mix(in srgb, var(--polytec-color-text-secondary) 25%, var(--pt-grid-head)); }
+  .pt-planning-grid__table thead .pt-planning-grid__today { box-shadow:inset 0 -3px var(--polytec-color-action-primary); }
+  .pt-planning-grid__cell--nonworking:not(.pt-planning-grid__cell--weekend)::after { content:""; position:absolute; inset-inline-end:var(--polytec-space-1); inset-block-end:var(--polytec-space-1); inline-size:var(--polytec-space-1); border-block-end:1px solid var(--polytec-color-text-secondary); pointer-events:none; }
+  .pt-planning-grid__cell.is-selected { outline:1px dashed var(--polytec-color-focus-ring); outline-offset:-1px; }
+  .pt-planning-grid__cell--error { box-shadow:inset 0 -2px var(--polytec-color-status-danger); }
+  .pt-planning-grid__table .pt-planning-grid__cell--error.pt-planning-grid__week-start { box-shadow:inset 1px 0 var(--polytec-color-text-secondary), inset 0 -2px var(--polytec-color-status-danger); }
+  .pt-planning-grid__cell--error::before { content:"!"; position:absolute; inset-inline-start:0; inset-block-start:0; color:var(--polytec-color-status-danger); font-weight:700; pointer-events:none; }
+  @media (pointer:coarse), (max-width:1023px) {
+    .pt-planning-grid { --polytec-planning-day-width:calc(var(--polytec-touch-target-min) + 1px); --polytec-planning-row-height:calc(var(--polytec-touch-target-min) + 1px); }
+  }
+}

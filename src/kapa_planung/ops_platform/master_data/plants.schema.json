@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/plants.v1",
+  "title": "Plant",
+  "description": "A POLYTEC production site.",
+  "x-collection": "plants",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "structure",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "plantId",
+  "type": "object",
+  "required": [
+    "name",
+    "plantId"
+  ],
+  "properties": {
+    "plantId": {
+      "description": "Business key, e.g. 'PCSH'.",
+      "type": "string"
+    },
+    "name": {
+      "description": "Display name, e.g. 'Hörsching'.",
+      "type": "string"
+    },
+    "abbreviation": {
+      "description": "Short plant code of 2 to 6 uppercase letters or digits, unique, e.g. 'LOH'. Prefix of asset, tool and work order IDs; the plants go by it in daily use. Null = not set yet.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z0-9]{2,6}$"
+    },
+    "timeZone": {
+      "description": "IANA time zone of the plant, e.g. 'Europe/Berlin' (one zone for all of Europe); dates and times of the plant are shown in it. Null = not set yet.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sapPlantNumber": {
+      "description": "SAP plant (Werk), unchanged.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sapPlants": {
+      "description": "SAP system and plant assignments; each pair belongs to at most one platform plant.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["sapSystem", "plant", "role"],
+        "properties": {
+          "sapSystem": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+          "plant": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "enum": ["production", "consignment", "sales"]},
+          "currency": {"type": ["string", "null"], "pattern": "^[A-Z]{3}$"}
+        }
+      }
+    },
+    "aliases": {
+      "description": "Codes and names other systems use for this plant, e.g. in group finance reports ('ABC', 'Example Works'). Matched case- and accent-insensitively; each alias belongs to at most one plant. data-sync links reporting extracts through them.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1, "maxLength": 80}
+    },
+    "currency": {
+      "description": "Local (company-code) currency, ISO 4217, e.g. 'EUR'; amounts reported in local currency are converted with fx_rates. Null = not set.",
+      "type": ["string", "null"],
+      "pattern": "^[A-Z]{3}$"
+    },
+    "companyCode": {
+      "description": "SAP company code.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "companyName": {
+      "description": "Legal entity.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "address": {
+      "description": "Postal address.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "country": {
+      "description": "Country.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "businessLineId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Business line the plant reports to (business_lines@1); null = not assigned."
+    },
+    "active": {
+      "description": "False once closed; never delete.",
+      "type": "boolean"
+    },
+    "_tableEditRevision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Portal table-editor revision; optional on existing documents."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Actor persons.id; no copied display name."
+    },
+    "editHistory": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Append-only table-edit actor, UTC time and changed field values; appended atomically with the row write."
+    }
+  }
+}

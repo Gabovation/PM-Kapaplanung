@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/physical_locations.v1",
+  "title": "Physical location",
+  "description": "Place inside a plant: store, buffer, shipping, workplace area.",
+  "x-collection": "physical_locations",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "structure",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "name",
+    "plantId",
+    "type"
+  ],
+  "properties": {
+    "plantId": {
+      "description": "Plant (plants@1).",
+      "type": "string"
+    },
+    "name": {
+      "description": "Display name.",
+      "type": "string"
+    },
+    "type": {
+      "description": "e.g. 'store', 'buffer', 'shipping'.",
+      "type": "string"
+    },
+    "sapStorageLocationId": {
+      "description": "SAP storage location (sap_storage_locations@1), if any.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "active": {
+      "description": "False instead of delete.",
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/person_groups.v1",
+  "title": "Person group",
+  "description": "Reusable group of persons (e.g. alert recipients of a line), shared by all apps.",
+  "x-collection": "person_groups",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "groupId",
+  "type": "object",
+  "required": [
+    "groupId",
+    "name"
+  ],
+  "properties": {
+    "groupId": {
+      "type": "string",
+      "description": "Stable key, e.g. 'MAINTENANCE-PCSH'."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name."
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Purpose of the group."
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Plant the group is responsible for; empty = all plants."
+    },
+    "members": {
+      "type": "array",
+      "description": "Person ids (persons@1 `id`); names are never copied (IAM-06). Membership grants no app access. Recipient expansion sends separate personal messages; this is not a Teams team/channel/chat ID."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False instead of delete."
+    },
+    "_tableEditRevision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Portal table-editor revision; optional on existing documents."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Actor persons.id; no copied display name."
+    },
+    "editHistory": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Append-only table-edit actor, UTC time and changed field values; appended atomically with the row write."
+    }
+  }
+}

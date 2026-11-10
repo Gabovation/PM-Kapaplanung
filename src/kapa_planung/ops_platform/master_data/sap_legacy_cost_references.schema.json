@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_legacy_cost_references.v1",
+  "title": "Legacy cost reference reconciliation",
+  "description": "Read-only migration evidence, including ambiguous or untyped references and uninterpreted PSP subcodes. Never an assignment catalogue.",
+  "x-collection": "sap_legacy_cost_references",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (SAP interface)",
+  "x-source": "legacy:maintenance-power-app",
+  "x-writer": "data-sync",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "sourceSystem",
+    "field",
+    "rawValue",
+    "status",
+    "count",
+    "sourceHashes",
+    "active"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string"
+    },
+    "sourceSystem": {
+      "type": "string"
+    },
+    "field": {
+      "type": "string"
+    },
+    "rawValue": {
+      "type": "string"
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "legacyPlant": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "resolved",
+        "ambiguous",
+        "unresolved",
+        "legacy_subcode",
+        "invalid_key"
+      ]
+    },
+    "costObject": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "sampleTimeIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sourceHashes": {
+      "type": "object"
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False retains obsolete migration evidence without deleting its history."
+    },
+    "syncRunId": {
+      "type": "string"
+    },
+    "syncedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string"
+    }
+  }
+}

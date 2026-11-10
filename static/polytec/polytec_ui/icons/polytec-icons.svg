@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- Standard platform icons. Outline, 24px grid, 1.8px stroke via .pt-icon. -->
+  <symbol id="pt-icon-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></symbol>
+  <symbol id="pt-icon-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="pt-icon-back" viewBox="0 0 24 24"><path d="m11 5-7 7 7 7M5 12h15"/></symbol>
+  <symbol id="pt-icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="pt-icon-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></symbol>
+  <symbol id="pt-icon-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v5l-4 2v-7Z"/></symbol>
+  <symbol id="pt-icon-add" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="pt-icon-edit" viewBox="0 0 24 24"><path d="m4 20 4.5-1 10-10-3.5-3.5-10 10zM13.5 7l3.5 3.5"/></symbol>
+  <symbol id="pt-icon-save" viewBox="0 0 24 24"><path d="M4 3h13l3 3v15H4zM8 3v6h8V3M8 21v-7h8v7"/></symbol>
+  <symbol id="pt-icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/></symbol>
+  <symbol id="pt-icon-close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+  <symbol id="pt-icon-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+  <symbol id="pt-icon-more-vertical" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></symbol>
+  <symbol id="pt-icon-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></symbol>
+  <symbol id="pt-icon-upload" viewBox="0 0 24 24"><path d="M12 16V4m-5 5 5-5 5 5M4 20h16"/></symbol>
+  <symbol id="pt-icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+  <symbol id="pt-icon-warning" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19zM12 9v5M12 17h.01"/></symbol>
+  <symbol id="pt-icon-bell" viewBox="0 0 24 24"><path d="M5 17h14l-2-3V9a5 5 0 0 0-10 0v5zM10 20h4"/></symbol>
+  <symbol id="pt-icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="pt-icon-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+  <symbol id="pt-icon-chevron-down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
+  <symbol id="pt-icon-chevron-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="pt-icon-chevron-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+  <symbol id="pt-icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 2l.06.06-2.1 2.1-.06-.06a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.65V20.5h-3v-.1A1.8 1.8 0 0 0 10.5 18.7a1.8 1.8 0 0 0-2 .36l-.06.06-2.1-2.1.06-.06a1.8 1.8 0 0 0 .36-2A1.8 1.8 0 0 0 5.1 13.9H5v-3h.1a1.8 1.8 0 0 0 1.65-1.1 1.8 1.8 0 0 0-.36-2l-.06-.06 2.1-2.1.06.06a1.8 1.8 0 0 0 2 .36 1.8 1.8 0 0 0 1.1-1.65V4.3h3v.1a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 2-.36l.06-.06 2.1 2.1-.06.06a1.8 1.8 0 0 0-.36 2 1.8 1.8 0 0 0 1.65 1.1h.1v3h-.1A1.8 1.8 0 0 0 19.4 15Z"/></symbol>
+  <symbol id="pt-icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+  <symbol id="pt-icon-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.5-4.5L3 9m0-5v5h5M4 13a8 8 0 0 0 14.5 4.5L21 15m0 5v-5h-5"/></symbol>
+  <symbol id="pt-icon-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6zM18 12h.01"/></symbol>
+  <symbol id="pt-icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="pt-icon-external-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></symbol>
+
+  <!-- POLYTEC operations icons: local, domain-specific and intentionally not generic app glyphs. -->
+  <symbol id="pt-icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12h.01"/></symbol>
+  <symbol id="pt-icon-history" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.5-6M3 4v4h4M12 8v4l3 2"/></symbol>
+  <symbol id="pt-icon-comment" viewBox="0 0 24 24"><path d="M4 5h16v11H10l-4 4v-4H4zM8 9h8M8 12h5"/></symbol>
+  <symbol id="pt-icon-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8M12 17h.01"/></symbol>
+  <symbol id="pt-icon-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+  <symbol id="pt-icon-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></symbol>
+  <symbol id="pt-icon-expand" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></symbol>
+  <symbol id="pt-icon-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.8-.7 1.8-1.6 0-.7-.5-1.1-.5-1.8 0-1 .8-1.6 1.8-1.6H17a4 4 0 0 0 4-4C21 6.8 17 3 12 3Z"/><path d="M7.5 12h.01M10 8h.01M14 8h.01M16.5 11h.01"/></symbol>
+  <symbol id="pt-icon-chart-line" viewBox="0 0 24 24"><path d="M3 20h18M4 16l5-6 4 4 7-8"/></symbol>
+  <symbol id="pt-icon-chart-column" viewBox="0 0 24 24"><path d="M3 20h18"/><rect x="5" y="11" width="4" height="9" rx="1"/><rect x="10" y="5" width="4" height="15" rx="1"/><rect x="15" y="8" width="4" height="12" rx="1"/></symbol>
+  <symbol id="pt-icon-chart-stacked" viewBox="0 0 24 24"><path d="M3 20h18"/><rect x="5" y="8" width="4" height="12" rx="1"/><path d="M5 14h4"/><rect x="10" y="4" width="4" height="16" rx="1"/><path d="M10 11h4"/><rect x="15" y="10" width="4" height="10" rx="1"/><path d="M15 15h4"/></symbol>
+  <symbol id="pt-icon-value" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M9 15V9l-1.5 1.5M13.5 9h3l-2.5 6"/></symbol>
+  <symbol id="pt-icon-gauge" viewBox="0 0 24 24"><path d="M4 17a8 8 0 0 1 16 0M4 17h16M12 17l3.5-5"/></symbol>
+  <symbol id="pt-icon-master-data" viewBox="0 0 24 24"><ellipse cx="9" cy="5" rx="5" ry="2.5"/><path d="M4 5v7c0 1.4 2.2 2.5 5 2.5.7 0 1.4-.1 2-.2M4 9.5C4 10.9 6.2 12 9 12s5-1.1 5-2.5M14 16h6m-3-3v6M15 21h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"/></symbol>
+  <symbol id="pt-icon-analytics" viewBox="0 0 24 24"><path d="M4 20V4M4 20h17M8 16v-4M13 16V7M18 16v-7"/><path d="m7 8 5-3 4 2 4-3"/></symbol>
+  <symbol id="pt-icon-report" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 17v-3m3 3v-6m3 6v-4"/></symbol>
+  <symbol id="pt-icon-machine" viewBox="0 0 24 24"><path d="M3 20h18M5 20V9h9v11M14 14h5l2 3v3h-7M7 9V5h5v4M8 14h2M16 17h1"/><circle cx="8" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></symbol>
+  <symbol id="pt-icon-asset" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></symbol>
+  <symbol id="pt-icon-mould-tool" viewBox="0 0 24 24"><path d="M4 5h5v14H4zM15 5h5v14h-5zM9 8h6v8H9zM11 10h2v4h-2zM12 2v3M12 19v3"/><path d="M12 14c-1.5 1.4-1.5 2.3 0 3.5 1.5-1.2 1.5-2.1 0-3.5Z"/></symbol>
+  <symbol id="pt-icon-algorithm" viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="5" rx="1"/><rect x="16" y="4" width="5" height="5" rx="1"/><rect x="9.5" y="15" width="5" height="5" rx="1"/><path d="m8 6.5 8 0M5.5 9v3.5h6.5V15M18.5 9v3.5H12"/></symbol>
+  <symbol id="pt-icon-process" viewBox="0 0 24 24"><rect x="3" y="4" width="6" height="5" rx="1"/><rect x="15" y="4" width="6" height="5" rx="1"/><rect x="9" y="15" width="6" height="5" rx="1"/><path d="M9 6.5h6M18 9v3.5h-6V15M6 9v3.5h6"/></symbol>
+  <symbol id="pt-icon-maintenance" viewBox="0 0 24 24"><path d="M14 6a5 5 0 0 0-6.5 6.5L3 17l4 4 4.5-4.5A5 5 0 0 0 18 10l-3 2-3-3z"/><path d="m5.5 18.5 1 1"/></symbol>
+  <symbol id="pt-icon-work-order" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3.5h6v3H9zM9 11h6M9 15h3M14 15l1.5 1.5L18 13"/></symbol>
+  <symbol id="pt-icon-quality" viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+  <symbol id="pt-icon-plant" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l6 3V7l8 4v10M7 14h.01M7 17h.01M11 15h.01M15 14h.01M15 17h.01M19 14h.01M19 17h.01M5 9V4h3v6"/></symbol>
+  <symbol id="pt-icon-material" viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4zM4 12l8 4 8-4M4 17l8 4 8-4"/></symbol>
+  <symbol id="pt-icon-parameters" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="7" cy="18" r="2"/></symbol>
+  <symbol id="pt-icon-integration" viewBox="0 0 24 24"><path d="M8 8V5a2 2 0 0 1 2-2h1v4h2V3h1a2 2 0 0 1 2 2v3M8 16v3a2 2 0 0 0 2 2h1v-4h2v4h1a2 2 0 0 0 2-2v-3M8 9H5a2 2 0 0 0-2 2v1h4v2H3v1a2 2 0 0 0 2 2h3M16 9h3a2 2 0 0 1 2 2v1h-4v2h4v1a2 2 0 0 1-2 2h-3"/></symbol>
+  <symbol id="pt-icon-model" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 10.9 15.7 7.1M8.3 13.1l7.4 3.8"/></symbol>
+  <symbol id="pt-icon-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="pt-icon-eye-off" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7c1.6 0 3 .4 4.3 1M22 12s-3.5 7-10 7c-1.6 0-3-.4-4.3-1M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18"/></symbol>
+  <symbol id="pt-icon-required" viewBox="0 0 24 24"><path d="M12 4v16M5.1 8l13.8 8M18.9 8 5.1 16"/></symbol>
+  <symbol id="pt-icon-grip" viewBox="0 0 24 24"><path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01"/></symbol>
+  <symbol id="pt-icon-list" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h.01M11 8h5M8 12h.01M11 12h5M8 16h.01M11 16h5"/></symbol>
+  <symbol id="pt-icon-cart" viewBox="0 0 24 24"><path d="M3 4h2l2.5 11h11L21 8H6.2"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></symbol>
+  <symbol id="pt-icon-book" viewBox="0 0 24 24"><path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3ZM21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7Z"/></symbol>
+  <symbol id="pt-icon-trend-up" viewBox="0 0 24 24"><path d="M5 20v-4M10 20v-7M15 20v-5M20 20V9"/><path d="m4 11 6-6 4 3 6-5M16 3h4v4"/></symbol>
+  <symbol id="pt-icon-barcode" viewBox="0 0 24 24"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M7 8v8M10 8v8M12.5 8v8M15 8v8M17 8v8"/></symbol>
+  <symbol id="pt-icon-guidance" viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></symbol>
+  <symbol id="pt-icon-energy" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7Z"/></symbol>
+  <symbol id="pt-icon-agv" viewBox="0 0 24 24"><path d="M5 17h14v-5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2Z"/><circle cx="8" cy="18" r="1.5"/><circle cx="16" cy="18" r="1.5"/><path d="M9 14h6M9.5 6.5a4 4 0 0 1 5 0M7.5 4.5a7 7 0 0 1 9 0"/></symbol>
+  <symbol id="pt-icon-checklist" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 13l2 2 4-4"/></symbol>
+  <symbol id="pt-icon-training" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5Z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5M22 9v6"/></symbol>
+  <symbol id="pt-icon-capacity" viewBox="0 0 24 24"><path d="M4 20v-7M8 20V9M12 20V5"/><circle cx="17.5" cy="16.5" r="2.5"/><path d="M17.5 12v1.5M17.5 19.5V21M13 16.5h1.5M20.5 16.5H22M14.3 13.3l1 1M19.7 18.7l1 1M14.3 19.7l1-1M19.7 14.3l1-1"/></symbol>
+  <symbol id="pt-icon-planner" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M6 13h7M10 17h8"/></symbol>
+  <symbol id="pt-icon-shift" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 3v4h-4M12 8v4l3 2"/></symbol>
+</svg>

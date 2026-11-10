@@ -1,0 +1,10 @@
+# Runtime baseline (STR-02). Review against current advisories on every release (QA-04).
+Flask>=3.1,<4
+Werkzeug>=3.1,<4
+waitress>=3.0.1,<4
+pymongo>=4.12,<5
+python-dotenv>=1.0,<2
+psutil>=6.0,<8
+Markdown>=3.9,<4                 # user manual under Help (docs/user-manual*.md, DOC-05)
+bleach>=6.2,<7                   # its HTML is sanitised before it is shown
+pywin32>=308; sys_platform == "win32"

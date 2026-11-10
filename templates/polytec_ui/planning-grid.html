@@ -1,0 +1,48 @@
+{% macro grid(id, title, days, rows, labels, caller=none) -%}
+<section id="{{ id }}" class="pt-planning-grid" data-pt-planning-grid data-planning-grid aria-label="{{ title }}">
+  <div class="pt-planning-grid__toolbar">
+    <strong>{{ title }}</strong>
+    {% if caller %}<span class="pt-planning-grid__extras">{{ caller() }}</span>{% endif %}
+    <span role="status" aria-live="polite" aria-atomic="true" data-pt-planning-status data-planning-status>{{ labels.get('status', '') }}</span>
+  </div>
+  <p class="pt-visually-hidden" id="{{ id }}-instructions">{{ labels.get('instructions', 'Arrow keys move between cells; Shift plus arrows selects a range. Type to fill a selection, paste tab-separated cells, Control+D fills down, Delete clears, Enter moves to the next row. Changes are drafts until the app saves them.') }}</p>
+  <div class="pt-planning-grid__scroll" data-pt-planning-scroll role="region" tabindex="0" aria-label="{{ title }} — {{ labels.get('scroll', 'Scrollable planning grid') }}" aria-describedby="{{ id }}-instructions">
+    <table class="pt-planning-grid__table" style="--pt-planning-days:{{ days|length }}">
+      <caption class="pt-visually-hidden">{{ title }}</caption>
+      <colgroup><col class="pt-planning-grid__employee-col">{% for day in days %}<col class="pt-planning-grid__day-col">{% endfor %}</colgroup>
+      <thead>
+        <tr class="pt-planning-grid__months"><th rowspan="3" scope="col" class="pt-planning-grid__corner">{{ labels.get('employee', 'Employee') }}</th>
+        {% for day in days %}{% if loop.first or day.month_key != days[loop.index0 - 1].month_key %}
+          {% set count = namespace(value=0, done=false) %}{% for next in days[loop.index0:] %}{% if not count.done and next.month_key == day.month_key %}{% set count.value = count.value + 1 %}{% else %}{% set count.done = true %}{% endif %}{% endfor %}
+          <th scope="colgroup" colspan="{{ count.value }}">{{ day.month }}</th>
+        {% endif %}{% endfor %}</tr>
+        <tr class="pt-planning-grid__weeks">{% for day in days %}{% if loop.first or day.week_key != days[loop.index0 - 1].week_key %}
+          {% set count = namespace(value=0, done=false) %}{% for next in days[loop.index0:] %}{% if not count.done and next.week_key == day.week_key %}{% set count.value = count.value + 1 %}{% else %}{% set count.done = true %}{% endif %}{% endfor %}
+          <th scope="colgroup" colspan="{{ count.value }}" class="pt-planning-grid__week-start">{{ day.week }}</th>
+        {% endif %}{% endfor %}</tr>
+        <tr class="pt-planning-grid__days">{% for day in days %}<th scope="col" title="{{ day.key }} — {{ day.weekday }}" class="{% if day.week_start|default(false) %}pt-planning-grid__week-start {% endif %}{% if day.weekend|default(false) %}pt-planning-grid__weekend {% endif %}{% if day.today|default(false) %}pt-planning-grid__today{% endif %}"><span>{{ day.weekday }}</span><span>{{ day.text }}</span></th>{% endfor %}</tr>
+      </thead>
+      {% set grouping = namespace(open=false, key=none) %}
+      {% for row in rows %}{% set row_index = loop.index0 %}{% set group_key = row.group_key|default('') %}
+        {% if loop.first or group_key != grouping.key %}
+          {% if grouping.open %}</tbody>{% endif %}{% set grouping.open = true %}{% set grouping.key = group_key %}
+          <tbody{% if group_key %} aria-labelledby="{{ id }}-group-{{ row_index }}"{% endif %}>
+          {% if group_key %}<tr class="pt-planning-grid__group" data-pt-planning-group><th scope="rowgroup" colspan="{{ days|length + 1 }}" id="{{ id }}-group-{{ row_index }}"><span>{{ row.group_label|default(group_key, true) }}</span></th></tr>{% endif %}
+        {% endif %}
+        <tr data-pt-planning-row data-row-key="{{ row.key }}">
+        {% set url = row.label_url|default('') %}{% set safe_url = url and ':' not in url and '\\' not in url and not url.startswith('//') %}
+        <th scope="row" title="{{ row.label }}">{% if safe_url %}<a href="{{ url }}">{{ row.label }}</a>{% else %}{{ row.label }}{% endif %}</th>
+        {% for day in days %}
+          {% set cell = row.cells.get(day.key, {}) if row.cells is mapping else row.cells[loop.index0]|default({}) %}
+          {% set nonworking = cell.nonworking|default(false) %}{% set error = cell.error|default('') %}
+          {% set tone = cell.tone|default('') %}{% set tone = tone if tone in ['neutral', 'info', 'success', 'warning', 'danger'] else '' %}
+          {% set label = cell.label|default(row.label ~ ' — ' ~ day.key ~ ' — ' ~ day.weekday, true) %}
+          <td class="pt-planning-grid__cell{% if day.week_start|default(false) %} pt-planning-grid__week-start{% endif %}{% if day.weekend|default(false) %} pt-planning-grid__cell--weekend{% endif %}{% if day.today|default(false) %} pt-planning-grid__cell--today{% endif %}{% if nonworking %} pt-planning-grid__cell--nonworking{% endif %}{% if error %} pt-planning-grid__cell--error{% endif %}" data-row="{{ row_index }}" data-col="{{ loop.index0 }}">
+            <input type="text" name="{{ cell.name|default('') }}" value="{{ cell.value|default('') }}" aria-label="{{ label }}{% if nonworking %} — {{ labels.get('nonworking', 'Nonworking day; editable') }}{% endif %}" title="{{ cell.title|default(label, true) }}{% if nonworking %} — {{ labels.get('nonworking', 'Nonworking day; editable') }}{% endif %}{% if error %} — {{ error }}{% endif %}" autocomplete="off" spellcheck="false" data-pt-planning-input data-pt-planning-tone="{{ tone }}"{% if error %} aria-invalid="true" aria-describedby="{{ id }}-error-{{ row_index }}-{{ loop.index0 }}"{% endif %}>
+            {% if error %}<span class="pt-visually-hidden" id="{{ id }}-error-{{ row_index }}-{{ loop.index0 }}">{{ error }}</span>{% endif %}
+          </td>
+        {% endfor %}</tr>{% endfor %}{% if grouping.open %}</tbody>{% else %}<tbody></tbody>{% endif %}
+    </table>
+  </div>
+</section>
+{%- endmacro %}

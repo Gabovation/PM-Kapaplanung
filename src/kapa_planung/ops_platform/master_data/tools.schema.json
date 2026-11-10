@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/tools.v1",
+  "title": "Tool",
+  "description": "Mould, gauge, fixture or other production tool that moves between machines and plants. Work orders and shot counters reference toolCode.",
+  "x-collection": "tools",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "maintenance",
+  "x-sync": null,
+  "x-key": "toolCode",
+  "type": "object",
+  "required": [
+    "toolCode",
+    "name",
+    "plantId"
+  ],
+  "properties": {
+    "toolCode": {
+      "description": "Stable business key: the tool number, e.g. 'T262000'. Never changes, also not on a transfer.",
+      "type": "string"
+    },
+    "plantId": {
+      "description": "Plant where the tool is now (plants@1).",
+      "type": "string"
+    },
+    "name": {
+      "description": "Display name.",
+      "type": "string"
+    },
+    "toolType": {
+      "description": "Code of the list 'tool_types' (lookup_lists@1): the production process, e.g. 'injection_moulding', 'gauge'.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "description": "Code of the list 'tool_statuses' (lookup_lists@1), e.g. 'in_use', 'stored', 'in_repair', 'external', 'scrapped'.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sapReferences": {
+      "description": "SAP keys, unchanged (MD-04): {equipmentNumber, materialNumber, costObject: {type, number}}.",
+      "type": "object"
+    },
+    "attributes": {
+      "description": "Further values by field key; meaning, unit, list and applicability per type and plant are defined in equipment_fields@1.",
+      "type": "object"
+    },
+    "originPlantId": {
+      "description": "Plant where the record was created; stays after a transfer (plantId is the current plant).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "isActive": {
+      "description": "False once decommissioned or scrapped; never delete.",
+      "type": "boolean"
+    },
+    "source": {
+      "description": "'manual', 'import' or 'migration'.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "legacyId": {
+      "description": "Id in the previous system (Power App list item), for migration and lookup.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "updatedAt": {
+      "description": "Last change (UTC).",
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "description": "Person id (persons@1) of the last change.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{% extends "ops_platform_ui/embed.html" %}
+{% import "polytec_ui/macros.html" as ui %}
+{# Rendered by the platform kit for a widget request that cannot show the widget: signed-out,
+   forbidden or unknown. Framable, so the board's tile shows the state instead of a blank frame. #}
+{% block content %}{{ ui.widget_state("error" if widget_state|default("") == "unknown" else widget_state|default("error"), _(widget_message) if _ is defined else widget_message) }}{% endblock %}

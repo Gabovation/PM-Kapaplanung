@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "$id": "polytec-ops/master-data/person_app_access.v1",
+  "title": "Person app access",
+  "description": "One document per stable person ID; revision protects atomic saves across app columns..",
+  "x-collection": "person_app_access",
+  "required": [
+    "_id",
+    "revision",
+    "apps"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "persons.id"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "apps": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "assignments"
+        ],
+        "properties": {
+          "assignments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "scope_type",
+                "scope_id",
+                "role_id"
+              ],
+              "properties": {
+                "scope_type": {
+                  "enum": [
+                    "corporate",
+                    "plant",
+                    "org_unit"
+                  ]
+                },
+                "scope_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Null for corporate, otherwise plants.plantId or org_units.orgUnitId."
+                },
+                "role_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Catalogue role ID, or null for explicit No access. Missing assignment inherits corporate if supported."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/org_units.v1",
+  "title": "Organisational unit",
+  "description": "A unit that is no plant (e.g. Group Purchasing) on one of the two levels of the plant hierarchy: level 'business_line' sits beside the business lines, level 'plant' beside the plants. Modules treat it like a business line or a plant of that level.",
+  "x-collection": "org_units",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "structure",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "orgUnitId",
+  "type": "object",
+  "required": [
+    "orgUnitId",
+    "name",
+    "level"
+  ],
+  "properties": {
+    "orgUnitId": {
+      "type": "string",
+      "description": "Business key, e.g. 'GRP-PUR'. Shares the key space of its level: never equal to a businessLineId (level 'business_line') or a plantId (level 'plant')."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name, e.g. 'Group Purchasing'."
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "business_line",
+        "plant"
+      ],
+      "description": "Level in the hierarchy business line > plant."
+    },
+    "parentId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Level 'plant': businessLineId (business_lines@1) or orgUnitId of a level-'business_line' unit it reports to. Level 'business_line': null."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False once dissolved; never delete (module data keeps the id)."
+    },
+    "_tableEditRevision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Portal table-editor revision; optional on existing documents."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Actor persons.id; no copied display name."
+    },
+    "editHistory": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Append-only table-edit actor, UTC time and changed field values; appended atomically with the row write."
+    }
+  }
+}

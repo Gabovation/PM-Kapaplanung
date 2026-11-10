@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/equipment_fields.v1",
+  "title": "Equipment field",
+  "description": "Definition of one value in assets.attributes or tools.attributes: label, group, data type, unit, list, and where it applies or is required.",
+  "x-collection": "equipment_fields",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "maintenance",
+  "x-sync": null,
+  "x-key": "kind + key",
+  "type": "object",
+  "required": [
+    "kind",
+    "key",
+    "group",
+    "dataType"
+  ],
+  "properties": {
+    "kind": {
+      "description": "'asset' or 'tool'.",
+      "type": "string"
+    },
+    "key": {
+      "description": "Stable field key used in attributes, e.g. 'clampingForceT'.",
+      "type": "string"
+    },
+    "group": {
+      "description": "Code of the list 'asset_field_groups' or 'tool_field_groups'.",
+      "type": "string"
+    },
+    "labels": {
+      "description": "Text per language, e.g. {en, de}.",
+      "type": "object"
+    },
+    "help": {
+      "description": "Text per language, e.g. {en, de}.",
+      "type": "object"
+    },
+    "dataType": {
+      "description": "'text', 'longtext', 'integer', 'decimal', 'date', 'boolean', 'list', 'multilist', 'person', 'asset', 'link'.",
+      "type": "string"
+    },
+    "unit": {
+      "description": "Unit shown with numbers, e.g. 't', 'mm'.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decimals": {
+      "description": "Decimals of a 'decimal' field.",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "listKey": {
+      "description": "List (lookup_lists@1) of a 'list' or 'multilist' field.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "order": {
+      "description": "Order within the group.",
+      "type": "integer"
+    },
+    "restricted": {
+      "description": "Shown in Maintenance only with a matching permission (e.g. tool costs); still readable by apps.",
+      "type": "boolean"
+    },
+    "rules": {
+      "description": "[{typeCode?, plantId?, state: 'not_applicable'|'optional'|'required'}]; the most specific rule wins: plant+type, type, plant, then optional.",
+      "type": "array"
+    },
+    "active": {
+      "description": "False instead of delete.",
+      "type": "boolean"
+    }
+  }
+}

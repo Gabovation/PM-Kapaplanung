@@ -1,0 +1,13 @@
+{% extends "polytec_ui/base.html" %}
+{# Widget page shown inside a board (gma-app-standards decision 0021, UI-02): no header, rail or
+   footer; the page fills the board's iframe and scrolls inside it. The board around it renews the
+   display connection, so a widget does not. Add "pt-display-scale" to body_class for boards read
+   from a distance. Served by routes with the kit's @widget_route. #}
+{% block styles %}{{ super() }}
+<link rel="stylesheet" href="{{ url_for('ops_platform_ui.static', filename='ops_platform_ui/css/connected-operations-tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('ops_platform_ui.static', filename='ops_platform_ui/css/ops-platform.css') }}">
+{% endblock %}
+{% block body_class %}ops-embed{% endblock %}
+{% block header %}{% endblock %}
+{% block app_main %}<main class="ops-embed__main" id="main-content" tabindex="-1">{% block content %}{% endblock %}</main>{% endblock %}
+{% block footer %}{% endblock %}

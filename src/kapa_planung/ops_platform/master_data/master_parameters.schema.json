@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/master_parameters.v1",
+  "title": "Master parameter",
+  "description": "Harmonised measurement parameter; tags map onto it instead of free naming.",
+  "x-collection": "master_parameters",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "name"
+  ],
+  "properties": {
+    "name": {
+      "description": "Harmonised name.",
+      "type": "string"
+    },
+    "unit": {
+      "description": "Unit.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "description": {
+      "description": "Meaning.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

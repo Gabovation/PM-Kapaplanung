@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=src --cov-branch --cov-report=term-missing --cov-report=xml"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
+# Every skip needs a comment naming the concrete false positive (QA-05).
+skips = []

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/business_lines.v1",
+  "title": "Business line",
+  "description": "An organisational business line that plants report to (e.g. BL Design Operations).",
+  "x-collection": "business_lines",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "structure",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "businessLineId",
+  "type": "object",
+  "required": [
+    "businessLineId",
+    "name"
+  ],
+  "properties": {
+    "businessLineId": {
+      "type": "string",
+      "description": "Business key, e.g. 'DESIGN-OPS'."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name, e.g. 'BL Design Operations'."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False once dissolved; never delete (plants and module data keep the id)."
+    },
+    "_tableEditRevision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Portal table-editor revision; optional on existing documents."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Actor persons.id; no copied display name."
+    },
+    "editHistory": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Append-only table-edit actor, UTC time and changed field values; appended atomically with the row write."
+    }
+  }
+}

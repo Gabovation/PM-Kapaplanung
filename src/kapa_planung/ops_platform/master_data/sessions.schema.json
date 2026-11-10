@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sessions.v1",
+  "title": "Session",
+  "description": "Server-side login session behind the ops_session cookie (IAM-08). Not master data, but part of the core contract every module reads.",
+  "x-collection": "sessions",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "personId",
+    "createdAt",
+    "expiresAt",
+    "sessionVersion"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "SHA-256 of the random cookie value - the cookie value itself is never stored."
+    },
+    "personId": {
+      "type": "string",
+      "description": "Person (persons@1)."
+    },
+    "sessionVersion": {
+      "type": "integer",
+      "description": "Copy of persons.session_version; a mismatch means revoked."
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Plant chosen in the header's plant switcher."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Login time."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "TTL index removes the session afterwards. Card sessions slide: the portal moves it to the last activity plus the idle time (default 60 minutes), never past the start plus the card lifetime (default 12.5 hours)."
+    },
+    "authenticationMethod": {
+      "type": "string",
+      "enum": [
+        "password",
+        "entra",
+        "card"
+      ],
+      "description": "Portal-issued authentication method. Missing means password. entra and card never require the local initial-password change; none grants anything."
+    },
+    "deviceId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Card sessions: the registered terminal (display_devices id) the card was used on."
+    }
+  }
+}

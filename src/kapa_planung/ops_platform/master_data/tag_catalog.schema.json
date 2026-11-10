@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/tag_catalog.v1",
+  "title": "Tag catalogue",
+  "description": "Versioned mapping of a source's tags to master parameters; measurements store tagIndex + catalogVersion.",
+  "x-collection": "tag_catalog",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "catalogVersion",
+    "parameters",
+    "source"
+  ],
+  "properties": {
+    "source": {
+      "description": "{type: 'asset' | ..., id}.",
+      "type": "object"
+    },
+    "catalogVersion": {
+      "description": "Increases on every mapping change.",
+      "type": "integer"
+    },
+    "parameters": {
+      "description": "[{tagIndex, sourceKey, masterParameterId}].",
+      "type": "array"
+    }
+  }
+}

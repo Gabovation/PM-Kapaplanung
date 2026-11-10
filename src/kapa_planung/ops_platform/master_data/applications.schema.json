@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/applications.v1",
+  "title": "Application",
+  "description": "An app of this environment: its start-page tile and where the app proxy routes it. Added from the app's manifest in the portal; the portal's application list is the register of apps (REG-03). The URL is the environment's base URL + path.",
+  "x-collection": "applications",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "appId",
+  "type": "object",
+  "required": [
+    "appId",
+    "category",
+    "name",
+    "path",
+    "state"
+  ],
+  "properties": {
+    "appId": {
+      "description": "Manifest app id, e.g. 'processdata'.",
+      "type": "string"
+    },
+    "name": {
+      "description": "Tile title.",
+      "type": "string"
+    },
+    "description": {
+      "description": "One line under the title.",
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "description": "Category key (application_categories@1)."
+    },
+    "icon": {
+      "type": "string",
+      "description": "UI Kit icon name."
+    },
+    "requiredPermission": {
+      "description": "Permission needed to see the tile; the target app checks it again.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sortOrder": {
+      "description": "Order within the category.",
+      "type": "integer"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "live",
+        "coming_soon",
+        "hidden"
+      ],
+      "description": "live = links to the module; coming_soon = shown, not clickable; hidden = not shown, still routed by the proxy while the app is built and tested (REG-07, REG-08)."
+    },
+    "plantIds": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "Plants the tile is shown for; null = all plants. Taken from the manifest's [app].plants on import (Mini-Apps, REG-09). With all plants selected the start page shows every tile."
+    },
+    "path": {
+      "type": "string",
+      "description": "Path behind the app proxy, e.g. '/processdata/' (REG-07)."
+    },
+    "upstreamHost": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Host the app proxy forwards to, usually '127.0.0.1' (DEP-03); null = no proxy rule."
+    },
+    "upstreamPort": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Port of the app's Waitress server = [runtime].default_port = APP_PORT (REG-05); null = no proxy rule."
+    },
+    "consumes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Master-data contracts the app consumes, from the last imported manifest, e.g. 'persons@1'."
+    },
+    "manifestVersion": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "App version of the last imported manifest."
+    },
+    "manifestImportedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "When the manifest was last imported (UTC)."
+    },
+    "serviceName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Runtime Windows service name imported from the manifest; administrators may correct the deployed name."
+    },
+    "monitoringExpected": {
+      "type": "boolean",
+      "default": false,
+      "description": "Explicitly expected to run for monitoring incidents; unrelated to tile visibility."
+    }
+  }
+}

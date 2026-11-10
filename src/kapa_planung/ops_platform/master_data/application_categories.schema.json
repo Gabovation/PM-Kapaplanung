@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/application_categories.v1",
+  "title": "Application category",
+  "description": "Group of tiles on the start page, e.g. Manufacturing or a plant's mini-apps.",
+  "x-collection": "application_categories",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "categoryId",
+  "type": "object",
+  "required": [
+    "categoryId",
+    "name",
+    "sortOrder"
+  ],
+  "properties": {
+    "categoryId": {
+      "type": "string",
+      "description": "Key, e.g. 'manufacturing'."
+    },
+    "name": {
+      "type": "string",
+      "description": "Heading on the start page."
+    },
+    "accent": {
+      "type": "string",
+      "enum": [
+        "red",
+        "grey",
+        "green",
+        "blue"
+      ],
+      "description": "Heading colour role from the UI Kit palette."
+    },
+    "plantIds": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "Plants the category is shown for; null = all (e.g. 'LOH Mini-Apps' only for PPG-LOH)."
+    },
+    "sortOrder": {
+      "type": "integer",
+      "description": "Order on the start page."
+    }
+  }
+}

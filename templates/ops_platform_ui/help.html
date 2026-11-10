@@ -1,0 +1,18 @@
+{# The app's user manual, rendered by the platform kit (ops_help: title, html, toc). It extends the
+   app's own layout (ops_help_layout) so the app's navigation stays, and marks Help as active. #}
+{% extends ops_help_layout|default("ops_platform_ui/base.html") %}
+{% import "polytec_ui/macros.html" as help_ui %}
+{% set app_help_active = true %}
+{% block content %}
+{% if ops_help %}
+<div class="ops-help">
+  <nav class="pt-card ops-help__contents" aria-labelledby="ops-help-contents-title">
+    <h2 id="ops-help-contents-title">Contents</h2>
+    <ul>{% for item in ops_help.toc %}<li><a href="#{{ item.id }}">{{ item.label }}</a></li>{% endfor %}</ul>
+  </nav>
+  <article class="pt-card ops-help__body">{{ ops_help.html }}</article>
+</div>
+{% else %}
+{{ help_ui.empty_state("No user manual", "The user manual could not be found on the server.", "help") }}
+{% endif %}
+{% endblock %}

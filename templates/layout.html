@@ -1,0 +1,20 @@
+{% extends "ops_platform_ui/base.html" %}
+{% import "ops_platform_ui/macros.html" as ops %}
+{% set app_title = app_manifest.name %}
+{% set document_language = "de" %}
+{% set app_home_url = url_for("index") %}
+{% set platform_home_url = false %}
+{% block styles %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='app/app.css') }}">{% endblock %}
+{% block sidebar_navigation %}
+{{ ops.navigation_item("Übersicht", url_for("index") ~ "#overview", "dashboard", active=true) }}
+{{ ops.navigation_item("Projekte", url_for("index") ~ "#projects", "work-order") }}
+{{ ops.navigation_divider() }}
+{{ ops.navigation_item("Personen", url_for("index") ~ "#people", "user") }}
+{{ ops.navigation_item("Einstellungen", url_for("index") ~ "#settings", "settings") }}
+{% endblock %}
+{% block mobile_navigation %}
+{{ ops.mobile_navigation_item("Übersicht", url_for("index") ~ "#overview", "dashboard", active=true) }}
+{{ ops.mobile_navigation_item("Projekte", url_for("index") ~ "#projects", "work-order") }}
+{{ ops.mobile_navigation_item("Personen", url_for("index") ~ "#people", "user") }}
+{{ ops.mobile_navigation_item("Einstellungen", url_for("index") ~ "#settings", "settings") }}
+{% endblock %}

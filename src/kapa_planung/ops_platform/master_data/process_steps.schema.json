@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/process_steps.v1",
+  "title": "Process step",
+  "description": "Real step of the process chain per article, with target values and ERP/asset mapping.",
+  "x-collection": "process_steps",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "articleId",
+    "name",
+    "stepCode"
+  ],
+  "properties": {
+    "articleId": {
+      "description": "Article (articles@1).",
+      "type": "string"
+    },
+    "plantId": {
+      "description": "Plant (plants@1).",
+      "type": "string"
+    },
+    "stepCode": {
+      "description": "Step code, unique per plant.",
+      "type": "string"
+    },
+    "name": {
+      "description": "Business name of the step.",
+      "type": "string"
+    },
+    "assetIds": {
+      "description": "Assets that can perform the step (assets@1).",
+      "type": "array"
+    },
+    "erp": {
+      "description": "{operation, subOperation} of the SAP routing.",
+      "type": "object"
+    },
+    "targetCycleTimeMs": {
+      "description": "Target cycle time.",
+      "type": "integer"
+    },
+    "validFrom": {
+      "description": "Valid from.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "validTo": {
+      "description": "Valid to; null = open.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "_tableEditRevision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Portal table-editor revision; optional on existing documents."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Actor persons.id; no copied display name."
+    },
+    "editHistory": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Append-only table-edit actor, UTC time and changed field values; appended atomically with the row write."
+    }
+  }
+}

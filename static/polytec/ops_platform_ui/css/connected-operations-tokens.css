@@ -1,0 +1,8 @@
+@layer tokens {
+  :root {
+    --polytec-ops-shell-footer-background: #333F48;
+    --polytec-ops-header-height: 56px;
+    --polytec-ops-header-height-compact: 52px;
+    --polytec-ops-footer-height: 52px;
+  }
+}

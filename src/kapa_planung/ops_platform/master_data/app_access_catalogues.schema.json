@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "$id": "polytec-ops/master-data/app_access_catalogues.v1",
+  "title": "App access catalogue",
+  "description": "Imported app manifest roles and supported scopes; enabled only after migration. In-use catalogues are immutable without a reviewed catalogue migration.",
+  "x-collection": "app_access_catalogues",
+  "required": [
+    "_id",
+    "name",
+    "enabled",
+    "scopes",
+    "roles",
+    "permissions",
+    "required_permission"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "scopes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "corporate",
+          "plant",
+          "org_unit"
+        ]
+      }
+    },
+    "required_permission": {
+      "type": "string"
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "label",
+          "description",
+          "permissions"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "display_policy": {
+      "type": "object",
+      "description": "Additive, explicitly imported app-owned opt-in; allowed_roles are the default screen roles. Does not change the immutable human catalogue.",
+      "properties": {
+        "allowed_roles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "read_permissions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "display_roles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "description": "Portal-administrator choice of app roles screens may use, edit roles included. Missing: display_policy.allowed_roles."
+    }
+  }
+}

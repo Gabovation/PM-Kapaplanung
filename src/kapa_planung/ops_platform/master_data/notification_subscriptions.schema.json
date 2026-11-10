@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/notification_subscriptions.v1",
+  "title": "Notification subscription",
+  "description": "Planned subscription contract only, not implemented by the current portal or kit. Who is notified for which scope; alert rules stay in the app. The draft currently requires personId despite describing groupId as an alternative; resolve this before implementing group subscriptions. Current BMDA app-side integration is documented in chapter 16.",
+  "x-collection": "notification_subscriptions",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "active",
+    "personId",
+    "scope"
+  ],
+  "properties": {
+    "personId": {
+      "description": "Person (persons@1).",
+      "type": "string"
+    },
+    "groupId": {
+      "description": "Alternatively a person group (person_groups@1).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scope": {
+      "description": "Scope, e.g. {plantId, appId, assetId}.",
+      "type": "object"
+    },
+    "active": {
+      "description": "Switch without deleting.",
+      "type": "boolean"
+    }
+  }
+}

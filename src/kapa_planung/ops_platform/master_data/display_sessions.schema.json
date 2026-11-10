@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "identity",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "$id": "polytec-ops/master-data/display_sessions.v1",
+  "title": "Display session",
+  "description": "Short-lived session behind ops_display_session. Separate from unchanged human sessions@1; fixed expiry, device revision checked by modules.",
+  "x-collection": "display_sessions",
+  "required": [
+    "_id",
+    "deviceId",
+    "deviceRevision",
+    "createdAt",
+    "expiresAt"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 of the random session cookie, never its raw value."
+    },
+    "deviceId": {
+      "type": "string"
+    },
+    "deviceRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "One-hour fixed expiry; TTL cleanup is not the authorization check."
+    }
+  }
+}

@@ -1,0 +1,722 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/articles.v1",
+  "title": "Article (SAP material master)",
+  "description": "One SAP material of one SAP system with plant views, production versions and purchasing data. Prepared by data-sync: SAP codes stay as values, fields carry readable names. The portal shows it read-only.",
+  "x-collection": "articles",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "erp:material",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "$defs": {
+    "valuation": {
+      "type": "object",
+      "required": ["valuationType", "deleted", "currency"],
+      "properties": {
+        "valuationType": {"type": ["string", "null"]},
+        "deleted": {"type": "boolean"},
+        "priceControl": {"type": ["string", "null"]},
+        "standardPrice": {"type": ["number", "null"]},
+        "movingAvgPrice": {"type": ["number", "null"]},
+        "priceUnit": {"type": ["number", "null"]},
+        "valuationClass": {"type": ["string", "null"]},
+        "currency": {"type": ["string", "null"]},
+        "stock": {"type": ["number", "null"]},
+        "stockValue": {"type": ["number", "null"]},
+        "lastPriceChange": {"type": ["string", "null"], "format": "date-time"}
+      }
+    }
+  },
+  "required": [
+    "_id",
+    "sapSystem",
+    "materialNumber",
+    "active"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "<sapSystem>-<materialNumber>; the number repeats across systems."
+    },
+    "sapSystem": {
+      "type": "string",
+      "description": "Source system: P01, P10 or PP4."
+    },
+    "materialNumber": {
+      "type": "string",
+      "description": "SAP material number without leading zeros."
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Material text (German, else English)."
+    },
+    "descriptionEn": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "descriptions": {
+      "type": "object",
+      "description": "Material descriptions keyed by SAP language code.",
+      "additionalProperties": {"type": "string"}
+    },
+    "materialType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "SAP material type (MTART)."
+    },
+    "groupMaterialType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Harmonised group material type."
+    },
+    "materialGroup": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "division": {
+      "type": ["string", "null"],
+      "description": "SAP division (SPART)."
+    },
+    "baseUnit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "productGroup": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "technology": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "surface": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "category": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "colour": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "processState": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "R raw, T trimmed, G primed, L painted, ZSB assembly; derived from the description."
+    },
+    "isDummy": {
+      "type": "boolean",
+      "description": "Planning placeholder material (number starts with PSDUMMY)."
+    },
+    "drawingNumber": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "drawingIndex": {
+      "type": ["string", "null"],
+      "description": "SAP drawing revision (ZEIVR)."
+    },
+    "projectNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "First three segments of the WBS element, e.g. 41-21-102."
+    },
+    "wbsElement": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "customerMaterialNumber": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "componentId": {
+      "type": ["string", "null"],
+      "description": "SAP component identifier (YYMATNR_KU)."
+    },
+    "sop": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "eop": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "grossWeight": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "netWeight": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "weightUnit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "qualityScore": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Master-data quality score of the source model (0..1)."
+    },
+    "plantData": {
+      "type": "array",
+      "description": "One entry per source plant view; inactive plants and incomplete views remain visible.",
+      "items": {
+        "type": "object",
+        "required": [
+          "plant",
+          "deleted"
+        ],
+        "properties": {
+          "plant": {
+            "type": "string",
+            "description": "SAP plant number."
+          },
+          "plantId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Platform plant (plants@1); null if the SAP plant is not mapped."
+          },
+          "plantActive": {
+            "type": ["boolean", "null"],
+            "description": "Source plant activity; null when the source plant table has no entry."
+          },
+          "deleted": {
+            "type": ["boolean", "null"],
+            "description": "Deletion flag of the plant view; null when the MARC plant view is missing."
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Plant-specific material status (MMSTA)."
+          },
+          "statusValidFrom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "procurementType": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "E in-house, F external, X both."
+          },
+          "specialProcurement": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "30 = subcontracting."
+          },
+          "mrpType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mrpController": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lotSizingProcedure": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "minLotSize": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "fixedLotSize": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "plannedDeliveryDays": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "inHouseProductionDays": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "lotSize": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Costing lot size."
+          },
+          "assemblyScrapPct": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "profitCenter": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coProduct": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "backflush": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priceControl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "S standard price, V moving average."
+          },
+          "standardPrice": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "movingAvgPrice": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "priceUnit": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "valuationClass": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stock": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Total stock in the base unit."
+          },
+          "stockValue": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "valuationVariants": {
+            "type": "array",
+            "description": "All valuation types, including deleted variants; the flat price fields use the untyped valuation only.",
+            "items": {"$ref": "#/$defs/valuation"}
+          },
+          "storageLocations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "storageLocation"
+              ],
+              "properties": {
+                "storageLocation": {
+                  "type": "string"
+                },
+                "unrestricted": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "inTransfer": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "qualityInspection": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "restricted": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "blocked": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "returns": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "storageBin": {
+                  "type": ["string", "null"],
+                  "description": "SAP storage bin (LGPBE)."
+                },
+                "deleted": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "sourceList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": ["string", "null"],
+                  "description": "SAP source-list item (ZEORD)."
+                },
+                "supplierId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "sap_suppliers@1 _id; null for a supplying plant."
+                },
+                "supplyingPlant": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "purchasingOrg": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "validFrom": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "validTo": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "fixed": {
+                  "type": "boolean"
+                },
+                "blocked": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "productionVersions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "version"
+              ],
+              "properties": {
+                "version": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "routingId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "sap_routings@1 _id."
+                },
+                "bomUsage": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "bomAlternative": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "locked": {
+                  "type": "boolean"
+                },
+                "validFrom": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "validTo": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "lotFrom": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "lotTo": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "isPrimary": {
+                  "type": "boolean",
+                  "description": "Display only. The capacity-relevant flag is sap_routings.materials[].isPrimary."
+                },
+                "routeKind": {
+                  "type": "string",
+                  "description": "own | own_painting | external_painting | intercompany | subcontracting | packaging_variant."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "unassignedValuations": {
+      "type": "array",
+      "description": "Valuation areas that cannot be identified as a source plant; never assigned to a guessed plant.",
+      "items": {
+        "allOf": [
+          {"$ref": "#/$defs/valuation"},
+          {"type": "object", "required": ["valuationArea"], "properties": {"valuationArea": {"type": "string"}}}
+        ]
+      }
+    },
+    "purchasing": {
+      "type": "array",
+      "description": "All purchasing info records of the material, with active flag.",
+      "items": {
+        "type": "object",
+        "required": [
+          "infoRecord",
+          "active"
+        ],
+        "properties": {
+          "infoRecord": {
+            "type": "string"
+          },
+          "supplierId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "sap_suppliers@1 _id."
+          },
+          "purchasingOrg": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plant": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Info record type (ESOKZ)."
+          },
+          "supplierMaterialNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "netPricePerUnit": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "netPricePerUnitEur": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "At the group rate of the extraction date; null without rate."
+          },
+          "priceUnit": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "orderUnit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "leadTimeDays": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "minOrderQty": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "validTo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False instead of delete (MD-07)."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "description": "Version of the derivation rules applied by data-sync."
+    },
+    "syncRunId": {
+      "type": "string",
+      "description": "data_sync_runs@1 _id of the run that last wrote the document."
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "description": "SHA-256 of the prepared content; the sync writes only when it changes."
+    }
+  }
+}

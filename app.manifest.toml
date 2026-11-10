@@ -1,0 +1,50 @@
+# Identity of this app on the POLYTEC Operations Platform.
+# Format and rules: gma-app-standards/standards/03-app-manifest-and-registry.md
+# Read by the app itself (ops_platform kit), platform_check and the portal (Add from manifest).
+schema = 2
+standard_version = "4.9.1"
+
+[app]
+id = "kapa-planung"                  # stable, lowercase; also the permission prefix and cookie name
+kind = "module"                    # "platform-core" only for the portal (ARC-07)
+name = "Kapazitätsplanung"
+description = "Projektübergreifende Kapazitätsplanung"
+package = "kapa_planung"            # Python package under src/
+version = "0.2.0"                  # bump on every release (shown by /health)
+category = "TBD"                   # portal tile group, e.g. "Manufacturing" or "Mini-Apps"
+# plants = ["PCSH"]                # Mini-Apps only: plant ids the tile is shown for (REG-09)
+icon = "TBD"                       # icon name from the POLYTEC UI Kit sprite
+owner = "TBD"                      # owning department, e.g. "Group Maintenance & Automation"; never guess
+support_contact = "TBD"            # named people, e.g. "First Last, First Last"
+
+[runtime]
+path = "/kapa-planung"               # path segment behind the app proxy, no trailing slash
+default_port = 5123        # = APP_PORT in .env; the portal routes the proxy to this port (REG-05)
+deployment_mode = "windows-service"  # or "console"
+service_name = "KapazitTsplanung"
+database = "gma-kapa-planung-q"           # gma-<app-id>-<q|prod>; omit if the module stores no data (DB-01)
+
+[permissions]
+"kapa-planung.viewer" = "Open Kapazitätsplanung and view its data"
+"kapa-planung.editor" = "Change Kapazitätsplanung data and settings"
+
+[access]
+model = "scoped"
+scopes = ["corporate"]
+required_permission = "kapa-planung.viewer"   # the portal shows the tile only with this permission
+
+[app_roles.reader]
+label = "Reader"
+description = "View app data."
+permissions = ["kapa-planung.viewer"]
+
+[app_roles.editor]
+label = "Editor"
+description = "View and change app data."
+permissions = ["kapa-planung.viewer", "kapa-planung.editor"]
+
+[i18n]
+languages = ["en", "de"]         # chapter 15; add "sk", "cs", "nl", "hu" with their JSON files
+
+[master_data]
+consumes = ["persons@1", "sessions@1", "roles@1", "app_access_catalogues@1", "person_app_access@1"]                      # e.g. ["plants@1", "assets@1", "persons@1"] - see master-data/ in the standards repo

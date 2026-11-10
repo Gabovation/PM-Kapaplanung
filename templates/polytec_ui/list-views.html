@@ -1,0 +1,63 @@
+{% import 'polytec_ui/macros.html' as ui %}
+<div class="pt-list-views" id="{{ id }}" data-pt-live-results data-pt-list-views>
+  <script type="application/json" data-pt-view-config>{{ view|tojson }}</script>
+  <div class="pt-list-views__picker">
+    <form id="{{ id }}-picker" method="get" action="{{ view.list_url }}" data-pt-autosubmit data-pt-live-search data-pt-view-picker>
+      {% for key, value in view.context.items() %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+      {% call ui.field(view.labels.saved_view, id ~ '-select') %}
+      <select class="pt-select" id="{{ id }}-select" name="view">
+        <option value="standard"{% if not view.current %} selected{% endif %}>{{ view.labels.standard }}</option>
+        {% for item in view.saved %}<option value="{{ item.id }}"{% if view.current and item.id == view.current.id %} selected{% endif %}>{{ item.label }}</option>{% endfor %}
+      </select>{% endcall %}
+      <noscript>{{ ui.button('Open', 'secondary', type='submit') }}</noscript>
+    </form>
+    <button class="pt-button pt-button--secondary" type="button" data-pt-dialog-open="{{ id }}-dialog" data-pt-manage-view hidden>{{ ui.icon('parameters') }}<span>Manage view</span></button>
+  </div>
+  <dialog class="pt-dialog pt-view-dialog" id="{{ id }}-dialog" aria-labelledby="{{ id }}-title">
+    <form id="{{ id }}-form" method="get" action="{{ view.list_url }}" data-pt-list-apply data-pt-view-editor data-pt-guard-dirty>
+      <input type="hidden" name="f" value="1"><input type="hidden" name="columns_set" value="1">
+      {% if view.current %}<input type="hidden" name="view_id" value="{{ view.current.id }}">{% endif %}
+      {% for key, values in view.hidden.items() %}{% for value in ([values] if values is string else values) %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}{% endfor %}
+      <div class="pt-dialog__body">
+        <div class="pt-table-heading"><h2 class="pt-dialog__title" id="{{ id }}-title">Manage view</h2><button class="pt-icon-button pt-icon-button--subtle" type="button" data-pt-dialog-close aria-label="Close">{{ ui.icon('close') }}</button></div>
+        <div data-pt-tabs>
+          <div class="pt-tabs" role="tablist" aria-label="{{ view.labels.settings }}">
+            <button class="pt-tab" type="button" role="tab" id="{{ id }}-columns-tab" aria-controls="{{ id }}-columns" aria-selected="true">Columns</button>
+            {% if view.fields %}<button class="pt-tab" type="button" role="tab" id="{{ id }}-filters-tab" aria-controls="{{ id }}-filters" aria-selected="false" tabindex="-1">Filters</button>{% endif %}
+          </div>
+          <div id="{{ id }}-columns" role="tabpanel" aria-labelledby="{{ id }}-columns-tab">
+            {% call ui.field(view.labels.find_column, id ~ '-column-search') %}<input class="pt-input" type="search" id="{{ id }}-column-search" data-pt-view-column-search autocomplete="off" data-pt-ignore-dirty>{% endcall %}
+            {% call ui.table(view.labels.columns) %}
+              <thead><tr><th>{{ view.labels.columns }}</th><th>{{ view.labels.position }}</th></tr></thead>
+              <tbody data-pt-sort-list="columns" data-pt-sortable data-pt-view-columns></tbody>
+            {% endcall %}
+            {# Rows are built from the config when the dialog opens: list refreshes stay small. #}
+            <template data-pt-view-column-template><tr data-pt-sort-item><td><label class="pt-filter-bar__check"><input type="checkbox" name="columns"><span data-pt-view-column-label></span></label></td><td>{{ ui.sort_controls() }}</td></tr></template>
+          </div>
+          {% if view.fields %}<div id="{{ id }}-filters" role="tabpanel" aria-labelledby="{{ id }}-filters-tab" hidden>
+            <div class="pt-view-conditions" data-pt-view-conditions></div>
+          </div>{% endif %}
+        </div>
+        {% if view.person %}
+        <div class="pt-view-fields">
+          {% call ui.field(view.labels.name, id ~ '-name') %}<input class="pt-input" id="{{ id }}-name" data-pt-view-name maxlength="60" value="{{ view.current.name if view.current else '' }}">{% endcall %}
+          {% if view.may_share %}{% call ui.field(view.labels.scope, id ~ '-scope') %}<select class="pt-select" id="{{ id }}-scope" data-pt-view-scope><option value="personal"{% if not view.current or not view.current.shared %} selected{% endif %}>{{ view.labels.personal }}</option><option value="shared"{% if view.current and view.current.shared %} selected{% endif %}>{{ view.labels.shared }}</option></select>{% endcall %}{% endif %}
+        </div>
+        <div class="pt-view-defaults" role="group" aria-label="{{ view.labels.defaults }}">
+          {% if view.default_label %}<span>{{ view.default_label }}</span>{% endif %}
+          <button class="pt-button pt-button--subtle" type="button" data-pt-view-default="personal">Use as my default</button>
+          {% if view.may_share %}<button class="pt-button pt-button--subtle" type="button" data-pt-view-default="shared">Use as default for everyone</button>{% endif %}
+          {% if view.has_personal_default %}<button class="pt-button pt-button--subtle" type="button" data-pt-view-default="reset">Reset my default</button>{% endif %}
+          {% if view.current and view.current.writable %}<button class="pt-button pt-button--subtle" type="button" data-pt-view-delete data-pt-confirm="{{ view.labels.delete_confirm }}">{{ ui.icon('delete') }}<span>Delete view</span></button>{% endif %}
+        </div>
+        {% endif %}
+        <p class="pt-view-feedback" data-pt-view-feedback role="status" aria-live="polite"></p>
+      </div>
+      <div class="pt-dialog__actions">
+        <button class="pt-button pt-button--secondary" type="button" data-pt-dialog-close data-pt-action="cancel">Cancel</button>
+        {{ ui.button('Apply', 'secondary', type='submit') }}
+        {% if view.person %}{% if view.current and view.current.writable %}<button class="pt-button pt-button--primary" type="button" data-pt-view-save="update">Save changes</button>{% endif %}<button class="pt-button pt-button--{{ 'secondary' if view.current and view.current.writable else 'primary' }}" type="button" data-pt-view-save="new">{{ 'Save as new' if view.current else 'Save view' }}</button>{% endif %}
+      </div>
+    </form>
+  </dialog>
+</div>

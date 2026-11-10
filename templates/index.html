@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+<div id="kapa-app" data-api-url="{{ url_for('planning_data') }}" data-write-token="{{ write_token }}">
+  <header class="kapa-heading"><h1 id="title" class="pt-page-header__title">Übersicht</h1>{{ ui.button('Projekt anlegen', variant='primary', icon_name='add', id='newProject') }}</header>
+  <div id="content" aria-live="polite"></div>
+</div>
+<dialog id="modal" class="pt-dialog pt-dialog--wide" aria-label="Bearbeiten"><div id="dialogContent" class="pt-dialog__body"></div></dialog>
+<script src="{{ url_for('static', filename='app/plan.js') }}" defer></script>
+{% endblock %}
+

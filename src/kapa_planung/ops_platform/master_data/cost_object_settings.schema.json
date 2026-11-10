@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/cost_object_settings.v1",
+  "title": "Platform cost object settings",
+  "description": "Portal-owned manual cost objects and explicit availability/label overrides of exact typed imported keys. No SAP fields or import provenance are copied or edited. See decision 0025.",
+  "x-collection": "cost_object_settings",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": "live",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "type",
+    "number",
+    "origin",
+    "label",
+    "active",
+    "plantIds",
+    "version",
+    "updatedAt",
+    "updatedBy",
+    "history",
+    "mode"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 of UTF-8 type:number, exact case-sensitive key, immutable."
+    },
+    "type": {
+      "enum": [
+        "cc",
+        "wbs"
+      ]
+    },
+    "number": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Exact immutable costCenterNumber or wbsNumber; leading zeros and punctuation retained."
+    },
+    "origin": {
+      "enum": [
+        "manual",
+        "reference"
+      ],
+      "description": "Manual entry or platform settings referencing an imported key. If a reference disappears it is unavailable, never converted to manual."
+    },
+    "label": {
+      "type": "string",
+      "maxLength": 240,
+      "description": "Platform description. Import text remains unchanged."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Explicit platform availability approval. Overrides imported eligibility, without changing or claiming SAP lifecycle/validation."
+    },
+    "plantIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "Plants approved for new assignments; an active entry needs at least one active plant."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Actor persons.id; no copied names."
+    },
+    "history": {
+      "type": "array",
+      "description": "Atomic append-only revisions with actor ID, time, version, label, active, plantIds and reason. Never removed or truncated by the editor.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "mode": {
+      "enum": [
+        "inherit",
+        "override"
+      ],
+      "description": "Follow current/future imports, or use explicit platform label/availability/plants. Manual entries require override. Inherit stores empty label/plants and active=false; effective values come directly from the current import."
+    }
+  }
+}

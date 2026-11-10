@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/article_overrides.v1",
+  "title": "Article platform overrides",
+  "description": "Portal-owned data retained from legacy manually maintained articles. SAP material data remains in articles@1 and is never edited here.",
+  "x-collection": "article_overrides",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "Group Maintenance & Automation",
+  "x-source": "platform",
+  "x-writer": "portal",
+  "x-sync": null,
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "legacyId",
+    "active",
+    "legacyDocument",
+    "migratedAt"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "Deterministic portal override id derived from the legacy article id."
+    },
+    "legacyId": {
+      "type": "string",
+      "description": "Canonical BSON Extended JSON representation of the original legacy article id; preserves its type for audit and idempotent migration."
+    },
+    "articleId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Matched articles@1 _id, or null until the legacy article is mapped."
+    },
+    "articleNo": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "legacyDocument": {
+      "type": "object",
+      "description": "Complete original manually maintained document, including its BSON _id."
+    },
+    "migratedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

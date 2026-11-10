@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_production_versions.v1",
+  "title": "SAP production version",
+  "description": "Deprecated: production versions are embedded in articles@1 (plantData[].productionVersions). SAP reference data, synchronised read-only by the SAP interface job (MD-06).",
+  "x-collection": "sap_production_versions",
+  "x-version": 1,
+  "x-status": "deprecated",
+  "x-group": "sap",
+  "x-owner": "TBD (SAP interface)",
+  "x-source": "erp:production_versions",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "productionVersion",
+  "type": "object",
+  "required": [
+    "productionVersion"
+  ],
+  "properties": {
+    "plantId": {
+      "description": "Plant (plants@1).",
+      "type": "string"
+    },
+    "materialId": {
+      "description": "Article (articles@1).",
+      "type": "string"
+    },
+    "productionVersion": {
+      "description": "SAP Produktionsversion.",
+      "type": "string"
+    },
+    "bomId": {
+      "description": "sap_boms@1.",
+      "type": "string"
+    },
+    "routingId": {
+      "description": "sap_routings@1.",
+      "type": "string"
+    },
+    "validFrom": {
+      "description": "Valid from.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "validTo": {
+      "description": "Valid to.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "x-deprecated-until": "2027-01-31"
+}

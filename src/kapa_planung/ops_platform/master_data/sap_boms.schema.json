@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_boms.v1",
+  "title": "SAP bill of materials (multi-level explosion)",
+  "description": "The multi-level explosion of one header article in one plant as delivered by the SAP function module, flat with level and path. Level 1 is the classic bill of materials; headers without components stay (level 0 only).",
+  "x-collection": "sap_boms",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "erp:boms",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "sapSystem",
+    "plant",
+    "headerArticleId",
+    "active"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "<sapSystem>-<plant>-<header>-<usage>-<alternative>."
+    },
+    "sapSystem": {
+      "type": "string",
+      "description": "Source system: P01, P10 or PP4."
+    },
+    "plant": {
+      "type": "string"
+    },
+    "plantId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "plants@1"
+    },
+    "headerArticleId": {
+      "type": "string",
+      "description": "articles@1 _id."
+    },
+    "usage": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "alternative": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "headerStatus": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "headerType": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "explosion": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "componentArticleId",
+          "level",
+          "path"
+        ],
+        "properties": {
+          "componentArticleId": {
+            "type": "string",
+            "description": "articles@1 _id."
+          },
+          "componentPlant": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "level": {
+            "type": "integer",
+            "description": "0 = the header itself."
+          },
+          "path": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Quantity per parent."
+          },
+          "quantityPer1000Header": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Cumulated quantity per 1000 header units (MNGLG)."
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lotSize": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "componentScrapPct": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "cumulatedScrapPct": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "coProducts": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "netScrap": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "componentType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False instead of delete (MD-07)."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "description": "Version of the derivation rules applied by data-sync."
+    },
+    "syncRunId": {
+      "type": "string",
+      "description": "data_sync_runs@1 _id of the run that last wrote the document."
+    },
+    "syncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "description": "SHA-256 of the prepared content; the sync writes only when it changes."
+    }
+  }
+}

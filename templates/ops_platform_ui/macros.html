@@ -1,0 +1,136 @@
+{% import "polytec_ui/macros.html" as core %}
+{% macro app_tile(label, url, icon_name, description=None, state="live", badge_label="Coming soon") -%}
+{% if state == "live" and url -%}
+<a class="ops-app-tile" href="{{ url }}"{% if description %} title="{{ description }}"{% endif %}>{{ core.icon(icon_name) }}<strong>{{ label }}</strong></a>
+{%- else -%}
+<div class="ops-app-tile is-coming-soon" aria-disabled="true">{{ core.icon(icon_name) }}<strong>{{ label }}</strong><span class="ops-app-tile__badge">{{ badge_label }}</span></div>
+{%- endif %}
+{%- endmacro %}
+
+{# Start page: a group of app tiles. accent: red | grey | green | blue; span: 1-6 tiles wide. #}
+{% macro app_category(title, count_label=None, url=None, accent="red", span=3, id=None) -%}
+{% set heading_id = (id or title|lower|replace(" ", "-")|replace("&", "and")) ~ "-title" -%}
+<section class="ops-app-category ops-app-category--{{ accent }} ops-app-category--span-{{ [[span, 1]|max, 6]|min }}"{% if id %} id="{{ id }}"{% endif %} aria-labelledby="{{ heading_id }}">
+  <header class="ops-app-category__head"><h2 class="ops-app-category__title" id="{{ heading_id }}">{{ title }}</h2>{% if url %}<a class="ops-app-category__more" href="{{ url }}">{{ count_label or "Show all" }}{{ core.icon("chevron-right") }}</a>{% elif count_label %}<span class="ops-app-category__more">{{ count_label }}</span>{% endif %}</header>
+  <div class="ops-app-category__tiles">{{ caller() }}</div>
+</section>
+{%- endmacro %}
+
+{% macro app_categories() -%}
+<div class="ops-app-categories">{{ caller() }}</div>
+{%- endmacro %}
+
+{# Header control that submits on change, e.g. the plant switcher. Pass hidden fields (CSRF) via call. #}
+{% macro header_select(label, name, options, selected=None, icon_name=None, action="", id=None) -%}
+<form class="ops-header-select" method="post" action="{{ action }}" data-pt-autosubmit>
+  {%- if caller %}{{ caller() }}{% endif -%}
+  {% if icon_name %}{{ core.icon(icon_name) }}{% endif %}
+  <label class="pt-visually-hidden" for="{{ id or name }}">{{ label }}</label>
+  <select class="pt-select" id="{{ id or name }}" name="{{ name }}">{% for value, text in options %}<option value="{{ value }}"{% if value == selected %} selected{% endif %}>{{ text }}</option>{% endfor %}</select>
+  <noscript><button class="pt-button pt-button--secondary" type="submit">{{ label }}</button></noscript>
+</form>
+{%- endmacro %}
+
+{# Avatar with initials that opens the account menu; menu entries come from the call body. #}
+{% macro user_menu(initials, name, label="Account") -%}
+<details class="ops-user-menu">
+  <summary class="ops-user-menu__avatar" aria-label="{{ label }}: {{ name }}" title="{{ name }}">{{ initials }}</summary>
+  <div class="ops-user-menu__panel"><p class="ops-user-menu__name">{{ name }}</p>{{ caller() }}</div>
+</details>
+{%- endmacro %}
+
+{% macro environment_status(label, state="online") -%}
+<span class="ops-environment ops-environment--{{ state }}"><span class="ops-environment__dot" aria-hidden="true"></span><span>{{ label }}</span></span>
+{%- endmacro %}
+
+{% macro navigation_item(label, url, icon_name, active=false) -%}
+<a class="ops-navigation-item{% if active %} is-active{% endif %}" href="{{ url }}" title="{{ label }}"{% if active %} aria-current="page"{% endif %}>{{ core.icon(icon_name) }}<span>{{ label }}</span></a>
+{%- endmacro %}
+
+{# Separates groups in the sidebar, e.g. analysis views from reference data. #}
+{% macro navigation_divider() -%}
+<hr class="ops-navigation-divider">
+{%- endmacro %}
+
+{% macro mobile_navigation_item(label, url, icon_name, active=false) -%}
+<a class="ops-mobile-navigation__item{% if active %} is-active{% endif %}" href="{{ url }}"{% if active %} aria-current="page"{% endif %}>{{ core.icon(icon_name) }}<span>{{ label }}</span></a>
+{%- endmacro %}
+
+{# Board layout (1.33.0): a fixed grid that fills the work area, for screens composed of widgets.
+   Use it in a page whose body_class adds "ops-board-mode" (and "ops-board-mode--display" on a
+   registered display, which hides the rail and footer). Below 64 rem the slots stack. #}
+{% macro board_grid(label, columns=12, rows=6, id=None) -%}
+<section class="ops-board-grid" aria-label="{{ label }}" style="--ops-board-columns:{{ columns|int }};--ops-board-rows:{{ rows|int }}"{% if id %} id="{{ id }}"{% endif %} data-ops-board>
+{{ caller() }}
+</section>
+<script type="module" src="{{ url_for('ops_platform_ui.static', filename='ops_platform_ui/js/board.js') }}"></script>
+{%- endmacro %}
+
+{# One slot of board_grid(): x/y 0-based cell, w/h cells. With frame_src it holds a widget page of
+   the same origin in an iframe; board.js shows the loading and error states (a page that is no
+   widget page counts as error), retries a failed widget after a minute and reloads all frames on
+   Refresh. Without frame_src it shows the caller's content. #}
+{% macro board_slot(title, x, y, w, h, frame_src=None, id=None, loading_message="Loading…", error_message="This widget is not available right now. Retrying automatically.") -%}
+<article class="ops-board-slot" style="--ops-slot-x:{{ x|int + 1 }};--ops-slot-y:{{ y|int + 1 }};--ops-slot-w:{{ w|int }};--ops-slot-h:{{ h|int }}"{% if id %} id="{{ id }}"{% endif %} data-ops-board-slot>
+  <header class="ops-board-slot__header"><h2 class="ops-board-slot__title" title="{{ title }}">{{ title }}</h2></header>
+  <div class="ops-board-slot__body">
+    {%- if frame_src %}
+    <iframe class="ops-board-slot__frame" src="{{ frame_src }}" title="{{ title }}" loading="eager" referrerpolicy="same-origin" sandbox="allow-scripts allow-same-origin allow-forms allow-modals" data-ops-board-frame></iframe>
+    <div class="ops-board-slot__state" data-ops-board-state="loading">{{ core.widget_state("loading", loading_message) }}</div>
+    <div class="ops-board-slot__state" data-ops-board-state="error" hidden>{{ core.widget_state("error", error_message) }}</div>
+    {%- else %}{{ caller() if caller is defined else '' }}{% endif %}
+  </div>
+</article>
+{%- endmacro %}
+
+{# Board editor (1.34.0): design a board_grid() layout. Tiles are placed, moved and resized on the
+   same fixed grid the board uses - by pointer (drag the tile, pull the corner) or keyboard (arrows
+   move, Shift+arrows resize, Enter edits, Delete removes). The screen frame shows the board in
+   landscape (16:9) or portrait (9:16); widget previews render at the screen's resolution (screen, the
+   landscape width and height) scaled down to the frame. board-editor.js keeps placement only and reports it with
+   events on the element; the page owns what a tile shows and saves the layout itself:
+   ops:board-editor-change {tiles}, ops:board-editor-edit {id}, ops:board-editor-remove {id}
+   (cancelable). element.opsBoardEditor offers add(), update(), remove(), tiles(), setGrid(),
+   setOrientation() and focus(); ops:board-editor-ready fires once it exists.
+   texts: edit, remove, resize, help, position ("{title}: column {x}, row {y}, {w} × {h}"),
+   blocked, full, removed. #}
+{% macro board_editor(label, columns=12, rows=6, orientation="landscape", id=None, texts=None, screen=(1920, 1080)) -%}
+{%- set t = {"edit": "Edit", "remove": "Remove", "resize": "Resize",
+             "help": "Drag a tile to move it and its corner to resize it. With the keyboard: arrow keys move the selected tile, Shift and arrow keys resize it, Enter edits and Delete removes it.",
+             "position": "{title}: column {x}, row {y}, {w} × {h}", "blocked": "No room there - the tile stays where it was.",
+             "full": "There is no free space for this tile. Make room on the board first.", "removed": "{title} removed."} -%}
+{%- if texts %}{% set _ = t.update(texts) %}{% endif -%}
+{%- set editor_id = id or "board-editor" -%}
+<section class="ops-board-editor" id="{{ editor_id }}" aria-label="{{ label }}" data-ops-board-editor data-columns="{{ columns|int }}" data-rows="{{ rows|int }}" data-orientation="{{ 'portrait' if orientation == 'portrait' else 'landscape' }}" data-screen-width="{{ screen[0]|int }}" data-screen-height="{{ screen[1]|int }}"
+         data-text-position="{{ t.position }}" data-text-blocked="{{ t.blocked }}" data-text-full="{{ t.full }}" data-text-removed="{{ t.removed }}" style="--ops-board-columns:{{ columns|int }};--ops-board-rows:{{ rows|int }}">
+  <div class="ops-board-editor__screen">
+    <div class="ops-board-editor__grid" data-ops-board-editor-grid aria-describedby="{{ editor_id }}-help">
+      <div class="ops-board-editor__cells" aria-hidden="true" data-ops-board-editor-cells></div>
+{{ caller() if caller is defined else '' }}
+    </div>
+  </div>
+  <p class="pt-visually-hidden" id="{{ editor_id }}-help">{{ t.help }}</p>
+  <p class="pt-visually-hidden" role="status" aria-live="polite" data-ops-board-editor-live></p>
+  <template data-ops-board-editor-template>{{ board_editor_tile("", 0, 0, 1, 1, "", edit_label=t.edit, remove_label=t.remove, resize_label=t.resize) }}</template>
+</section>
+<script type="module" src="{{ url_for('ops_platform_ui.static', filename='ops_platform_ui/js/board-editor.js') }}"></script>
+{%- endmacro %}
+
+{# One tile of board_editor(): x/y 0-based cell, w/h cells, min_w/min_h the smallest size it may
+   take. With frame_src it shows the widget page as a live preview that takes no input; otherwise
+   the caller's content. tile_id is the page's own key for the tile. #}
+{% macro board_editor_tile(title, x, y, w, h, tile_id, min_w=1, min_h=1, frame_src=None, edit_label="Edit", remove_label="Remove", resize_label="Resize") -%}
+<article class="ops-board-editor__tile" tabindex="0" aria-label="{{ title }}" style="--ops-slot-x:{{ x|int + 1 }};--ops-slot-y:{{ y|int + 1 }};--ops-slot-w:{{ w|int }};--ops-slot-h:{{ h|int }}"
+         data-ops-board-editor-tile="{{ tile_id }}" data-x="{{ x|int }}" data-y="{{ y|int }}" data-w="{{ w|int }}" data-h="{{ h|int }}" data-min-w="{{ min_w|int }}" data-min-h="{{ min_h|int }}">
+  <header class="ops-board-editor__tile-header">
+    {{ core.icon("grip") }}<h3 class="ops-board-editor__tile-title" data-ops-board-editor-title title="{{ title }}">{{ title }}</h3>
+    <button class="ops-board-editor__action" type="button" data-ops-board-editor-action="edit" aria-label="{{ edit_label }}" title="{{ edit_label }}">{{ core.icon("edit") }}</button>
+    <button class="ops-board-editor__action" type="button" data-ops-board-editor-action="remove" aria-label="{{ remove_label }}" title="{{ remove_label }}">{{ core.icon("trash") }}</button>
+  </header>
+  <div class="ops-board-editor__tile-body">
+    <div class="ops-board-editor__preview" inert{% if not frame_src %} hidden{% endif %}><iframe src="{{ frame_src or 'about:blank' }}" title="{{ title }}" tabindex="-1" loading="lazy" referrerpolicy="same-origin" sandbox="allow-scripts allow-same-origin" data-ops-board-editor-frame></iframe></div>
+    {{- caller() if caller is defined else '' }}
+  </div>
+  <span class="ops-board-editor__resize" data-ops-board-editor-resize title="{{ resize_label }}" aria-hidden="true"></span>
+</article>
+{%- endmacro %}

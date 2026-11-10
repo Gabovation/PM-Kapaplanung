@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/sap_storage_locations.v1",
+  "title": "SAP storage location",
+  "description": "SAP reference data, synchronised read-only by the SAP interface job (MD-06).",
+  "x-collection": "sap_storage_locations",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (SAP interface)",
+  "x-source": "erp:storage_locations",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "storageLocationNumber",
+  "type": "object",
+  "required": [
+    "storageLocationNumber",
+    "sapSystem",
+    "active"
+  ],
+  "properties": {
+    "plantId": {
+      "description": "Plant (plants@1).",
+      "type": "string"
+    },
+    "storageLocationNumber": {
+      "description": "SAP Lagerort.",
+      "type": "string"
+    },
+    "text": {
+      "description": "Description.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sapSystem": {
+      "type": "string"
+    },
+    "plant": {
+      "type": "string"
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "syncRunId": {
+      "type": "string"
+    },
+    "syncedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string"
+    }
+  }
+}

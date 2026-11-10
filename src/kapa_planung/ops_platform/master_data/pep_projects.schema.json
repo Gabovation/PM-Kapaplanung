@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/pep_projects.v1",
+  "title": "PEP project",
+  "description": "One externally sourced PEP project and its known subprojects. Source completeness, global key uniqueness and SAP/article links require owner confirmation.",
+  "x-collection": "pep_projects",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "production",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "external:pep",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": ["_id", "projectNumber", "active", "ruleVersion"],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The projectNumber; global uniqueness requires source-owner confirmation."
+    },
+    "projectNumber": {"type": "string", "minLength": 1},
+    "name": {"$ref": "#/$defs/nullableString"},
+    "customer": {"$ref": "#/$defs/nullableString"},
+    "customerGroup": {"$ref": "#/$defs/nullableString"},
+    "endCustomer": {"$ref": "#/$defs/nullableString"},
+    "vehicle": {"$ref": "#/$defs/nullableString"},
+    "platform": {"$ref": "#/$defs/nullableString"},
+    "program": {"$ref": "#/$defs/nullableString"},
+    "businessLine": {"$ref": "#/$defs/nullableString"},
+    "businessType": {"$ref": "#/$defs/nullableString"},
+    "deliveryPlantId": {"$ref": "#/$defs/nullableString"},
+    "status": {"$ref": "#/$defs/nullableString"},
+    "currentGate": {"$ref": "#/$defs/nullableString"},
+    "nextGate": {"$ref": "#/$defs/nullableString"},
+    "currency": {"$ref": "#/$defs/nullableString"},
+    "sop": {"$ref": "#/$defs/nullableDate"},
+    "eop": {"$ref": "#/$defs/nullableDate"},
+    "setsPerYear": {"$ref": "#/$defs/nullableNumber"},
+    "partsPrice": {"$ref": "#/$defs/nullableNumber"},
+    "totalTurnover": {"$ref": "#/$defs/nullableNumber"},
+    "yearlySales": {"$ref": "#/$defs/yearlySales"},
+    "gates": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "gate": {"$ref": "#/$defs/nullableString"},
+          "status": {"$ref": "#/$defs/nullableString"},
+          "plannedDate": {"$ref": "#/$defs/nullableDate"},
+          "approvalDate": {"$ref": "#/$defs/nullableDate"}
+        }
+      }
+    },
+    "subprojects": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "required": ["number"],
+        "properties": {
+          "number": {"type": "string", "minLength": 1},
+          "title": {"$ref": "#/$defs/nullableString"},
+          "productGroup": {"$ref": "#/$defs/nullableString"},
+          "mainTechnology": {"$ref": "#/$defs/nullableString"},
+          "surface": {"$ref": "#/$defs/nullableString"},
+          "pepStatus": {"$ref": "#/$defs/nullableString"},
+          "sop": {"$ref": "#/$defs/nullableDate"},
+          "eop": {"$ref": "#/$defs/nullableDate"},
+          "volumePerYear": {"$ref": "#/$defs/nullableNumber"},
+          "totalTurnover": {"$ref": "#/$defs/nullableNumber"},
+          "partPrice": {"$ref": "#/$defs/nullableNumber"},
+          "yearlySales": {"$ref": "#/$defs/yearlySales"},
+          "articleIds": {
+            "type": ["array", "null"],
+            "description": "Optional unresolved article links; their element contract needs agreement."
+          }
+        }
+      }
+    },
+    "sapProjects": {
+      "type": ["array", "null"],
+      "description": "Optional unresolved SAP project links; their element contract needs agreement."
+    },
+    "source": {
+      "type": ["object", "null"],
+      "properties": {
+        "origin": {"$ref": "#/$defs/nullableString"},
+        "guid": {"$ref": "#/$defs/nullableString"},
+        "modifiedAt": {"$ref": "#/$defs/nullableDate"}
+      }
+    },
+    "active": {"type": "boolean"},
+    "ruleVersion": {"type": "integer", "minimum": 1},
+    "syncRunId": {"type": "string"},
+    "syncedAt": {"type": ["string", "null"], "format": "date-time"},
+    "contentHash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "nullableString": {"type": ["string", "null"]},
+    "nullableNumber": {"type": ["number", "null"]},
+    "nullableDate": {
+      "anyOf": [
+        {"type": "string", "format": "date"},
+        {"type": "string", "format": "date-time"},
+        {"type": "null"}
+      ]
+    },
+    "yearlySales": {
+      "type": ["object", "null"],
+      "description": "Revenue by year, not quantities.",
+      "patternProperties": {"^[0-9]{4}$": {"type": "number"}},
+      "additionalProperties": false
+    }
+  }
+}

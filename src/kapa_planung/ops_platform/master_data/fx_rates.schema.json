@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "polytec-ops/master-data/fx_rates.v1",
+  "title": "Group exchange rate",
+  "description": "One global XOMRV exchange rate per period, version, currency and rate type.",
+  "x-collection": "fx_rates",
+  "x-version": 1,
+  "x-status": "draft",
+  "x-group": "sap",
+  "x-owner": "TBD (data-sync)",
+  "x-source": "erp:group-exchange-rates",
+  "x-writer": "data-sync",
+  "x-sync": "TBD",
+  "x-key": "_id",
+  "type": "object",
+  "required": [
+    "_id",
+    "period",
+    "version",
+    "currency",
+    "rateType",
+    "unit",
+    "eurPerUnit",
+    "sourceSystem",
+    "active",
+    "ruleVersion"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "<YYMM><version>-<currency>-<rateType>."
+    },
+    "period": {
+      "type": "string",
+      "pattern": "^[0-9]{2}(0[1-9]|1[0-2])$",
+      "description": "Source period in YYMM form."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{2}$"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "rateType": {
+      "type": "string",
+      "pattern": "^[A-Z]$",
+      "description": "Source rate-type code; its business meaning requires owner confirmation."
+    },
+    "unit": {
+      "type": "number",
+      "const": 1,
+      "description": "Source unit. Non-unit source semantics have not been confirmed."
+    },
+    "eurPerUnit": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Source EUR rate for one currency unit. Zero source rates are retained but require review before use."
+    },
+    "sourceSystem": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Source extract's group-system marker, not a SAP-system scope."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "False when no longer present in the complete global source snapshot."
+    },
+    "ruleVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "syncRunId": {
+      "type": "string"
+    },
+    "syncedAt": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}
