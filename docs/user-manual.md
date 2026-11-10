@@ -4,7 +4,10 @@
 Die linke Navigation öffnet Übersicht, Projekte, Personen und Einstellungen. Mit dem Pfeil oberhalb der Navigation werden die Beschriftungen ein- und ausgeklappt. Auf kleinen Bildschirmen stehen die Hauptziele am unteren Rand. Nach einem Neustart des Servers die Browserseite neu laden.
 
 ## Personen und Kapazität
-Person mit Name, Rolle und FTE-Prozent anlegen. In Einstellungen gilt zunächst: 100 % FTE = 40 Stunden pro Woche. Eine Person mit 50 % FTE hat dadurch 20 Wochenstunden. Feiertage und Abwesenheiten sind noch nicht enthalten.
+Person mit Name, Rolle und FTE-Prozent anlegen. Die Rolle wird aus einem Dropdown gewählt. Zu Beginn sind Projektleiter und QVP vorhanden. In Einstellungen gilt zunächst: 100 % FTE = 40 Stunden pro Woche. Eine Person mit 50 % FTE hat dadurch 20 Wochenstunden. Feiertage und Abwesenheiten sind noch nicht enthalten.
+
+## Rollen bearbeiten und hinzufügen
+Unter Einstellungen → Rollen mit „Rolle hinzufügen“ eine neue Bezeichnung anlegen. „Bearbeiten“ benennt eine vorhandene Rolle um. Bereits zugewiesene Personen behalten ihre Rolle und zeigen automatisch die neue Bezeichnung. Rollennamen müssen ausgefüllt und eindeutig sein. Die Rollen gelten für die lokale Kapazitätsplanung.
 
 ## Projekte
 Projektname, Projektnummer, Status, verantwortliche Person und Basisbudget eingeben. Die Termine von Gate 3, Gate 5, Gate 6, Gate 7 und Gate 8 müssen aufsteigend sein. Gate 8 ist das exklusive Ende. Die vier Prozentanteile ergeben zusammen 100 %. Der Favorit aus Einstellungen kann im Projektformular angewendet werden.
@@ -19,7 +22,7 @@ Zusätzliche ganze Stunden und das Gültigkeitsdatum eintragen. Die Stunden werd
 In der Übersicht Woche oder Monat auswählen und mit den Pfeilen den Zeitraum wechseln. Geplante Stunden werden projektübergreifend addiert. Mehr als 100 % bedeutet Überlastung. Erwartete Projekte zählen vollständig mit. Projekte ohne Personenzuweisung belasten noch keine Person.
 
 ## Sichern
-In Einstellungen eine JSON-Sicherung exportieren. Wiederherstellen ersetzt die aktuelle Planung nach Bestätigung. Ein veraltetes Browserfenster erhält beim Speichern einen Konfliktfehler. Dann zuerst die Eingaben als Sicherung exportieren und die Seite danach neu laden.
+In Einstellungen eine JSON-Sicherung exportieren. Wiederherstellen ersetzt die aktuelle Planung nach Bestätigung. Auch ältere Sicherungen mit frei eingegebenen Rollen werden übernommen. Ein veraltetes Browserfenster erhält beim Speichern einen Konfliktfehler. Dann zuerst die Eingaben als Sicherung exportieren und die Seite danach neu laden.
 
 ## SAP
 SAP-Buchungen, Ist- und Reststunden sind noch nicht enthalten.

@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 SAP INPUT.xlsx
 planung.json
+planung.vor-rollen-v2.json
 .venv/
 __pycache__/
 *.pyc

@@ -8,9 +8,11 @@
 - Schreibzugriffe vergleichen die geladene Revision. Veraltete Browserstände erhalten HTTP 409.
 
 ## Automatische Prüfungen
-`python -m pytest -p no:cacheprovider -o addopts="" tests`: 15 Tests erfolgreich. Geprüft werden Plattform-Health, Sicherheitsheader, Proxy-Prefix/Cookie, Rate Limiter, Sprache, Datenzugriffe, Schreib-Token, Revisionskonflikte, lokaler Startmodus sowie HTML- und Icon-Regressionen.
+`python -m pytest -p no:cacheprovider -o addopts="" tests`: 25 Tests erfolgreich. Geprüft werden Plattform-Health, Sicherheitsheader, Proxy-Prefix/Cookie, Rate Limiter, Sprache, Datenzugriffe, Schreib-Token, Revisionskonflikte, lokaler Startmodus, HTML- und Icon-Regressionen sowie Rollenmigration, Sicherung, Katalogvalidierung, Umbenennen ohne Zuordnungsverlust und Vorbereitung älterer Sicherungen.
 
 `tests/plan.test.js`: Budgetsummen, ganze Stunden, Gate- und Monatsgrenzen sowie gewichtete Wochen wurden mit der JavaScript-Laufzeit geprüft.
+
+`tests/roles.test.js`: Dropdown mit Projektleiter/QVP, Person mit QVP-Zuordnung, Umbenennen mit erhaltener ID, zusätzliche Rolle, Abfangen doppelter Namen und aktualisierte Auswahl wurden geprüft. Der Personendialog verwendet die unveränderte Formular- und Aktionszeile des UI-Kits. Seine tatsächliche Browserdarstellung bleibt Bestandteil der noch offenen Sichtprüfung.
 
 Der automatische Plattform-Check prüft nur einen Teil der Regeln. Seine PASS-Zeilen sind keine Produktionsfreigabe. Die manuellen Aufgaben und lokalen Abweichungen bleiben bestehen.
 

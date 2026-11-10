@@ -22,7 +22,7 @@ def test_shell_and_data_write_conflict(local_client):
     assert page.status_code == 200
     assert b'ops-workspace' in page.data and b'kapa-app' in page.data
     assert local_client.get('/api/data').json is None
-    payload = {'version': 1, 'people': [], 'projects': [], '_revision': 0}
+    payload = {'version': 2, 'people': [], 'projects': [], 'roles': [{'id': 'pm', 'name': 'Projektleiter'}], '_revision': 0}
     assert local_client.post('/api/data', json=payload).status_code == 403
     headers = {'X-Kapa-Token': web.TOKEN}
     assert local_client.post('/api/data', json=payload, headers=headers).json == {'revision': 1}
@@ -33,3 +33,35 @@ def test_shell_and_data_write_conflict(local_client):
 def test_rejects_nonlocal_mode(monkeypatch):
     monkeypatch.setenv('APP_ENV', 'prd')
     with pytest.raises(RuntimeError): web.create_app()
+
+
+def test_role_rename_persists_without_changing_person_assignment(local_client):
+    payload = {'version': 2, 'roles': [{'id': 'qvp', 'name': 'QVP'}],
+               'people': [{'id': 'person-1', 'name': 'Test', 'roleId': 'qvp', 'fte': 100}],
+               'projects': [], '_revision': 0}
+    headers = {'X-Kapa-Token': web.TOKEN}
+    assert local_client.post('/api/data', json=payload, headers=headers).status_code == 200
+    payload['roles'][0]['name'] = 'Qualitätsvorausplanung'
+    payload['_revision'] = 1
+    assert local_client.post('/api/data', json=payload, headers=headers).status_code == 200
+    loaded = local_client.get('/api/data').json
+    assert loaded['roles'][0]['name'] == 'Qualitätsvorausplanung'
+    assert loaded['people'][0]['roleId'] == 'qvp'
+
+
+def test_missing_role_is_rejected_without_overwriting_data(local_client):
+    payload = {'version': 2, 'roles': [{'id': 'pm', 'name': 'Projektleiter'}],
+               'people': [{'id': 'person-1', 'roleId': 'missing'}], 'projects': [], '_revision': 0}
+    assert local_client.post('/api/data', json=payload, headers={'X-Kapa-Token': web.TOKEN}).status_code == 400
+    assert local_client.get('/api/data').json is None
+
+
+def test_legacy_backup_import_is_prepared_without_writing(local_client):
+    payload = {'version': 1, 'people': [{'id': 'p1', 'name': 'Test', 'role': 'Projektleitung', 'fte': 100}],
+               'projects': [], 'fte': 40, 'favorite': [20, 20, 20, 40]}
+    assert local_client.post('/api/prepare-import', json=payload).status_code == 403
+    response = local_client.post('/api/prepare-import', json=payload, headers={'X-Kapa-Token': web.TOKEN})
+    assert response.status_code == 200
+    assert response.json['version'] == 2
+    assert response.json['people'][0]['roleId'] == 'project-manager'
+    assert local_client.get('/api/data').json is None

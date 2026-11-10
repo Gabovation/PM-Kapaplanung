@@ -14,6 +14,7 @@ from kapa_planung import PROJECT_ROOT
 from kapa_planung.ops_platform import init_platform
 from kapa_planung.ops_platform.auth import require_permission
 from kapa_planung.ops_platform.rate_limiter import rate_limit
+from kapa_planung.services.roles import prepare_snapshot, validate_roles
 
 TOKEN = secrets.token_urlsafe(32)
 LOCK = threading.Lock()
@@ -52,8 +53,12 @@ def create_app() -> Flask:
             if not hmac.compare_digest(request.headers.get('X-Kapa-Token', ''), TOKEN):
                 abort(403)
             incoming = request.get_json(silent=True)
-            if not isinstance(incoming, dict) or incoming.get('version') != 1 or not isinstance(incoming.get('people'), list) or not isinstance(incoming.get('projects'), list):
+            if not isinstance(incoming, dict) or incoming.get('version') != 2 or not isinstance(incoming.get('people'), list) or not isinstance(incoming.get('projects'), list):
                 return jsonify(error='Ungültige Planungsdaten.'), 400
+            try:
+                validate_roles(incoming)
+            except ValueError as exc:
+                return jsonify(error=str(exc)), 400
             revision = current.get('_revision', 0) if current else 0
             if incoming.get('_revision', 0) != revision:
                 return jsonify(error='Die Planung wurde in einem anderen Fenster geändert. Bitte neu laden.'), 409
@@ -66,4 +71,17 @@ def create_app() -> Flask:
             except OSError:
                 return jsonify(error='Die Planung konnte nicht gespeichert werden.'), 500
             return jsonify(revision=incoming['_revision'])
+
+    @app.post('/api/prepare-import')
+    @require_permission('kapa-planung.editor')
+    @rate_limit('planning-import', env='RATE_LIMIT_WRITE_PER_MINUTE', default=120)
+    def prepare_import():
+        if not hmac.compare_digest(request.headers.get('X-Kapa-Token', ''), TOKEN):
+            abort(403)
+        try:
+            snapshot = prepare_snapshot(request.get_json(silent=True))
+        except (ValueError, TypeError) as exc:
+            return jsonify(error=str(exc)), 400
+        # Preparing an import is read-only; the normal write still compares the revision.
+        return jsonify(snapshot)
     return app
