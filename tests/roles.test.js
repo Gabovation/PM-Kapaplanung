@@ -16,6 +16,7 @@ const context = vm.createContext({
   location: {hash:''}, window:{addEventListener() {}},
   fetch:()=>new Promise(()=>{}), alert:message=>alerts.push(message), console,
 });
+vm.runInContext(fs.readFileSync('static/app/hours.js','utf8'), context);
 vm.runInContext(fs.readFileSync('static/app/plan.js','utf8'), context);
 vm.runInContext('init(); persist = () => {}; editPerson();', context);
 assert.equal(vm.runInContext('state.version', context), 2);

@@ -1,6 +1,6 @@
 # Kapazitätsplanung
 
-Lokaler Prototyp für die projektübergreifende Kapazitätsplanung mit Gate-Budgets, Wochengewichten, Personen-FTE und Planwertänderungen.
+Lokaler Prototyp für die projektübergreifende Kapazitätsplanung mit Gate-Budgets, absoluten Wochen- und Monatsstunden, grafischem Verlauf, Personen-FTE und Planwertänderungen.
 
 ## Lokal starten
 

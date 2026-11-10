@@ -43,6 +43,13 @@ def test_html_is_not_cached_and_local_templates_reload(client, app):
     assert app.jinja_env.auto_reload is True
 
 
+def test_hour_editor_dependencies_are_loaded_in_order(client):
+    html = client.get('/').get_data(as_text=True)
+    assert html.index('app/hours.js') < html.index('app/plan.js') < html.index('app/fine-editor.js')
+    for asset in ('hours.js', 'plan.js', 'fine-editor.js'):
+        assert client.get('/static/app/' + asset).status_code == 200
+
+
 def test_shell_dimensions_are_consumed_from_unmodified_kit_tokens():
     tokens = (ROOT / 'static/polytec/ops_platform_ui/css/connected-operations-tokens.css').read_text()
     shell = (ROOT / 'static/polytec/ops_platform_ui/css/ops-platform.css').read_text()

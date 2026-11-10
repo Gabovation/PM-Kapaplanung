@@ -15,6 +15,7 @@ from kapa_planung.ops_platform import init_platform
 from kapa_planung.ops_platform.auth import require_permission
 from kapa_planung.ops_platform.rate_limiter import rate_limit
 from kapa_planung.services.roles import prepare_snapshot, validate_roles
+from kapa_planung.services.planning import validate_hour_plans
 
 TOKEN = secrets.token_urlsafe(32)
 LOCK = threading.Lock()
@@ -57,6 +58,7 @@ def create_app() -> Flask:
                 return jsonify(error='Ungültige Planungsdaten.'), 400
             try:
                 validate_roles(incoming)
+                validate_hour_plans(incoming)
             except ValueError as exc:
                 return jsonify(error=str(exc)), 400
             revision = current.get('_revision', 0) if current else 0
@@ -80,6 +82,7 @@ def create_app() -> Flask:
             abort(403)
         try:
             snapshot = prepare_snapshot(request.get_json(silent=True))
+            validate_hour_plans(snapshot)
         except (ValueError, TypeError) as exc:
             return jsonify(error=str(exc)), 400
         # Preparing an import is read-only; the normal write still compares the revision.

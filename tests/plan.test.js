@@ -3,6 +3,7 @@ import vm from 'node:vm';
 import fs from 'node:fs';
 const doc = {querySelector:()=>({dataset:{apiUrl:'/api/data',writeToken:'test'}}), querySelectorAll:()=>[], addEventListener:()=>{}};
 const context = vm.createContext({document:doc, location:{hash:''},window:{addEventListener:()=>{}}, fetch:()=>new Promise(()=>{}),console,Date,Math,Number,String,Array,JSON,Promise});
+vm.runInContext(fs.readFileSync('static/app/hours.js','utf8'), context);
 vm.runInContext(fs.readFileSync('static/app/plan.js','utf8'), context);
 const check = vm.runInContext(`(()=>{
  const p={budget:801,percent:[20,20,20,40],dates:['2026-03-30','2026-04-01','2026-04-08','2026-05-01','2026-06-01'],weights:{},changes:[{date:'2026-04-15',hours:101}]};

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 – 10.11.2026
+- Feinplanung von Gewichten auf absolute ganze Stunden umgestellt. Wochen und Monate laufen von links nach rechts; die Ansicht ist umschaltbar und zeigt Basisstunden, Planwertänderungen und den Gesamtverlauf als Diagramm.
+- Jede Gate-Phase und Planwertänderung besitzt eine eigene Stundenzeile. Live-Summen zeigen offene oder überschrittene Budgets. „Ausgleichen“ verteilt die Differenz auf noch unbearbeitete Zeiträume, ohne manuelle Eingaben zu ändern.
+- Wochen und Monate werden aus derselben Tagesverteilung aggregiert. Umschalten allein verändert keine Stunden. Beim Speichern müssen alle Phasenbudgets exakt erfüllt sein. Ein neuer serverseitiger Prüfschritt kontrolliert ganze Stunden, Intervalle, Quellen und Summen.
+- Vorhandene gewichtete Planungen werden mit unveränderten Stunden angezeigt. Beim ersten Speichern werden absolute Werte übernommen. Geänderte Gate-Termine und Budgets verteilen betroffene Verläufe passend um. Neue Planwertänderungen folgen den verbleibenden Basisstunden und behalten ihre eigene Herkunft.
+- 39 Python-Tests sowie JavaScript-Prüfungen der Planung, Rollen und des neuen Editors erfolgreich. Die bisherigen Stunden des vorhandenen Projekts wurden gegen den Vorgängerstand verglichen und sind unverändert.
+
 ## 0.3.0 – 10.11.2026
 - Rollen sind im Personendialog per Dropdown auswählbar. Startrollen: Projektleiter und QVP.
 - Unter Einstellungen können Rollen hinzugefügt und umbenannt werden. Personen referenzieren unveränderliche Rollen-IDs; Umbenennen erhält die Zuordnung. Doppelte oder leere Bezeichnungen werden abgefangen.

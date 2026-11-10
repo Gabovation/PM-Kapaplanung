@@ -22,7 +22,33 @@
 .bar span.over {background:var(--polytec-color-status-danger)}
 .notice {padding:var(--polytec-space-3);border-left:var(--polytec-space-1) solid var(--polytec-color-status-warning);background:var(--polytec-color-surface-subtle)}
 .empty {padding:var(--polytec-space-5);text-align:center;color:var(--polytec-color-text-secondary)}
-.weights input {max-width:7rem}
+.kapa-fine-toolbar {display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--polytec-space-3)}
+.kapa-hours-legend {display:flex;flex-wrap:wrap;gap:var(--polytec-space-4);margin-block:var(--polytec-space-3);font-size:.875rem}
+.kapa-hours-legend span {display:inline-flex;align-items:center;gap:var(--polytec-space-2)}
+.kapa-hours-legend i {display:inline-block;width:var(--polytec-space-4);height:var(--polytec-space-3)}
+.kapa-hours-legend .kapa-hours-base {background:var(--polytec-chart-series-2)}
+.kapa-hours-legend .kapa-hours-change {background:var(--polytec-chart-series-1)}
+.kapa-hours-legend .kapa-hours-line-key {border-top:2px solid var(--polytec-color-text-primary);height:0}
+#dialogContent {min-width:0}
+.kapa-timeline-scroll {min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--polytec-color-border-default);background:var(--polytec-color-surface-panel);overscroll-behavior:contain}
+.kapa-timeline {--kapa-label-width:calc(12 * var(--polytec-space-4));--kapa-period-width:calc(6 * var(--polytec-space-4));width:calc(var(--kapa-label-width) + var(--kapa-period-count) * var(--kapa-period-width))}
+.kapa-hours-chart {display:block;width:100%;background:var(--polytec-color-surface-panel)}
+.kapa-hours-grid line {stroke:var(--polytec-color-border-default);stroke-width:1}
+.kapa-hours-grid text,.kapa-hours-reading {fill:var(--polytec-color-text-secondary);font-family:var(--polytec-font-family);font-size:12px}
+.kapa-hours-base {fill:var(--polytec-chart-series-2)}
+.kapa-hours-change {fill:var(--polytec-chart-series-1)}
+.kapa-hours-line {fill:none;stroke:var(--polytec-color-text-primary);stroke-width:2}
+.kapa-hours-point {fill:var(--polytec-color-surface-panel);stroke:var(--polytec-color-text-primary);stroke-width:2}
+.kapa-hours-table {table-layout:fixed;width:100%}
+.kapa-hours-label-column {width:var(--kapa-label-width)}
+.kapa-hours-period-column {width:var(--kapa-period-width)}
+.kapa-hours-table th:first-child {position:sticky;left:0;z-index:1;background:var(--polytec-color-surface-panel);white-space:normal;border-right:1px solid var(--polytec-color-border-default)}
+.kapa-hours-table thead th,.kapa-hours-table tfoot td {white-space:nowrap}
+.kapa-hours-table tbody th strong,.kapa-hours-table tbody th .sub {display:block}
+.kapa-hours-table tbody th .pt-status {margin-block:var(--polytec-space-1)}
+.kapa-hours-table tbody td {padding-inline:var(--polytec-space-2)}
+.kapa-hours-table .pt-input {text-align:right}
+.kapa-hours-table .kapa-source-change th {border-left:var(--polytec-space-1) solid var(--polytec-chart-series-1)}
 @media(max-width:64rem){.layout,.split{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:40rem){.kapa-heading,.hero,.detailtop{align-items:flex-start;flex-wrap:wrap}.phasegrid,.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.panelhead{flex-wrap:wrap}}
 @media(max-width:30rem){.formgrid{grid-template-columns:minmax(0,1fr)}}
