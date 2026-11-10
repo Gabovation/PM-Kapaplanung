@@ -108,3 +108,12 @@ Die Matrix zeigt Prozentwerte je Person und Zeitraum. Überlastung ist durch War
 - Meilensteine werden auf ihren tatsächlichen Kalendertag gesetzt, nicht auf eine Periodengrenze verschoben.
 - Prozentwerte dürfen erst für die Anzeige gerundet werden; geringe tatsächliche Überschreitungen müssen erkennbar bleiben.
 - Während der Prüfung trat eine kurzzeitige Windows-Dateisperre auf. Der lokale Schreibvorgang wiederholt Zugriffsfehler begrenzt und räumt temporäre Dateien auf. Dauerhafte Fehler bleiben sichtbar.
+
+## Diagramm-Scrollen und SharePoint-Projektlinks
+Die horizontalen Zeitachsen in Kapazitätsvorschau, Stundenverlauf und Stundeneditor begrenzen das Überscroll-Verhalten ausschließlich auf der X-Achse. Auf der Y-Achse darf das Mausrad an den umgebenden Arbeitsbereich beziehungsweise den Dialog weitergegeben werden. Die horizontale Scrollleiste und horizontale Trackpad-Gesten bleiben verfügbar.
+
+Im Portfolio, in der Projektliste und im Projektdetail erzeugt „SharePoint öffnen“ die Adresse `https://polytec.sharepoint.com/sites/m365-pep-` gefolgt von der Projektnummer. Die Nummer wird als einzelner URL-Pfadbestandteil kodiert. Der Link öffnet einen neuen Tab; sein Klick löst nicht zugleich die Navigation der Projektkarte aus. Es findet keine automatische Anmeldung, Prüfung oder Übertragung der Projektseite durch die Anwendung statt.
+
+## Ergänzte Lessons Learned
+- `overscroll-behavior: contain` wirkt auf beide Achsen. Bei einer horizontalen Zeitachse kann dies das vertikale Mausrad blockieren, obwohl der umgebende Arbeitsbereich noch scrollen könnte. Die Achsen müssen getrennt konfiguriert werden.
+- Ein externer Link in einer anklickbaren Projektkarte muss sein Klickereignis abgrenzen, ohne die normale Linkaktion zu unterdrücken. Projektnummern müssen zudem als URL-Bestandteil und HTML-Text sicher behandelt werden.

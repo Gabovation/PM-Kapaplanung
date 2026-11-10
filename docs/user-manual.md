@@ -12,8 +12,12 @@ Unter Einstellungen → Rollen mit „Rolle hinzufügen“ eine neue Bezeichnung
 ## Projekte
 Projektname, Projektnummer, Status, verantwortliche Person und Basisbudget eingeben. Die Termine von Gate 3, Gate 5, Gate 6, Gate 7 und Gate 8 müssen aufsteigend sein. Gate 8 ist das exklusive Ende. Die vier Prozentanteile ergeben zusammen 100 %. Der Favorit aus Einstellungen kann im Projektformular angewendet werden.
 
+Bei jedem Projekt öffnet „SharePoint öffnen“ die Seite, deren Adresse aus `https://polytec.sharepoint.com/sites/m365-pep-` und der Projektnummer besteht. Der Link steht im Portfolio der Übersicht, in der Projektliste und im Projektdetail und öffnet einen neuen Browser-Tab.
+
 ## Feinplanung
 Im Projekt „Verlauf bearbeiten“ öffnen. Wochen oder Monate auswählen und ganze Stunden direkt in die Zeiträume eintragen. Die Zeitachse läuft von links nach rechts und lässt sich horizontal verschieben. Das Diagramm über den Eingaben zeigt die Änderungen sofort. Basisstunden und Planwertänderungen sind getrennt dargestellt.
+
+Über dem Diagramm scrollt das Mausrad weiterhin auf und ab. Die Zeitachse kann über ihre horizontale Scrollleiste oder mit einer horizontalen Trackpad-Geste nach links und rechts verschoben werden.
 
 Jede Gate-Phase und jede Planwertänderung hat eine eigene Zeile mit ihrem Budget. Nicht zur Phase gehörende Zeiträume zeigen einen Strich. Nach einer Eingabe zeigt die Zeile, wie viele Stunden noch offen oder zu viel verteilt sind. Mit „Ausgleichen“ wird die Differenz auf noch unbearbeitete Zeiträume dieser Zeile verteilt. Die bereits eingegebenen Werte bleiben erhalten. Wenn diese Werte allein das Budget überschreiten, muss einer davon reduziert werden.
 

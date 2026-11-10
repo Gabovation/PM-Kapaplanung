@@ -9,6 +9,7 @@
 .field.full {grid-column:1/-1}
 .card,.panel {background:var(--polytec-color-surface-panel);border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);padding:var(--polytec-space-4)}
 .projectcard {cursor:pointer}
+.kapa-project-link {display:inline-block;margin-inline-start:var(--polytec-space-2);white-space:nowrap}
 .value {font-size:2rem;font-weight:700;margin:var(--polytec-space-3) 0}
 .label,.caption,.sub,.quiet,.muted,.section-kicker {color:var(--polytec-color-text-secondary)}
 .caption,.sub,.quiet,.section-kicker {font-size:.875rem}
@@ -30,7 +31,7 @@
 .kapa-hours-legend .kapa-hours-change {background:var(--polytec-chart-series-1)}
 .kapa-hours-legend .kapa-hours-line-key {border-top:2px solid var(--polytec-color-text-primary);height:0}
 #dialogContent {min-width:0}
-.kapa-timeline-scroll {min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--polytec-color-border-default);background:var(--polytec-color-surface-panel);overscroll-behavior:contain}
+.kapa-timeline-scroll {min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--polytec-color-border-default);background:var(--polytec-color-surface-panel);overscroll-behavior-x:contain;overscroll-behavior-y:auto}
 .kapa-timeline {--kapa-label-width:calc(12 * var(--polytec-space-4));--kapa-period-width:calc(6 * var(--polytec-space-4));width:calc(var(--kapa-label-width) + var(--kapa-period-count) * var(--kapa-period-width))}
 .kapa-hours-chart {display:block;width:100%;background:var(--polytec-color-surface-panel)}
 .kapa-hours-grid line {stroke:var(--polytec-color-border-default);stroke-width:1}

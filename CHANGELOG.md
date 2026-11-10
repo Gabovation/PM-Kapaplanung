@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0 – 10.11.2026
+- Vertikale Mausradbewegungen über den horizontal scrollbaren Diagrammen werden wieder an den Arbeitsbereich beziehungsweise den Dialog weitergereicht. Horizontales Scrollen der Zeitachse bleibt möglich.
+- Portfolio, Projektliste und Projektdetail enthalten einen SharePoint-Link zur Adresse `https://polytec.sharepoint.com/sites/m365-pep-` plus Projektnummer. Der Link öffnet einen neuen Tab und löst in der Projektkarte keine zusätzliche Navigation aus.
+
 ## 0.5.0 – 10.11.2026
 - Gates G3, G5, G6, G7 und G8 mit Datum und Meilenstein im Stundenverlauf ergänzt, datumsgenau in Wochen und Monaten. Eng beieinanderliegende Labels stehen auf getrennten Zeilen.
 - Übersicht um Team- und höchste Einzelauslastung, 100-%-Grenze und eine Personenmatrix erweitert. Erster Engpass, betroffene Personen und nicht zugewiesene Stunden werden ausgewiesen.

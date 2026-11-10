@@ -35,4 +35,8 @@ MongoDB, Portal-Identität, echte Organisationsdaten, gemeinsame Bearbeitung und
 
 `KapaHours.milestones` liefert relative Gate-Positionen. Die SVG-Komposition in `fine-editor.js` verteilt Labels bei Bedarf auf mehrere Zeilen und wird in Projektansicht und Eingabevorschau gemeinsam verwendet. Die Formeln und Darstellungen speichern keine neuen Plandaten.
 
+Horizontale Diagrammflächen verwenden `overscroll-behavior-x: contain` und `overscroll-behavior-y: auto`. Dadurch bleibt die horizontale Zeitachsenbegrenzung erhalten, während vertikale Mausradbewegungen an den Arbeitsbereich oder den scrollbaren Dialog weitergereicht werden. Es gibt keinen JavaScript-Wheel-Handler, der native Trackpad- oder Mausradbewegungen abfängt.
+
+`sharePointLink` erzeugt die URL aus dem festen Host und der mit `encodeURIComponent` behandelten Projektnummer. Die Darstellung erfolgt im Portfolio, in der Projektliste und im Projektdetail. Die normale Linkaktion öffnet einen neuen Tab; das Klickereignis wird nicht an die umgebende Projektkarte weitergegeben.
+
 Bei lokalen Schreibzugriffen gibt es maximal drei Dateiersatzversuche mit 25 ms Abstand bei `PermissionError`. Temporäre Dateien werden anschließend entfernt. Ein dauerhafter Fehler liefert weiterhin HTTP 500 und ändert den gespeicherten Revisionsstand nicht.

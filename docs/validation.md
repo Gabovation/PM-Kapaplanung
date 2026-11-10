@@ -27,7 +27,11 @@ Der erneute Git-Pull der Referenz-Repositories lieferte keine Rückmeldung und w
 ## Sichtprüfung
 Eine vollständige dokumentierte Sicht- und Bedienprüfung bei 1440 × 900, 768 × 1024 und 390 × 844 steht noch aus. Der bisherige Browserzugriff wurde durch die Computersteuerung abgebrochen. Die Regressionstests prüfen die Ursache des gelieferten Screenshots; sie bescheinigen keine tatsächlichen Browserabmessungen oder vollständige Bedienbarkeit.
 
+Für Version 0.6.0 prüft `tests/project-links.test.js` den erzeugten Link in Portfolio, Projektliste und Projektdetail, die Kodierung ungewöhnlicher Projektnummern sowie das Klickverhalten innerhalb einer Projektkarte. Das Mausrad-Verhalten wurde durch Trennung der nativen Scrollachsen korrigiert; eine interaktive Prüfung mit Maus und Trackpad im Browser steht noch aus.
+
 ## Referenzen und offene Aufgaben
 GMA 4.9.1 `d7adb792b663419eed2955d446a0203a231b9057`; Designsystem 2.21.0 `7ee9123e3a03e54f4399ac30cf76c4c8a9dc7435`.
+
+Der erneute Remote-Abgleich vor Version 0.6.0 war ohne interaktive GitHub-Anmeldung nicht möglich. Verwendet und lokal geprüft wurden die genannten vorhandenen Stände.
 
 Vor einer Plattformfreigabe: serverseitige Fachvalidierung, Rollen und Portal-Anmeldung, MongoDB, bestätigte Organisationsdaten, echte Betriebs- und Sicherungsparameter und vollständige manuelle Regelprüfung. SAP-Verarbeitung und mehrere Rollenzuordnungen je Projekt sind weitere fachliche Schritte. Die aktuelle Version ist eine lokale Vorführung.
