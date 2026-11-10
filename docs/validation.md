@@ -59,3 +59,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.9.4
 41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. `tests/gate-status.test.js` prüft die Gruppenreihenfolge, aufsteigende nächste Gate-Termine, abgeschlossene Projekte und die unveränderte gespeicherte Reihenfolge. Die vorhandenen Linkprüfungen bestätigen die SharePoint-Links in der Projektliste. Die lokale UI-Kit-Kopie entspricht dem lokalen Designsystem-Repository. Eine visuelle Browserprüfung steht noch aus.
+
+## Prüfung Version 0.9.5
+41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Alle in der App-CSS verwendeten POLYTEC-Tokens sind im lokalen UI-Kit definiert; die Icon-Prüfung bestätigt das vorhandene Parameter-Symbol. Das vendorte UI-Kit stimmt mit dem lokalen Designsystem-Repository überein. Eine visuelle Browserprüfung steht noch aus.

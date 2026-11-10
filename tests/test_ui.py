@@ -21,7 +21,7 @@ def test_every_rendered_icon_exists_in_the_official_sprite(client):
     assert used <= defined, f'Undefined icons: {used - defined}'
     assert 'pt-icon-work-order' in used
     assert 'pt-icon-user' in used
-    assert 'pt-icon-settings' in used
+    assert 'pt-icon-parameters' in used
     assert 'pt-icon-add' in used
 
 

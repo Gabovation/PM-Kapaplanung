@@ -169,3 +169,12 @@ Die Projektliste gliedert vorhandene Projekte in die Abschnitte „Gewonnen“, 
 ## Ergänzte Lessons Learned
 - Die Sortierung muss dieselbe Gate-Definition wie die sichtbare Statusanzeige verwenden, damit die Kartenreihenfolge und das angezeigte nächste Gate übereinstimmen.
 - Fehlende oder bereits abgeschlossene Gate-Termine dürfen weder andere Projekte verdrängen noch dazu führen, dass ein Projekt aus dem Portfolio verschwindet.
+
+## Abstände und Symbol für Einstellungen
+Zwischen den Projektgruppen wird der im UI-Kit definierte Abstand `--polytec-space-6` verwendet. Derselbe Token sorgt auch in leeren Zuständen für Innenabstand. Das zuvor verwendete `--polytec-space-5` ist im lokalen Designsystem nicht definiert; der Browser konnte deshalb die Abstandsangabe nicht anwenden.
+
+Das mitgelieferte Zahnrad-Symbol `settings` hat im lokalen Designsystem einen fehlerhaften SVG-Pfad. Für „Einstellungen“ verwenden Desktop- und Mobilnavigation deshalb das vorhandene `parameters`-Symbol desselben UI-Kits. Die Navigation bleibt unverändert bedienbar und beschriftet. Das UI-Kit und das externe Designsystem-Repository wurden nicht verändert. Eine spätere Korrektur des Zahnrads gehört in das Designsystem und kann nach dessen regulärem Update übernommen werden.
+
+## Ergänzte Lessons Learned
+- CSS-Variablen müssen im tatsächlich eingebundenen Tokenbestand existieren; ansonsten entfällt die gesamte betroffene CSS-Eigenschaft, ohne dass der Browser einen sichtbaren Fehler meldet.
+- Icon-Defekte im gemeinsamen Sprite dürfen nicht durch Änderungen an der vendorten Kopie verdeckt werden. Ein geeignetes, vorhandenes Symbol kann eine lokale Übergangslösung sein.

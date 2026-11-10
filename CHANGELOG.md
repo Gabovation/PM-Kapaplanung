@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.5 – 10.11.2026
+- Der Abstand zwischen den Projektgruppen verwendet einen vorhandenen Abstandstoken. Auch leere Zustände nutzen denselben gültigen Token.
+- In der Desktop- und Mobilnavigation verwendet „Einstellungen“ das vorhandene Parameter-Symbol des UI-Kits; der Pfad des bisherigen Zahnrad-Symbols im zugrunde liegenden Designsystem ist fehlerhaft.
+
 ## 0.9.4 – 10.11.2026
 - Das Projektportfolio gruppiert Projekte nach „Gewonnen“ und „Erwartet“ und sortiert sie innerhalb jeder Gruppe nach dem nächsten geplanten Gate. Projekte ohne weiteres oder gültiges Gate stehen am Ende ihrer Gruppe.
 

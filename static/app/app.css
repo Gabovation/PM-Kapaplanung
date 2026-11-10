@@ -6,7 +6,7 @@
 .layout {grid-template-columns:repeat(2,minmax(0,1fr))}
 .split {grid-template-columns:2fr 1fr}
 .projectcards {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(18rem,100%),1fr));gap:var(--polytec-space-4)}
-.kapa-project-group {margin-top:var(--polytec-space-5)}
+.kapa-project-group {margin-top:var(--polytec-space-6)}
 .kapa-project-group-heading {display:flex;align-items:baseline;gap:var(--polytec-space-3);margin-bottom:var(--polytec-space-3)}
 .kapa-project-group-heading h3 {margin:0}
 .projectcard .bottom {display:flex;justify-content:space-between;gap:var(--polytec-space-3);margin-top:var(--polytec-space-3)}
@@ -30,7 +30,7 @@
 .bar span {display:block;height:100%;background:var(--polytec-color-status-success)}
 .bar span.over {background:var(--polytec-color-status-danger)}
 .notice {padding:var(--polytec-space-3);border-left:var(--polytec-space-1) solid var(--polytec-color-status-warning);background:var(--polytec-color-surface-subtle)}
-.empty {padding:var(--polytec-space-5);text-align:center;color:var(--polytec-color-text-secondary)}
+.empty {padding:var(--polytec-space-6);text-align:center;color:var(--polytec-color-text-secondary)}
 .kapa-fine-toolbar {display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--polytec-space-3)}
 .kapa-hours-legend {display:flex;flex-wrap:wrap;gap:var(--polytec-space-4);margin-block:var(--polytec-space-3);font-size:.875rem}
 .kapa-hours-legend span {display:inline-flex;align-items:center;gap:var(--polytec-space-2)}
