@@ -9,12 +9,13 @@ function teamCapacityLevel(value) {
   return value>=100?'critical':value>=85?'warning':'normal';
 }
 
-function forecastNavigationBounds(count) {
-  const current=currentPeriod(), base=mode==='week'?addDays(current,-offset*7):new Date(current.getFullYear(),current.getMonth()-offset,1);
+function forecastHorizon(start, granularity, minimum, projects) {
+  const base=granularity==='week'?monday(start):new Date(start.getFullYear(),start.getMonth(),1);
   const utcDay=d=>Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000;
-  const ends=(state.projects||[]).map(project=>project.dates?.[4]).filter(validGateDate).map(value=>addDays(date(value),-1));
-  const last=Math.max(0,...ends.map(end=>mode==='week'?Math.floor((utcDay(end)-utcDay(base))/7):(end.getFullYear()-base.getFullYear())*12+end.getMonth()-base.getMonth()));
-  return {min:Math.min(0,offset),max:Math.max(last,offset+count,count)};
+  const ends=projects.map(project=>project.dates?.[4]).filter(validGateDate).map(value=>addDays(date(value),-1));
+  const last=Math.max(-1,...ends.map(end=>granularity==='week'?Math.floor((utcDay(end)-utcDay(base))/7):(end.getFullYear()-base.getFullYear())*12+end.getMonth()-base.getMonth()));
+  const requested=Math.max(minimum,last+1);
+  return {count:Math.min(600,requested),truncated:requested>600};
 }
 
 function forecastChart(model) {
@@ -43,17 +44,16 @@ function forecastChart(model) {
     <polyline class="kapa-capacity-team" points="${teamPoints}"/><polyline class="kapa-capacity-peak" points="${peakPoints}"/><polyline class="kapa-capacity-won" points="${wonPoints}"/><polyline class="kapa-capacity-expected" points="${expectedPoints}"/>${points}</svg>`;
 }
 
-function capacityForecast(model) {
+function capacityForecast(model, truncated=false) {
   const unit=mode==='week'?'Wochen':'Monate', counts=mode==='week'?[12,26,52]:[12,24,36];
-  const controls=`<label class="pt-field__label" for="forecast-count">Vorschau</label><select class="pt-select" id="forecast-count" data-pt-search="off" onchange="setForecastCount(this.value)">${counts.map(count=>`<option value="${count}" ${model.columns.length===count?'selected':''}>${count} ${unit}</option>`).join('')}</select>`;
+  const controls=`<label class="pt-field__label" for="forecast-count">Vorschau mindestens</label><select class="pt-select" id="forecast-count" data-pt-search="off" onchange="setForecastCount(this.value)">${counts.map(count=>`<option value="${count}" ${forecastCounts[mode]===count?'selected':''}>${count} ${unit}</option>`).join('')}</select>`;
   const summary=model.firstBottleneck?`<div class="pt-alert pt-alert--warning" role="status"><span><strong>Erster Engpass: ${esc(model.firstBottleneck.period.title)}</strong> · ${esc(model.firstBottleneck.person.name)} · ${KapaCapacity.percent(model.firstBottleneck.period.peak)} %. ${model.affectedPeople} ${model.affectedPeople===1?'Person':'Personen'} im Vorschaufenster überlastet.</span></div>`:
     `<div class="pt-status pt-status--neutral">Keine Überlastung aus zugewiesenen Stunden im Vorschaufenster</div>`;
   const warning=model.unassigned?`<div class="pt-alert pt-alert--warning" role="status"><span>${model.unassigned.toLocaleString('de-AT')} h sind keiner vorhandenen Person zugewiesen und fehlen in der Auslastung.</span></div>`:'';
   const header=`<div class="panelhead"><div><span class="section-kicker">VORAUSSCHAU</span><h2>Kapazität und Engpässe</h2></div><div class="kapa-forecast-controls">${controls}</div></div>`;
   if(!model.people.length) return `<section class="panel kapa-forecast-panel">${header}${warning}<p class="muted">Personen mit FTE anlegen, um zukünftige Engpässe auszuwerten.</p></section>`;
   const width=192+96*model.columns.length, people=[...model.people].sort((a,b)=>Math.max(...b.cells.map(cell=>cell.ratio))-Math.max(...a.cells.map(cell=>cell.ratio)));
-  const bounds=forecastNavigationBounds(model.columns.length), first=model.columns[0], last=model.columns[model.columns.length-1];
-  const navigation=`<div class="kapa-forecast-navigation"><button type="button" class="pt-button pt-button--secondary" onclick="shiftForecast(-1)" aria-label="Vorherige ${model.columns.length} ${unit}">← Zurück</button><div class="kapa-forecast-navigation__slider"><label for="forecast-position">Vorschau verschieben · ${esc(first.label)} – ${esc(last.label)}</label><input id="forecast-position" type="range" min="${bounds.min}" max="${bounds.max}" step="1" value="${offset}" aria-label="Start der Vorschau verschieben" aria-valuetext="${esc(first.title)} bis ${esc(last.title)}" onchange="setForecastPosition(this.value)"></div><button type="button" class="pt-button pt-button--secondary" onclick="shiftForecast(1)" aria-label="Nächste ${model.columns.length} ${unit}">Weiter →</button></div>`;
+  const limitNotice=truncated?`<div class="pt-alert pt-alert--warning">Die Vorschau ist auf 600 ${unit} begrenzt. Spätere Projekte sind nicht enthalten. <label for="forecast-start">Anderen Start wählen:</label> <input id="forecast-start" type="date" value="${esc(model.columns[0].start)}" onchange="setForecastStart(this.value)"></div>`:'';
   const heatmap=`<table class="pt-table kapa-capacity-table"><caption class="pt-visually-hidden">Auslastung je Person und Zeitraum. Werte über 100 Prozent bedeuten Überlastung.</caption><colgroup><col style="width:${192/width*100}%">${model.columns.map(()=>`<col style="width:${96/width*100}%">`).join('')}</colgroup>
     <thead><tr><th scope="col">Person / FTE</th>${model.columns.map(period=>`<th scope="col" title="${esc(period.title)}">${esc(period.label)}</th>`).join('')}</tr></thead>
     <tbody>${people.map(row=>`<tr><th scope="row"><strong>${esc(row.person.name)}</strong><span class="sub">${row.person.fte} % FTE</span></th>${row.cells.map((cell,index)=>{
@@ -64,9 +64,9 @@ function capacityForecast(model) {
       const level=teamCapacityLevel(period.ratio), description=level==='critical'?'Ab 100 %':level==='warning'?'Ab 85 %':'Unter 85 %';
       return `<td class="kapa-team-${level}" title="${description}">${KapaCapacity.percent(period.ratio)} % <span class="pt-visually-hidden">(${description})</span></td>`;
     }).join('')}</tr></tfoot></table>`;
-  return `<section class="panel kapa-forecast-panel">${header}${navigation}${summary}${warning}<div class="kapa-hours-legend"><span><i class="kapa-capacity-team-key" aria-hidden="true"></i>Team gesamt</span><span><i class="kapa-capacity-won-key" aria-hidden="true"></i>Gewonnen · Anteil am Team</span><span><i class="kapa-capacity-expected-key" aria-hidden="true"></i>Erwartet · Anteil am Team</span><span><i class="kapa-capacity-peak-key" aria-hidden="true"></i>Höchste Einzelauslastung</span><span><i class="kapa-capacity-limit-key" aria-hidden="true"></i>100 % Kapazität</span></div>
-    <div class="kapa-timeline-scroll" role="region" tabindex="0" aria-label="Kapazitätsvorschau und Auslastung je Person, horizontal scrollbar"><div class="kapa-timeline kapa-capacity-timeline" style="--kapa-period-count:${model.columns.length}">${forecastChart(model)}${heatmap}</div></div>
-    <p class="pt-field__help">Gewonnen und erwartet zeigen jeweils ihren Anteil an der gesamten Teamkapazität. In der Personenmatrix stehen G für gewonnen und E für erwartet. Beide zählen vollständig zur Gesamtauslastung und Engpassprüfung. „Team gesamt“: Orange ab 85 %, Rot ab 100 %. Zeitraum anklicken, um die Personenübersicht darauf einzustellen. Aktuelle FTE gelten für alle dargestellten Zeiträume; Abwesenheiten sind noch nicht abgezogen.</p></section>`;
+  return `<section class="panel kapa-forecast-panel">${header}${limitNotice}${summary}${warning}<div class="kapa-hours-legend"><span><i class="kapa-capacity-team-key" aria-hidden="true"></i>Team gesamt</span><span><i class="kapa-capacity-won-key" aria-hidden="true"></i>Gewonnen · Anteil am Team</span><span><i class="kapa-capacity-expected-key" aria-hidden="true"></i>Erwartet · Anteil am Team</span><span><i class="kapa-capacity-peak-key" aria-hidden="true"></i>Höchste Einzelauslastung</span><span><i class="kapa-capacity-limit-key" aria-hidden="true"></i>100 % Kapazität</span></div>
+    <div class="kapa-timeline-scroll kapa-capacity-scroll" role="region" tabindex="0" aria-label="Kapazitätsvorschau und Auslastung je Person, horizontal scrollbar"><div class="kapa-timeline kapa-capacity-timeline" style="--kapa-period-count:${model.columns.length};--kapa-visible-periods:${forecastCounts[mode]}">${forecastChart(model)}${heatmap}</div></div>
+    <p class="pt-field__help">Die Vorschau reicht mindestens über den gewählten Zeitraum und bis zum letzten Projektende. Mit dem Balken unter der Tabelle lässt sich der Verlauf horizontal verschieben. Die Engpassmeldung bezieht sich auf den gesamten dargestellten Zeitraum. Gewonnen und erwartet zeigen jeweils ihren Anteil an der gesamten Teamkapazität. In der Personenmatrix stehen G für gewonnen und E für erwartet. Beide zählen vollständig zur Gesamtauslastung und Engpassprüfung. „Team gesamt“: Orange ab 85 %, Rot ab 100 %. Zeitraum anklicken, um die Personenübersicht darauf einzustellen. Aktuelle FTE gelten für alle dargestellten Zeiträume; Abwesenheiten sind noch nicht abgezogen.</p></section>`;
 }
 
 function setForecastCount(value) {
@@ -76,5 +76,9 @@ function setForecastCount(value) {
   render();
 }
 function focusForecastPeriod(index) { offset+=index; render(); }
-function shiftForecast(direction) { if(direction!==-1&&direction!==1)return; offset+=direction*forecastCounts[mode]; render(); }
-function setForecastPosition(value) { const next=Number(value); if(!Number.isInteger(next))return; offset=next; render(); document.querySelector('#forecast-position')?.focus?.(); }
+function setForecastStart(value) {
+  if(!validGateDate(value))return;
+  const target=date(value), now=new Date(), utcDay=d=>Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000;
+  offset=mode==='week'?Math.floor((utcDay(monday(target))-utcDay(monday(now)))/7):(target.getFullYear()-now.getFullYear())*12+target.getMonth()-now.getMonth();
+  render();
+}

@@ -63,10 +63,9 @@
 .kapa-forecast-panel .panelhead,.kapa-forecast-panel .kapa-hours-legend {margin:0}
 .kapa-forecast-controls {display:flex;align-items:center;gap:var(--polytec-space-2)}
 .kapa-forecast-controls .pt-select,.kapa-forecast-controls .pt-select-wrap {min-width:9rem}
-.kapa-forecast-navigation {display:flex;align-items:center;gap:var(--polytec-space-3);flex-wrap:wrap}
-.kapa-forecast-navigation__slider {display:grid;flex:1 1 16rem;gap:var(--polytec-space-1);min-width:0}
-.kapa-forecast-navigation__slider input {width:100%;accent-color:var(--polytec-color-status-info)}
 .kapa-capacity-timeline {min-width:100%}
+.kapa-capacity-scroll {container-type:inline-size}
+.kapa-capacity-timeline {--kapa-period-width:max(6rem,calc((100cqw - 12rem) / var(--kapa-visible-periods)))}
 .kapa-capacity-team,.kapa-capacity-limit {fill:none;stroke:var(--polytec-chart-series-2);stroke-width:2}
 .kapa-capacity-limit {stroke-dasharray:7 5;stroke-width:1.5}
 .kapa-capacity-peak {fill:none;stroke:var(--polytec-chart-series-1);stroke-width:2.5}

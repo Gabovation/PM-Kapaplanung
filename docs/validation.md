@@ -53,3 +53,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.9.2
 41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Die Navigation wurde für Fensterwechsel und direkte Startposition geprüft; ein fünf Jahre entferntes Projektende wird im Wochen- und Monatsraster vom Schieberegler erreicht. Eine visuelle und interaktive Browserprüfung des Reglers steht noch aus.
+
+## Prüfung Version 0.9.3
+41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Die JavaScript-Prüfung deckt die Verlängerung über zwölf Wochen hinaus, das exklusive Projektende, Wochen- und Monatsraster sowie die Begrenzungsmeldung ab. Der vormals separate Schieberegler wurde durch den nativen horizontalen Scrollcontainer ersetzt. Eine visuelle und interaktive Browserprüfung steht noch aus.

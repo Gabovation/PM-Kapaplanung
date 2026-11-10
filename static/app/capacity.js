@@ -5,7 +5,7 @@ const KapaCapacity = (()=>{
   const add=(value,days)=>{const result=new Date(value);result.setDate(result.getDate()+days);return result;};
   const total=values=>values.reduce((a,b)=>a+b,0);
   function periods(start,granularity,count) {
-    if(!['week','month'].includes(granularity)||!Number.isInteger(count)||count<1||count>60) throw Error('Ungültiger Vorschauzeitraum.');
+    if(!['week','month'].includes(granularity)||!Number.isInteger(count)||count<1||count>600) throw Error('Ungültiger Vorschauzeitraum.');
     let current=typeof start==='string'?date(start):new Date(start);
     current=granularity==='week'?add(current,-(current.getDay()+6)%7):new Date(current.getFullYear(),current.getMonth(),1,12);
     const result=[];

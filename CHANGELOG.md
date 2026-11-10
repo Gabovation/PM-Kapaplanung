@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.3 – 10.11.2026
+- Die Vorschau verwendet wieder den normalen horizontalen Scrollbalken unter Diagramm und Tabelle. Die Zeitachse reicht mindestens über die gewählte Vorschau und bei längeren Projekten bis zum letzten Projektende. Der separate Schieberegler entfällt.
+- Die Engpassmeldung betrachtet den gesamten dargestellten Zeitraum. Zum Schutz der Darstellung gilt eine Grenze von 600 Zeiträumen; darüber erscheint ein Hinweis mit Datumsauswahl.
+
 ## 0.9.2 – 10.11.2026
 - Die Kapazitätsvorschau besitzt einen Schieberegler sowie „Zurück“ und „Weiter“, um das gewählte Zeitfenster über die zunächst angezeigten Wochen oder Monate hinaus zu verschieben. Der Bereich und der sichtbare Start und das Ende werden angezeigt.
 
