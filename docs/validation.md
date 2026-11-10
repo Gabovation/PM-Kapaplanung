@@ -8,7 +8,7 @@
 - Schreibzugriffe vergleichen die geladene Revision. Veraltete Browserstände erhalten HTTP 409.
 
 ## Automatische Prüfungen
-`python -m pytest -p no:cacheprovider -o addopts="" tests`: 39 Tests erfolgreich. Zusätzlich zu den Plattform-, Rollen-, HTML- und Speicherprüfungen kontrolliert die unabhängige Stundenplanprüfung Quellen, ganze Stunden, Gate- und Änderungsintervalle, Rundung und Budgetsummen. Ungültige Stundenpläne werden vor dem Speichern abgelehnt. Die Prüfung deckt auch die Reihenfolge und Erreichbarkeit der Editor-Skripte ab.
+`python -m pytest -p no:cacheprovider -o addopts="" tests`: 41 Tests erfolgreich. Zusätzlich zu den Plattform-, Rollen-, HTML- und Speicherprüfungen kontrolliert die unabhängige Stundenplanprüfung Quellen, ganze Stunden, Gate- und Änderungsintervalle, Rundung und Budgetsummen. Ungültige Stundenpläne werden vor dem Speichern abgelehnt. Die Prüfung deckt auch die Reihenfolge und Erreichbarkeit der Editor-Skripte ab.
 
 `tests/plan.test.js`: Budgetsummen, ganze Stunden, Gate- und Monatsgrenzen sowie gewichtete Wochen wurden mit der JavaScript-Laufzeit geprüft.
 
@@ -17,6 +17,12 @@
 `tests/hours.test.js`: absolute Wochen- und Monatseingaben, Diagrammmarkup, Live-Summen, Schutz manueller Werte beim Ausgleichen, ungültige Eingaben, Speicherung, Wechsel ohne Datenänderung, Gate-/Monatsgrenzen, geänderte Budgets und Planwertänderungen geprüft. Der Stundenstand des vorhandenen Projekts wurde zusätzlich gegen die vorherige Berechnung aus Git verglichen: Alle bisherigen Tagesstunden sind unverändert.
 
 Der automatische Plattform-Check prüft nur einen Teil der Regeln. Seine PASS-Zeilen sind keine Produktionsfreigabe. Die manuellen Aufgaben und lokalen Abweichungen bleiben bestehen.
+
+`tests/forecast.test.js`: überlastete Einzelperson bei freier Teamkapazität, mehrere Projekte je Person, zukünftiger Engpass, Teilzeit-/Monatskapazität, kleine Überschreitungen, fehlende Zuordnung und Nullkapazität geprüft. Gates einschließlich exklusivem Gate 8, Sommerzeitgrenzen und nahe Labels sowie Horizont- und Zeitraumauswahl geprüft. Die komplette Übersicht wurde zusätzlich mit Personenmatrix gerendert.
+
+Bei einem Python-Test trat einmalig ein Dateizugriffsfehler auf. Begrenzte Wiederholungen und temporäre Bereinigung sind mit eigenen Fehlerfalltests abgedeckt; anschließend waren alle 41 Tests erfolgreich.
+
+Der erneute Git-Pull der Referenz-Repositories lieferte keine Rückmeldung und wurde beendet. Verwendet werden die unten genannten lokalen Commit-Stände; die UI-Kit-Kopie wird gegen diese lokale Referenz geprüft.
 
 ## Sichtprüfung
 Eine vollständige dokumentierte Sicht- und Bedienprüfung bei 1440 × 900, 768 × 1024 und 390 × 844 steht noch aus. Der bisherige Browserzugriff wurde durch die Computersteuerung abgebrochen. Die Regressionstests prüfen die Ursache des gelieferten Screenshots; sie bescheinigen keine tatsächlichen Browserabmessungen oder vollständige Bedienbarkeit.

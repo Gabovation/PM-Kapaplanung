@@ -7,6 +7,7 @@ import os
 import secrets
 import tempfile
 import threading
+import time
 from pathlib import Path
 
 from flask import Flask, abort, jsonify, render_template, request
@@ -65,13 +66,28 @@ def create_app() -> Flask:
             if incoming.get('_revision', 0) != revision:
                 return jsonify(error='Die Planung wurde in einem anderen Fenster geändert. Bitte neu laden.'), 409
             incoming['_revision'] = revision + 1
+            name = None
             try:
                 with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=DATA.parent, delete=False) as tmp:
-                    json.dump(incoming, tmp, ensure_ascii=False)
                     name = tmp.name
-                os.replace(name, DATA)
+                    json.dump(incoming, tmp, ensure_ascii=False)
+                # Bounded retries tolerate transient Windows file locks; persistent errors still fail.
+                for attempt in range(3):
+                    try:
+                        os.replace(name, DATA)
+                        break
+                    except PermissionError:
+                        if attempt == 2:
+                            raise
+                        time.sleep(0.025)
             except OSError:
                 return jsonify(error='Die Planung konnte nicht gespeichert werden.'), 500
+            finally:
+                if name:
+                    try:
+                        Path(name).unlink(missing_ok=True)
+                    except OSError:
+                        app.logger.warning('Temporary planning file could not be removed.')
             return jsonify(revision=incoming['_revision'])
 
     @app.post('/api/prepare-import')

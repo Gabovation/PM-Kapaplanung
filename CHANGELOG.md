@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0 – 10.11.2026
+- Gates G3, G5, G6, G7 und G8 mit Datum und Meilenstein im Stundenverlauf ergänzt, datumsgenau in Wochen und Monaten. Eng beieinanderliegende Labels stehen auf getrennten Zeilen.
+- Übersicht um Team- und höchste Einzelauslastung, 100-%-Grenze und eine Personenmatrix erweitert. Erster Engpass, betroffene Personen und nicht zugewiesene Stunden werden ausgewiesen.
+- Vorschau über 12/26/52 Wochen oder 12/24/36 Monate ab dem ausgewählten Zeitraum. Diagrammpunkte und Matrixzellen stellen die Personenübersicht auf den gewählten Zeitraum ein.
+- Vorschau und aktuelle Auslastung verwenden dieselbe Berechnung und ungerundete Schwellenwerte.
+- Ein im Test aufgetretener temporärer Windows-Zugriffsfehler wurde mit begrenzten Wiederholungen bei Dateisperren und Aufräumen temporärer Dateien abgesichert.
+- 41 Python-Tests und vier JavaScript-Prüfgruppen erfolgreich; visuelle Browserabnahme bleibt offen.
+
 ## 0.4.0 – 10.11.2026
 - Feinplanung von Gewichten auf absolute ganze Stunden umgestellt. Wochen und Monate laufen von links nach rechts; die Ansicht ist umschaltbar und zeigt Basisstunden, Planwertänderungen und den Gesamtverlauf als Diagramm.
 - Jede Gate-Phase und Planwertänderung besitzt eine eigene Stundenzeile. Live-Summen zeigen offene oder überschrittene Budgets. „Ausgleichen“ verteilt die Differenz auf noch unbearbeitete Zeiträume, ohne manuelle Eingaben zu ändern.

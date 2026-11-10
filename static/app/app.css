@@ -49,6 +49,39 @@
 .kapa-hours-table tbody td {padding-inline:var(--polytec-space-2)}
 .kapa-hours-table .pt-input {text-align:right}
 .kapa-hours-table .kapa-source-change th {border-left:var(--polytec-space-1) solid var(--polytec-chart-series-1)}
+.kapa-gate-line {fill:none;stroke:var(--polytec-chart-series-focus);stroke-width:1;stroke-dasharray:4 4;opacity:.6}
+.kapa-gate-marker rect {fill:var(--polytec-color-surface-panel)}
+.kapa-gate-marker text {font-family:var(--polytec-font-family);font-size:12px;font-weight:700;fill:var(--polytec-chart-series-focus)}
+.kapa-gate-marker .kapa-gate-date {font-weight:400;fill:var(--polytec-color-text-secondary)}
+.kapa-gate-diamond {fill:var(--polytec-chart-series-focus)}
+.kapa-forecast-panel {display:grid;min-width:0;gap:var(--polytec-space-3)}
+.kapa-forecast-panel .panelhead,.kapa-forecast-panel .kapa-hours-legend {margin:0}
+.kapa-forecast-controls {display:flex;align-items:center;gap:var(--polytec-space-2)}
+.kapa-forecast-controls .pt-select,.kapa-forecast-controls .pt-select-wrap {min-width:9rem}
+.kapa-capacity-timeline {min-width:100%}
+.kapa-capacity-team,.kapa-capacity-limit {fill:none;stroke:var(--polytec-chart-series-2);stroke-width:2}
+.kapa-capacity-limit {stroke-dasharray:7 5;stroke-width:1.5}
+.kapa-capacity-peak {fill:none;stroke:var(--polytec-chart-series-1);stroke-width:2.5}
+.kapa-capacity-team-point {fill:var(--polytec-color-surface-panel);stroke:var(--polytec-chart-series-2);stroke-width:2}
+.kapa-capacity-peak-point {fill:var(--polytec-chart-series-1)}
+.kapa-capacity-over {fill:var(--polytec-color-status-danger)}
+.kapa-capacity-over-band {fill:var(--polytec-color-status-danger);opacity:.06}
+.kapa-capacity-over-label {fill:var(--polytec-color-status-danger);font-size:12px;font-weight:700}
+.kapa-capacity-point {cursor:pointer}
+.kapa-capacity-point:focus {outline:2px solid var(--polytec-color-focus-ring)}
+.kapa-hours-legend .kapa-capacity-team-key {border-top:2px solid var(--polytec-chart-series-2);height:0}
+.kapa-hours-legend .kapa-capacity-peak-key {border-top:3px solid var(--polytec-chart-series-1);height:0}
+.kapa-hours-legend .kapa-capacity-limit-key {border-top:2px dashed var(--polytec-chart-series-2);height:0}
+.kapa-capacity-table {table-layout:fixed;width:100%}
+.kapa-capacity-table th:first-child {position:sticky;left:0;z-index:1;background:var(--polytec-color-surface-panel);border-right:1px solid var(--polytec-color-border-default)}
+.kapa-capacity-table th strong,.kapa-capacity-table th .sub {display:block}
+.kapa-capacity-table tbody th {white-space:normal;overflow-wrap:anywhere}
+.kapa-capacity-table thead th {white-space:nowrap}
+.kapa-capacity-table td {padding:var(--polytec-space-1)}
+.kapa-capacity-cell {width:100%;white-space:nowrap}
+.kapa-capacity-cell.is-planned {background:var(--polytec-color-surface-subtle)}
+.kapa-capacity-cell.is-free {color:var(--polytec-color-text-secondary)}
+.kapa-capacity-cell.is-overloaded {background:color-mix(in srgb,var(--polytec-color-status-danger) 12%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-danger);font-weight:700}
 @media(max-width:64rem){.layout,.split{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:40rem){.kapa-heading,.hero,.detailtop{align-items:flex-start;flex-wrap:wrap}.phasegrid,.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.panelhead{flex-wrap:wrap}}
 @media(max-width:30rem){.formgrid{grid-template-columns:minmax(0,1fr)}}

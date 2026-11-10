@@ -8,7 +8,7 @@ function node(selector) {
   return nodes.get(selector);
 }
 const context=vm.createContext({document:{querySelector:node,querySelectorAll:()=>[],addEventListener(){}},location:{hash:''},window:{addEventListener(){}},fetch:()=>new Promise(()=>{}),alert:text=>alerts.push(text),console});
-for(const path of ['hours.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+path,'utf8'),context);
+for(const path of ['hours.js','capacity.js','capacity-view.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+path,'utf8'),context);
 const run=script=>vm.runInContext(script,context);
 assert.equal(run("JSON.stringify(KapaHours.phaseBudgets({budget:12,percent:[20,45,0,35]}))"),'[3,5,0,4]');
 run(`init(); persist=()=>{}; const p={id:'p',name:'Test',number:'P1',budget:800,percent:[20,20,20,40],dates:['2026-01-01','2026-04-01','2026-07-01','2027-01-01','2027-07-01'],weights:{},changes:[]};state.projects=[p];editHours('p');`);

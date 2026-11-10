@@ -28,3 +28,11 @@ Vorlagen werden mit UTF-8-BOM-Behandlung geladen. Die lokale Jinja-Umgebung prü
 
 ## Offene Plattformintegration
 MongoDB, Portal-Identität, echte Organisationsdaten, gemeinsame Bearbeitung und serverseitige Fachberechnung sind noch offen. Manifestdeklarationen und Standard-Dienstskripte sind Vorbereitungen. Es wurde kein Portal, Proxy oder Dienst verändert.
+
+
+## Kapazitätsvorschau und Gates
+`static/app/capacity.js` berechnet die gemeinsame Personen-/Teamkapazität. Ein Projektverlauf wird je Modellaufbau einmal berechnet, dann nach Personen und Perioden aggregiert. Aktuelle Übersicht und Vorschau verwenden dasselbe Modell. `capacity-view.js` zeigt Grafik, 100-%-Grenze, Personenmatrix und Zeitraumauswahl. Beide Dateien werden vor `plan.js` geladen.
+
+`KapaHours.milestones` liefert relative Gate-Positionen. Die SVG-Komposition in `fine-editor.js` verteilt Labels bei Bedarf auf mehrere Zeilen und wird in Projektansicht und Eingabevorschau gemeinsam verwendet. Die Formeln und Darstellungen speichern keine neuen Plandaten.
+
+Bei lokalen Schreibzugriffen gibt es maximal drei Dateiersatzversuche mit 25 ms Abstand bei `PermissionError`. Temporäre Dateien werden anschließend entfernt. Ein dauerhafter Fehler liefert weiterhin HTTP 500 und ändert den gespeicherten Revisionsstand nicht.

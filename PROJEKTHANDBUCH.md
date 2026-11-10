@@ -86,3 +86,25 @@ python tools/migrate_roles.py planung.json
 Dabei muss der Server beendet sein. Die Migration erzeugt `planung.vor-rollen-v2.json` als unveränderte Sicherung. Eine bestehende Sicherung wird nie überschrieben. „Projektleitung“ und „Projektleiter“ werden der Startrolle Projektleiter zugeordnet. QVP und bisherige eigene Rollen bleiben erhalten. Projektwerte, Personen-IDs und FTE ändern sich nicht. Ein wiederholter Aufruf auf Datenformat 2 validiert den Stand und verändert ihn nicht.
 
 Neue Sicherungen verwenden Datenformat 2 mit `roles` und `people[].roleId`. Alte Sicherungen können weiterhin über Einstellungen wiederhergestellt werden. Die Vorbereitung konvertiert sie in Datenformat 2; erst nach der Bestätigung ersetzt der normale, revisionsgeprüfte Schreibvorgang die aktuelle Planung.
+
+
+## Gate-Meilensteine im Stundenverlauf
+G3, G5, G6, G7 und G8 werden in der Projektansicht und im Editor mit Datum, Verbindungslinie und Meilenstein markiert. Ihre Position ergibt sich aus dem Kalendertagsanteil innerhalb einer Wochen- oder Monatsspalte. UTC-Kalendertagsnummern vermeiden Verschiebungen durch Sommerzeitwechsel. Gate 8 bleibt auch sichtbar, wenn sein Termin exakt dem Ende der letzten Spalte entspricht. Nahe Labels werden auf mehrere Zeilen verteilt. Die Markierungen verändern keine Stunden.
+
+## Grafische Kapazitätsvorschau
+Die Übersicht zeigt ab dem ausgewählten Zeitraum eine rollende Vorschau. Wählbar sind 12, 26 oder 52 Wochen und 12, 24 oder 36 Monate. Zeitraum-Pfeile ändern den Start. Eine Auswahl im Diagramm oder in der Matrix stellt die darunterliegende Personenübersicht auf diesen Zeitraum ein. Der Vorschauhorizont ist eine Ansichtseinstellung und wird nicht in der Planungsdatei gespeichert.
+
+Die Nachfrage je Person stammt aus der Summe ihrer zugewiesenen Projekte, einschließlich Planwertänderungen. Verwendet werden dieselben Tagesstunden wie im Stundeneditor. Die Kapazität ist `FTE-Prozent / 100 × Wochenstunden je FTE × Werktage / 5`. Montag bis Freitag zählen als Werktage. Feiertage, Urlaub und zeitlich veränderliche FTE sind noch nicht enthalten; aktuelle FTE gelten für das gesamte Fenster. Erwartete Projekte zählen vollständig mit.
+
+Die Teamkurve ist die Summe der zugewiesenen Stunden geteilt durch die Summe der individuellen Kapazitäten. Die zweite Kurve zeigt die jeweils höchste Einzelauslastung. Beispiel: Zwei Personen haben je 40 h Kapazität. 64 h auf einer Person ergeben 80 % Teamauslastung, aber 160 % auf dieser Person. Der Teamdurchschnitt darf diesen Engpass nicht verdecken.
+
+Die Matrix zeigt Prozentwerte je Person und Zeitraum. Überlastung ist durch Warnfarbe, Ausrufezeichen und Prozentwert erkennbar. Die Zusammenfassung nennt den frühesten Engpass und die Anzahl unterschiedlicher betroffener Personen im Vorschaufenster. Bei mehreren Engpässen im ersten Zeitraum wird die höchst ausgelastete Person genannt. Tooltips enthalten Planstunden und Kapazität. Projektstunden ohne gültige Personenzuweisung werden separat gemeldet und sind nicht im Teamquotienten enthalten.
+
+Überlastung wird vor dem Runden geprüft. Gleitkommaabweichungen unter einer Milliardstelstunde werden toleriert. Die Anzeige verwendet höchstens eine Nachkommastelle. Positive Nachfrage bei null Kapazität wird als `∞ %` und als Engpass angezeigt. Ohne Personen wird keine irreführend unauffällige Auslastungsgrafik erzeugt.
+
+## Weitere Lessons Learned
+- Der Teamdurchschnitt allein reicht für Engpassplanung nicht aus. Höchste Einzelauslastung und Personenmatrix müssen ihn ergänzen.
+- Monatswerte können Wochenengpässe verdecken. Beide Raster müssen verfügbar bleiben.
+- Meilensteine werden auf ihren tatsächlichen Kalendertag gesetzt, nicht auf eine Periodengrenze verschoben.
+- Prozentwerte dürfen erst für die Anzeige gerundet werden; geringe tatsächliche Überschreitungen müssen erkennbar bleiben.
+- Während der Prüfung trat eine kurzzeitige Windows-Dateisperre auf. Der lokale Schreibvorgang wiederholt Zugriffsfehler begrenzt und räumt temporäre Dateien auf. Dauerhafte Fehler bleiben sichtbar.

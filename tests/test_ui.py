@@ -46,7 +46,8 @@ def test_html_is_not_cached_and_local_templates_reload(client, app):
 def test_hour_editor_dependencies_are_loaded_in_order(client):
     html = client.get('/').get_data(as_text=True)
     assert html.index('app/hours.js') < html.index('app/plan.js') < html.index('app/fine-editor.js')
-    for asset in ('hours.js', 'plan.js', 'fine-editor.js'):
+    assert html.index('app/capacity.js') < html.index('app/capacity-view.js') < html.index('app/plan.js')
+    for asset in ('hours.js', 'capacity.js', 'capacity-view.js', 'plan.js', 'fine-editor.js'):
         assert client.get('/static/app/' + asset).status_code == 200
 
 

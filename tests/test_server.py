@@ -65,3 +65,35 @@ def test_legacy_backup_import_is_prepared_without_writing(local_client):
     assert response.json['version'] == 2
     assert response.json['people'][0]['roleId'] == 'project-manager'
     assert local_client.get('/api/data').json is None
+
+
+def test_transient_file_lock_is_retried(local_client, monkeypatch):
+    real_replace = web.os.replace
+    attempts = []
+    def transient_replace(source, destination):
+        attempts.append(source)
+        if len(attempts) == 1:
+            raise PermissionError('Simulated transient file lock')
+        return real_replace(source, destination)
+    monkeypatch.setattr(web.os, 'replace', transient_replace)
+    payload = {'version': 2, 'people': [], 'projects': [], 'roles': [{'id': 'pm', 'name': 'Projektleiter'}], '_revision': 0}
+    assert local_client.post('/api/data', json=payload, headers={'X-Kapa-Token': web.TOKEN}).status_code == 200
+    assert len(attempts) == 2
+    assert local_client.get('/api/data').json['_revision'] == 1
+
+
+def test_failed_save_cleans_temporary_data(local_client, monkeypatch):
+    real_tempfile = web.tempfile.NamedTemporaryFile
+    temporary_files = []
+    def tracked_tempfile(**kwargs):
+        handle = real_tempfile(**kwargs)
+        temporary_files.append(Path(handle.name))
+        return handle
+    def failed_replace(source, destination):
+        raise OSError('Simulated storage failure')
+    monkeypatch.setattr(web.tempfile, 'NamedTemporaryFile', tracked_tempfile)
+    monkeypatch.setattr(web.os, 'replace', failed_replace)
+    payload = {'version': 2, 'people': [], 'projects': [], 'roles': [{'id': 'pm', 'name': 'Projektleiter'}], '_revision': 0}
+    assert local_client.post('/api/data', json=payload, headers={'X-Kapa-Token': web.TOKEN}).status_code == 500
+    assert temporary_files and all(not path.exists() for path in temporary_files)
+    assert local_client.get('/api/data').json is None

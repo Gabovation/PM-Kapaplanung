@@ -113,5 +113,16 @@ const KapaHours = (() => {
       return {...period,base,change,total:base+change};
     });
   }
-  return {phaseBudgets,sources,snapshot,reconcile,defaultGranularity,materialize,periods,rowTotal,periodTotal,activeDays,editPeriod,balance,summary};
+  function milestones(project, columns) {
+    if(!columns.length) return [];
+    const ordinal=value=>Date.UTC(...value.split('-').map((part,index)=>Number(part)-(index===1?1:0)))/86400000;
+    return project.dates.map((date,index)=>{
+      let column=columns.findIndex(period=>date>=period.start&&date<period.end);
+      if(date===columns[columns.length-1].end) column=columns.length-1;
+      if(column<0) return null;
+      const period=columns[column], fraction=(ordinal(date)-ordinal(period.start))/(ordinal(period.end)-ordinal(period.start));
+      return {name:['Gate 3','Gate 5','Gate 6','Gate 7','Gate 8'][index],short:['G3','G5','G6','G7','G8'][index],date,position:column+fraction};
+    }).filter(Boolean);
+  }
+  return {phaseBudgets,sources,snapshot,reconcile,defaultGranularity,materialize,periods,rowTotal,periodTotal,activeDays,editPeriod,balance,summary,milestones};
 })();
