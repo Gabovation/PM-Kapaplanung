@@ -153,3 +153,12 @@ In der Kapazitätsmatrix sind die Zeiträume im Tabellenkopf und die Werte der Z
 ## Ergänzte Lessons Learned
 - Die Farbgrenze muss fachlich getrennt von der bestehenden Engpassdefinition behandelt werden: Genau 100 % ist hier rot, aber noch keine individuelle Überlastung.
 - Eine vor der Anzeige gerundete Zahl kann an einer Grenze bereits 85 % oder 100 % anzeigen; die Einstufung darf dadurch nicht unbemerkt verändert werden.
+
+## Vorschaufenster verschieben
+Die eingestellte Vorschaugröße legt die Anzahl berechneter Wochen oder Monate im aktuellen Fenster fest. Ein breiter Bildschirm kann dieses Fenster vollständig zeigen; dann gibt es keinen Überlauf und folglich keinen nativen horizontalen Scrollbalken. Der neue Schieberegler verschiebt den Anfang des Fensters wochen- beziehungsweise monatsweise. Er deckt mindestens den Zeitraum bis zum spätesten gültigen Gate 8 aller Projekte ab und ermöglicht auch Schritte über dieses Ende hinaus. „Zurück“ und „Weiter“ verschieben das Fenster um seine gesamte Länge. Anfang und Ende des Fensters stehen am Regler. Die bisherige horizontale Scrollleiste erscheint weiterhin, wenn das aktuelle Fenster breiter als der verfügbare Platz ist.
+
+Das Verschieben ändert den ausgewählten Zeitraum der Personenübersicht auf den Fensterbeginn. Engpasshinweis und Matrix werden für das neue Fenster berechnet; gespeicherte Projektdaten werden nicht geändert. Durch Wechsel des Wochen-/Monatsrasters wird wie bisher auf den aktuellen Zeitraum zurückgesetzt. Der Regler ist mit Tastatur und beschrifteten Steuerelementen bedienbar.
+
+## Ergänzte Lessons Learned
+- Ein horizontaler Scrollbalken kann nur Inhalte innerhalb des berechneten Fensters zeigen. Ein begrenzter Prognosehorizont braucht darüber hinaus eine sichtbare Zeitnavigation, damit spätere Projekte erreichbar bleiben.
+- Der Engpasshinweis muss seinen Betrachtungszeitraum klar benennen: Er gilt für das jeweils angezeigte Fenster und ist keine Aussage über die gesamte Zukunft.

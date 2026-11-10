@@ -50,3 +50,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.9.1
 41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Die Teamgrenzen wurden bei 84,999 %, 85 %, 99,999 %, 100 % und unendlicher Auslastung geprüft. Eine visuelle Browserprüfung der Ausrichtung und Farbflächen steht noch aus.
+
+## Prüfung Version 0.9.2
+41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Die Navigation wurde für Fensterwechsel und direkte Startposition geprüft; ein fünf Jahre entferntes Projektende wird im Wochen- und Monatsraster vom Schieberegler erreicht. Eine visuelle und interaktive Browserprüfung des Reglers steht noch aus.

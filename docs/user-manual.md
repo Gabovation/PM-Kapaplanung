@@ -45,6 +45,8 @@ Zwei zusätzliche Kurven zeigen, welcher Anteil der gesamten Teamkapazität auf 
 
 Die Vorschau startet im ausgewählten Zeitraum. Aktuelle FTE gelten für alle zukünftigen Perioden. Abwesenheiten und Feiertage sind nicht abgezogen. Monatswerte können einzelne Wochenengpässe glätten; bei Bedarf auf Woche umschalten.
 
+Die Auswahl „Vorschau“ bestimmt die Länge des angezeigten Zeitfensters, beispielsweise zwölf Wochen; sie begrenzt nicht die gesamte Projektplanung. Mit „Zurück“ und „Weiter“ lässt sich das Fenster um seine jeweilige Länge verschieben. Der Schieberegler erlaubt einzelne Wochen- beziehungsweise Monatsschritte und reicht mindestens bis zum Ende der hinterlegten Projekte. Über dem Regler stehen erster und letzter angezeigter Zeitraum. Die Personenübersicht wechselt dabei auf den Beginn des angezeigten Fensters. Die Engpassmeldung bezieht sich jeweils auf das angezeigte Fenster. Bei breiteren Diagrammen kann zusätzlich die horizontale Scrollleiste unter der Matrix verwendet werden.
+
 ## Sichern
 In Einstellungen eine JSON-Sicherung exportieren. Wiederherstellen ersetzt die aktuelle Planung nach Bestätigung. Auch ältere Sicherungen mit frei eingegebenen Rollen werden übernommen. Ein veraltetes Browserfenster erhält beim Speichern einen Konfliktfehler. Dann zuerst die Eingaben als Sicherung exportieren und die Seite danach neu laden.
 

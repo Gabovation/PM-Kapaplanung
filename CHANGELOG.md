@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.2 – 10.11.2026
+- Die Kapazitätsvorschau besitzt einen Schieberegler sowie „Zurück“ und „Weiter“, um das gewählte Zeitfenster über die zunächst angezeigten Wochen oder Monate hinaus zu verschieben. Der Bereich und der sichtbare Start und das Ende werden angezeigt.
+
 ## 0.9.1 – 10.11.2026
 - Die Zeiträume und Teamwerte in der Auswertungsmatrix sind zentriert. In „Team gesamt“ sind Werte ab 85 % orange und ab 100 % rot hinterlegt; die Einstufung erfolgt vor der Rundung.
 
