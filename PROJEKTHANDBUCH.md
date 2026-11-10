@@ -135,3 +135,14 @@ Auf breiten Bildschirmen teilen sich Personenübersicht und Portfolio den verfü
 ## Ergänzte Lessons Learned
 - Vergleichbare Bereiche profitieren von einer gleichmäßigen Platzaufteilung und konsistenten Tabellenüberschriften. Bei kleineren Fenstern müssen Spalten trotzdem zugänglich bleiben.
 - Eine Änderung der Portfolio-Darstellung darf bestehende Projektlinks und die Kennzeichnung des Gate-Planstands nicht verlieren. Die Einstellungen besitzen ein eigenes Layout und bleiben von der Änderung ausgenommen.
+
+## Gewonnene und erwartete Projekte in der Auswertung
+Das Portfolio besitzt eine Statusspalte. Projektliste und Projektdetail verwenden dieselben beschrifteten Statusmarkierungen. „Gewonnen“ und „Erwartet“ sind auch ohne Farbunterscheidung lesbar; andere oder fehlende Statuswerte werden neutral dargestellt. Der Status kann im Projektformular bearbeitet werden.
+
+In der Kapazitätsvorschau werden für jede Person und jeden Zeitraum die Stunden nach Projektstatus zusätzlich zur bestehenden Gesamtsumme ermittelt. Die beiden zusätzlichen Kurven teilen die jeweiligen zugewiesenen Stunden durch die gesamte Teamkapazität des Zeitraums. Bei 80 h Teamkapazität ergeben 24 h gewonnen 30 % und 16 h erwartet 20 %. Die Gesamtlinie zeigt weiterhin alle zugewiesenen Stunden; die höchste Einzelauslastung und Engpassprüfung verwenden wie bisher die Gesamtauslastung. Erwartete Projekte werden nicht mit einer Gewinnwahrscheinlichkeit gewichtet. Nicht zugewiesene Stunden erscheinen weiterhin in der Warnung und nicht in Teamkurven oder Personenmatrix. Ein unbekannter Status zählt zur Gesamtlast, wird aber keiner der beiden Statuskurven zugeschlagen.
+
+Die Personenmatrix zeigt je Zelle Gesamtprozent sowie „G“ für gewonnene und „E“ für erwartete Projektstunden. Tooltip und barrierefreie Beschriftung schreiben beide Anteile aus. Die Linien sind über Farbe und unterschiedliches Strichmuster sowie die Legende unterscheidbar. Bei exakt gleichen Werten können sich Linien überlagern; die Matrix und die Punktinformationen bleiben verfügbar.
+
+## Ergänzte Lessons Learned
+- Statusanteile in Prozent benötigen einen klar genannten gemeinsamen Nenner. Ein Vergleich der Anteile mit der Teamkapazität darf nicht als individuelle Auslastung oder Gewinnwahrscheinlichkeit ausgegeben werden.
+- Ein Statusfilter oder eine geänderte Gewichtung könnte Engpässe verdecken. Statuswerte daher ergänzend anzeigen und die bestehende Gesamtrechnung beibehalten; unbekannte Status nicht stillschweigend umdeuten.

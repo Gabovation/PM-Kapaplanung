@@ -14,6 +14,8 @@ Projektname, Projektnummer, Status, verantwortliche Person und Basisbudget einge
 
 In der Übersicht stehen Auslastung und Portfolio auf breiten Bildschirmen gleich breit nebeneinander, auf schmalen Bildschirmen untereinander. Das Portfolio zeigt die ersten fünf Projekte mit Person, Gate-Planstand, nächstem Gate und Budget in Spalten. Über „Alle ansehen“ öffnet sich die vollständige Projektliste. Falls die Tabelle nicht vollständig ins Fenster passt, kann sie horizontal verschoben werden.
 
+Der Projektstatus „Gewonnen“ oder „Erwartet“ steht als beschriftete Markierung im Portfolio, in der Projektliste und im Projektdetail. Er lässt sich über „Bearbeiten“ ändern.
+
 Bei jedem Projekt öffnet „SharePoint öffnen“ die Seite, deren Adresse aus `https://polytec.sharepoint.com/sites/m365-pep-` und der Projektnummer besteht. Der Link steht im Portfolio der Übersicht, in der Projektliste und im Projektdetail und öffnet einen neuen Browser-Tab.
 
 ## Feinplanung
@@ -36,6 +38,8 @@ In der Übersicht Woche oder Monat auswählen und mit den Pfeilen den Zeitraum w
 Die zusätzliche Grafik „Kapazität und Engpässe“ zeigt Team- und höchste Einzelauslastung über mehrere Zeiträume. Unter „Vorschau“ 12, 26 oder 52 Wochen beziehungsweise 12, 24 oder 36 Monate auswählen. Die gestrichelte Linie markiert 100 % Kapazität. Prozentwerte oberhalb und Ausrufezeichen in der Personenmatrix kennzeichnen Überlastung. Der erste Engpass und die Zahl betroffener Personen stehen über der Grafik.
 
 Die höchste Einzelauslastung kann bereits 160 % erreichen, obwohl das Team nur bei 80 % liegt. Die Matrix zeigt deshalb jede Person getrennt. Ein Klick auf einen Diagrammpunkt oder eine Matrixzelle stellt die Personenübersicht auf den zugehörigen Zeitraum ein. Nicht zugeordnete Stunden erscheinen als separate Warnung.
+
+Zwei zusätzliche Kurven zeigen, welcher Anteil der gesamten Teamkapazität auf gewonnene beziehungsweise erwartete Projekte entfällt. Beispiel: Bei 80 h Teamkapazität entsprechen 24 h aus gewonnenen Projekten 30 % und 16 h aus erwarteten Projekten 20 %. In jeder Personenzelle stehen unter dem Gesamtprozentwert die Stunden als „G“ für gewonnen und „E“ für erwartet. Beim Darüberfahren werden die Werte ausgeschrieben. Beide Projektarten zählen vollständig zur Gesamtauslastung und zur Engpassprüfung; die Kurven sind keine Gewinnwahrscheinlichkeit.
 
 Die Vorschau startet im ausgewählten Zeitraum. Aktuelle FTE gelten für alle zukünftigen Perioden. Abwesenheiten und Feiertage sind nicht abgezogen. Monatswerte können einzelne Wochenengpässe glätten; bei Bedarf auf Woche umschalten.
 

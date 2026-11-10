@@ -31,6 +31,29 @@ assert.equal(run('combined.people[0].cells[0].load'),80);
 assert.equal(run('combined.team[0].ratio'),100);
 assert.equal(run('combined.team[0].peak'),200);
 
+// Status contributions share the same team-capacity denominator and do not change total load.
+run(`const wonProject={...project,status:'Gewonnen',budget:24};
+ const expectedProject={...project,id:'expected',status:'Erwartet',budget:16};
+ const mixed=KapaCapacity.build({...state,projects:[wonProject,expectedProject]},'2026-11-09','week',1);
+ const mixedMonth=KapaCapacity.build({...state,projects:[wonProject,expectedProject]},'2026-11-01','month',1);`);
+assert.equal(run('mixed.team[0].load'),40);
+assert.equal(run('mixed.team[0].wonLoad'),24);
+assert.equal(run('mixed.team[0].expectedLoad'),16);
+assert.equal(run('mixed.team[0].wonRatio'),30);
+assert.equal(run('mixed.team[0].expectedRatio'),20);
+assert.equal(run('mixed.people[0].cells[0].wonLoad'),24);
+assert.equal(run('mixed.people[0].cells[0].expectedLoad'),16);
+assert.equal(run('mixedMonth.team[0].wonLoad'),24);
+assert.equal(run('mixedMonth.team[0].expectedLoad'),16);
+assert.match(run('capacityForecast(mixed)'),/Gewonnen · Anteil am Team/);
+assert.match(run('capacityForecast(mixed)'),/Erwartet · Anteil am Team/);
+assert.match(run('capacityForecast(mixed)'),/Gewonnen: 24 h · Erwartet: 16 h/);
+run(`const unknown=KapaCapacity.build({...state,projects:[{...project,status:'Offen'}]},'2026-11-09','week',1);`);
+assert.equal(run('unknown.team[0].load'),64);
+assert.equal(run('unknown.team[0].wonLoad + unknown.team[0].expectedLoad'),0);
+assert.match(run("projectStatusBadge({status:'Erwartet'})"),/pt-status--warning.*Erwartet/);
+assert.match(run("projectStatusBadge({status:'Gewonnen'})"),/pt-status--success.*Gewonnen/);
+
 // A later overload must be reported even when the first selected period is free.
 run(`const future={...project,dates:['2026-11-23','2026-11-30','2026-12-07','2026-12-14','2026-12-21']};
  const later=KapaCapacity.build({...state,projects:[future]},'2026-11-09','week',12);`);

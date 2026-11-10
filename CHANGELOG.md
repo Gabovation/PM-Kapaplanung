@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0 – 10.11.2026
+- Gewonnene und erwartete Projekte sind im Portfolio, in der Projektliste und im Projektdetail mit beschrifteten Statusmarkierungen unterscheidbar.
+- Die Kapazitätsvorschau zeigt die Anteile gewonnener und erwarteter Projekte an der Teamkapazität als getrennte Kurven. Die Personenmatrix ergänzt die jeweiligen Stunden. Beide Projektarten bleiben vollständig in Gesamtauslastung und Engpassprüfung enthalten.
+
 ## 0.8.0 – 10.11.2026
 - Die Bereiche „Auslastung nach Person“ und „Projekte“ sind auf breiten Bildschirmen gleich breit. Bei schmalen Fenstern stehen sie untereinander.
 - Das Portfolio zeigt Projekt, verantwortliche Person, Gate-Status (Plan), nächstes Gate und Budget in einer Tabelle. Projektnummer und SharePoint-Link bleiben beim Projekt sichtbar.

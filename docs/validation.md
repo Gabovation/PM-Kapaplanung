@@ -44,3 +44,6 @@ Der erneute Remote-Abgleich der privaten Referenz-Repositories war ohne interakt
 
 ## Prüfung Version 0.8.0
 41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. Die bestehenden Prüfungen decken die Gate-Anzeige und den SharePoint-Link auch im Portfolio ab. Die lokale UI-Kit-Kopie stimmt mit dem lokalen Designsystem-Repository überein. Der lokale Server liefert die aktualisierten Skripte und Styles aus. Eine visuelle Browserprüfung der neuen Aufteilung steht noch aus. Der erneute Remote-Abgleich der Referenz-Repositories war ohne GitHub-Anmeldung nicht möglich; verwendet wurden die oben genannten lokalen Commit-Stände.
+
+## Prüfung Version 0.9.0
+41 Python-Tests und sechs JavaScript-Prüfgruppen waren erfolgreich. `tests/forecast.test.js` prüft Statusanteile bei gemischten Projekten, Wochen- und Monatsauswertung, Beibehaltung der Gesamtsumme und einen unbekannten Status. Die lokale UI-Kit-Kopie entspricht dem lokalen Designsystem-Repository. Eine visuelle Browserprüfung der neuen Grafik und Matrix steht noch aus. Verwendet wurden die oben genannten lokalen Referenzstände; der Remote-Abgleich war zuvor ohne GitHub-Anmeldung nicht möglich.
