@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.1 – 11.11.2026
+- Für die lokale Vorführung gibt es die Windows-Verknüpfung „Kapazitätsplanung starten“. Sie öffnet den Browser und hält Fehlermeldungen sichtbar; der Plattformstarter `start.bat` bleibt unverändert.
+- Eine lokale Dateisperre verhindert, dass zwei lokale Server desselben Projektordners gleichzeitig dieselbe Planung bearbeiten.
+
 ## 0.10.0 – 11.11.2026
 - Projekte können zwei Projektleiter mit prozentualer Aufteilung sowie eine QVP-Person besitzen. Die Kapazitätsplanung verteilt PL-Stunden einschließlich Planwertänderungen in ganzen Stunden auf beide Projektleiter.
 - QVP erhält ein separates zusätzliches Budget. Es folgt derselben Gate-Verteilung und wird innerhalb jeder Phase gleichmäßig verteilt. Die Auswertung berücksichtigt QVP-Stunden zusätzlich; ohne zugewiesene QVP-Person werden sie als nicht zugeordnet gemeldet.

@@ -6,7 +6,15 @@ Je Projekt können zwei Projektleiter mit prozentualer Stundenaufteilung und ein
 
 ## Lokal starten
 
-Python 3.11 oder neuer. Abhängigkeiten installieren und Anwendung starten:
+Für den Doppelklick im Projektordner **„Kapazitätsplanung starten“** öffnen. Das Fenster zeigt die gestartete lokale Adresse und muss offen bleiben; der Browser öffnet sich automatisch. Tritt ein Fehler auf, bleibt das Fenster bis zur Eingabetaste geöffnet. Das Betriebssystem wählt einen freien Port. Wird der lokale Server erneut gestartet, während er bereits läuft, erscheint eine Meldung und es wird keine zweite Instanz gestartet.
+
+Die Verknüpfung ist für den aktuellen Rechner erzeugt und nicht in Git enthalten. Nach einem Verschieben des Projektordners, einem Wechsel des Python-Pfads oder auf einem anderen Rechner im Projektordner einmalig mit folgendem Befehl neu erstellen:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\create_local_shortcut.ps1
+```
+
+Alternativ Python 3.11 oder neuer verwenden. Abhängigkeiten installieren und Anwendung im Terminal starten:
 
 ```powershell
 python -m pip install -r requirements.txt
@@ -15,7 +23,7 @@ python server.py
 
 In dieser Arbeitsumgebung liegen die Abhängigkeiten bereits unter `.local_packages`. Der Browser öffnet sich automatisch, der Port wird frei gewählt. Ein fester lokaler Port kann über `KAPA_PORT` gesetzt werden. Der Server verwendet Waitress und bindet an 127.0.0.1. Nach einem Serverneustart offene Fenster neu laden.
 
-**Hinweis für PowerShell:** Programme im aktuellen Ordner werden mit `.\` aufgerufen, etwa `.\start.bat`. Die vorhandene `start.bat` ist jedoch für den späteren Plattformbetrieb vorgesehen und erwartet eine eingerichtete `.venv`; für diese lokale Vorführung bitte `python server.py` verwenden. Das Fenster muss offen bleiben. Wenn die Anwendung bereits läuft, den bestehenden Link verwenden und keinen zweiten Server für dieselbe Planungsdatei starten. Nach einem Neustart die neu angezeigte Adresse verwenden, weil der Port frei gewählt wird.
+**Hinweis für PowerShell:** Programme im aktuellen Ordner werden mit `.\` aufgerufen, etwa `.\start.bat`. Die vorhandene `start.bat` ist jedoch für den späteren Plattformbetrieb vorgesehen und erwartet eine eingerichtete `.venv`; für diese lokale Vorführung bitte die Verknüpfung oder `python server.py` verwenden. Nach einem Neustart die neu angezeigte Adresse verwenden, weil der Port frei gewählt wird.
 
 Die Daten liegen in `planung.json`. JSON-Sicherungen lassen sich unter Einstellungen exportieren und wiederherstellen. SAP-Stunden werden noch nicht importiert.
 
