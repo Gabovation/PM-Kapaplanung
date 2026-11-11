@@ -22,11 +22,29 @@ const KapaCapacity = (()=>{
   function build(state,start,granularity,count=12) {
     const columns=periods(start,granularity,count), loads=new Map(state.people.map(person=>[person.id,{}])), won=new Map(state.people.map(person=>[person.id,{}])), expected=new Map(state.people.map(person=>[person.id,{}])), unassigned={};
     for(const project of state.projects) {
-      const target=loads.get(project.person)||unassigned;
-      const category=project.status==='Gewonnen'?won.get(project.person):project.status==='Erwartet'?expected.get(project.person):null;
-      for(const [day,hours] of Object.entries(KapaHours.materialize(project).daily)) {
-        target[day]=(target[day]||0)+hours;
-        if(category) category[day]=(category[day]||0)+hours;
+      const daily=KapaHours.materialize(project).daily, split=Boolean(project.secondPerson), share=split?Number(project.leadPercent):100;
+      let cumulative=0, assignedFirst=0;
+      for(const day of Object.keys(daily).sort()) {
+        const hours=daily[day];
+        cumulative+=hours;
+        const first=Math.round(cumulative*share/100)-assignedFirst;
+        assignedFirst+=first;
+        for(const [id,part] of [[project.person,first],[project.secondPerson,hours-first]]) {
+          if(!part) continue;
+          const target=loads.get(id)||unassigned;
+          const category=project.status==='Gewonnen'?won.get(id):project.status==='Erwartet'?expected.get(id):null;
+          target[day]=(target[day]||0)+part;
+          if(category) category[day]=(category[day]||0)+part;
+        }
+      }
+      if(project.qvpBudget>0) {
+        const qualityPlan={...project,budget:project.qvpBudget,weights:{},changes:[],hourPlan:undefined};
+        const target=loads.get(project.qvpPerson)||unassigned;
+        const category=project.status==='Gewonnen'?won.get(project.qvpPerson):project.status==='Erwartet'?expected.get(project.qvpPerson):null;
+        for(const [day,hours] of Object.entries(KapaHours.materialize(qualityPlan).daily)) {
+          target[day]=(target[day]||0)+hours;
+          if(category) category[day]=(category[day]||0)+hours;
+        }
       }
     }
     const people=state.people.map(person=>({person,cells:columns.map(period=>{

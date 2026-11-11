@@ -76,7 +76,7 @@ function hoursTimeline(rows, columns, editable=false, project=null) {
 function projectHoursSection(project) {
   const granularity=detailGranularity||KapaHours.defaultGranularity(project);
   const rows=KapaHours.sources(project), columns=KapaHours.periods(project,granularity);
-  return `<section class="panel"><div class="panelhead"><div><span class="section-kicker">FEINPLANUNG</span><h2>Stundenverlauf</h2></div><div class="actions">${grainSelector('project-grain',granularity,'setProjectGranularity')}<button class="secondary" onclick="editHours('${project.id}')">Verlauf bearbeiten</button></div></div>
+  return `<section class="panel"><div class="panelhead"><div><span class="section-kicker">FEINPLANUNG</span><h2>PL-Stundenverlauf</h2></div><div class="actions">${grainSelector('project-grain',granularity,'setProjectGranularity')}<button class="secondary" onclick="editHours('${project.id}')">Verlauf bearbeiten</button></div></div>
   ${hoursLegend()}${hoursTimeline(rows,columns,false,project)}</section>`;
 }
 

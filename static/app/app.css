@@ -23,7 +23,7 @@
 .spacer {height:var(--polytec-space-4)}
 .tablewrap {overflow:auto}
 .tablewrap table {width:100%}
-.kapa-portfolio-table td:first-child,.kapa-portfolio-table td:nth-child(2) {overflow-wrap:anywhere}
+.kapa-portfolio-table td:first-child,.kapa-portfolio-table td:nth-child(3),.kapa-portfolio-table td:nth-child(4) {overflow-wrap:anywhere}
 .person {display:flex;align-items:center;gap:var(--polytec-space-2)}
 .avatar {display:grid;place-items:center;min-width:2rem;min-height:2rem;background:var(--polytec-color-surface-subtle);border-radius:50%}
 .bar {width:5rem;height:.5rem;background:var(--polytec-color-surface-subtle)}

@@ -14,6 +14,26 @@ def _calendar(value):
     return value
 
 
+def validate_assignments(snapshot: dict) -> None:
+    """Validate new project assignments while accepting existing single-person plans."""
+    people = {person['id'] for person in snapshot.get('people', []) if isinstance(person, dict) and isinstance(person.get('id'), str)}
+    for project in snapshot.get('projects', []):
+        if not isinstance(project, dict):
+            raise ValueError('Ungültiges Projekt.')
+        second = project.get('secondPerson', '')
+        qvp = project.get('qvpPerson', '')
+        share = project.get('leadPercent', 100)
+        budget = project.get('qvpBudget', 0)
+        if not isinstance(second, str) or not isinstance(qvp, str):
+            raise ValueError('Ungültige Projektzuweisung.')
+        if not _whole(share, 100) or not _whole(budget):
+            raise ValueError('Aufteilung und QVP-Budget müssen gültige ganze Zahlen sein.')
+        if second and (project.get('person') not in people or second not in people or second == project.get('person')):
+            raise ValueError('Bitte zwei unterschiedliche vorhandene Projektleiter auswählen.')
+        if qvp and qvp not in people:
+            raise ValueError('Die zugewiesene QVP-Person ist nicht vorhanden.')
+
+
 def validate_hour_plans(snapshot: dict) -> None:
     for project in snapshot.get("projects", []):
         if not isinstance(project, dict):

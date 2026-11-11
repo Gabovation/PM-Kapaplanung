@@ -2,6 +2,8 @@
 
 Lokaler Prototyp für die projektübergreifende Kapazitätsplanung mit Gate-Budgets, absoluten Wochen- und Monatsstunden, grafischem Verlauf, Personen-FTE und Planwertänderungen.
 
+Je Projekt können zwei Projektleiter mit prozentualer Stundenaufteilung und eine QVP-Person mit eigenem zusätzlichem Stundenbudget zugeordnet werden. Die QVP-Planung verwendet zunächst dieselbe Gate-Verteilung und innerhalb jeder Phase eine gleichmäßige Verteilung; der frei bearbeitbare Stundenverlauf und Planwertänderungen betreffen das PL-Budget.
+
 ## Lokal starten
 
 Python 3.11 oder neuer. Abhängigkeiten installieren und Anwendung starten:

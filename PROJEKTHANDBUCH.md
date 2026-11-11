@@ -1,7 +1,7 @@
 # Projekthandbuch – Kapazitätsplanung
 
 ## Zweck und Umfang
-Die lokale Anwendung unterstützt die projektübergreifende Kapazitätsplanung. Projekte besitzen eine Nummer, einen Namen, den Status gewonnen oder erwartet, eine verantwortliche Person, ein Basisbudget und fünf Gate-Termine. Rollen werden in Einstellungen verwaltet und bei Personen per Dropdown ausgewählt; zunächst ist je Projekt eine Person zugeordnet. Mehrere Zuordnungen je Projekt benötigen eine spätere Erweiterung.
+Die lokale Anwendung unterstützt die projektübergreifende Kapazitätsplanung. Projekte besitzen eine Nummer, einen Namen, den Status gewonnen oder erwartet, bis zu zwei Projektleiter mit anteiligem PL-Budget, eine QVP-Person mit separatem Budget und fünf Gate-Termine. Rollen werden in Einstellungen verwaltet und bei Personen per Dropdown ausgewählt.
 
 ## Start
 Python 3.11 oder neuer ist erforderlich. Die Abhängigkeiten stehen in `requirements.txt` und werden mit `python -m pip install -r requirements.txt` installiert. In dieser Arbeitsumgebung liegen sie bereits in `.local_packages`, das vom Startprogramm berücksichtigt wird. Im Projektordner `python server.py` ausführen. Der Browser öffnet sich automatisch; das Terminal muss geöffnet bleiben. Beenden mit Strg+C. Standardmäßig wählt das Betriebssystem einen freien lokalen Port. Optional kann mit `KAPA_PORT` ein fester Port eingestellt werden (PowerShell: `$env:KAPA_PORT=5123; python server.py`). Der Server bindet ausschließlich an 127.0.0.1. Bei fest eingestelltem belegtem Port schlägt der Start sichtbar fehl. Mehrere verschiedene Apps können so parallel laufen. Die Anwendung ist für die lokale Vorführung ausgelegt. Schreibzugriffe verwenden einen Revisionsvergleich. Bei einem veralteten Browserstand wird das Speichern mit einem sichtbaren Fehler abgelehnt. Nach einem Serverneustart müssen bereits geöffnete Browserfenster neu geladen werden.
@@ -193,3 +193,19 @@ Die Legende der Kapazitätsvorschau verwendet eine größere, kräftigere Schrif
 
 ## Ergänzte Lessons Learned
 - Ein Vergleich von „Gewonnen“ mit „Gewonnen + erwartet“ zeigt die zusätzliche erwartete Belastung unmittelbar als Abstand der Kurven. Eine identische Team-Gesamtkurve würde diese Darstellung überlagern und wird daher nur bei weiteren Status zusätzlich gezeigt.
+
+## Zwei Projektleiter und QVP-Budget
+Im Projektformular lassen sich Projektleiter 1, optional Projektleiter 2, der Anteil des ersten in ganzen Prozent und eine QVP-Person auswählen. Projektleiter 2 erhält den Rest zu 100 %. Dieselbe Person darf nicht als beide Projektleiter zugeordnet werden. Ohne zweiten Projektleiter erhält der erste das gesamte PL-Budget. Die Verteilung gilt für den gesamten Projektzeitraum und kann jederzeit geändert werden; auch vergangene Planstunden werden dann neu zugeordnet. Eine datumsabhängige Wechselhistorie ist noch nicht implementiert.
+
+Die PL-Planstunden einschließlich Planwertänderungen werden pro Tag anhand kumulierter Stunden und des Anteils aufgeteilt. Die Differenz zweier gerundeter kumulierter Anteile ergibt die ganzen Stunden des Tages für Projektleiter 1; der zweite erhält den Rest. Dadurch stimmen die Tagessummen exakt mit dem ursprünglichen Verlauf überein, die Projektsumme bleibt erhalten und der Anteil wird über den Gesamtverlauf auf die nächste ganze Stunde gerundet. Die Verteilung ist für Wochen und Monate konsistent; bei kleinen Einzelperioden können die gerundeten Anteile von den eingegebenen Prozenten abweichen.
+
+Das QVP-Budget ist ein eigenes zusätzliches Budget in ganzen Stunden und wird in der Kapazitätsplanung der QVP-Person zugerechnet. Es verwendet dieselben Gate-Prozente wie das PL-Basisbudget; die Phasenbudgets werden separat auf ganze Stunden gerundet und innerhalb jeder Phase gleichmäßig verteilt. Die vom PL bearbeiteten Spitzen und PL-Planwertänderungen gelten nicht für QVP. Eine eigenständige QVP-Feinplanung, eigene QVP-Planwertänderungen und andere Gate-Anteile sind noch nicht implementiert. Ohne QVP-Zuweisung fließen die QVP-Stunden in die Warnung für nicht zugeordnete Stunden, nicht in eine Personenauslastung.
+
+Portfolio und Projektliste zeigen PL und QVP getrennt; das Gesamtbudget enthält PL-Basisbudget, PL-Planwertänderungen und QVP-Budget. Projektkarten zeigen zwei PL-Anteile. Die Detailansicht weist die PL- und QVP-Budgets und ihre Gate-Phasen getrennt aus; der PL-Stundenverlauf bleibt weiterhin editierbar. Die Standardrolle `qvp` steuert die Auswahl für QVP; bestehende Zuweisungen bleiben auch bei späteren Rollenänderungen sichtbar. Eigene Rollen außerhalb von QVP können als Projektleitung gewählt werden.
+
+Bestandsprojekte ohne die neuen optionalen Felder verwenden die bisherige `person` als ersten Projektleiter, 100 % PL-Anteil und null QVP-Stunden. Die Datei wird beim Öffnen nicht migriert oder überschrieben. Erst beim Speichern eines Projekts werden `secondPerson`, `leadPercent`, `qvpPerson` und `qvpBudget` ergänzt. Die API prüft bei regulären Speicherungen und Sicherungsimporten ganzzahlige Werte, vorhandene Personen und unterschiedliche Projektleiter. Das Löschen zugewiesener Personen wird verhindert. Datenformat und bestehende Sicherungen bleiben kompatibel.
+
+## Ergänzte Lessons Learned
+- Eine pro Tag unabhängige Rundung würde bei kleinen Tageswerten systematisch eine Person bevorzugen. Kumulierte Rundung erhält die Gesamtstunden und das gewünschte Gesamtverhältnis.
+- Ein zusätzliches QVP-Budget darf nicht aus dem PL-Budget abgezogen oder einer nicht zugeordneten Person zugerechnet werden. Teamstatus und Engpässe müssen beide Budgets enthalten.
+- Ein rückwirkend geänderter Split ist keine dokumentierte Übergabe zu einem Stichtag. Falls Ist-Stunden oder Übergaben eingeführt werden, benötigen sie eigene zeitliche Zuordnungen.

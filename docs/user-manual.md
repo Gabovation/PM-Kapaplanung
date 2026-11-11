@@ -14,6 +14,12 @@ Projektname, Projektnummer, Status, verantwortliche Person und Basisbudget einge
 
 In der Übersicht stehen Auslastung und Portfolio auf breiten Bildschirmen gleich breit nebeneinander, auf schmalen Bildschirmen untereinander. Das Portfolio zeigt die ersten fünf Projekte mit Person, Gate-Planstand, nächstem Gate und Budget in Spalten. Über „Alle ansehen“ öffnet sich die vollständige Projektliste. Falls die Tabelle nicht vollständig ins Fenster passt, kann sie horizontal verschoben werden.
 
+Im Projektformular können ein erster und optional ein zweiter Projektleiter ausgewählt werden. Der Prozentwert legt den Anteil des ersten fest; der zweite erhält den angezeigten Rest. Ohne zweiten Projektleiter entfallen 100 % auf den ersten. Die Aufteilung gilt für den gesamten Projektzeitraum, einschließlich der PL-Planwertänderungen. Sie kann über „Bearbeiten“ jederzeit geändert werden; auch bereits vergangene Planzeiträume werden dabei neu aufgeteilt. Die Planung verwendet ganze Stunden und verteilt Rundungsreste über den Verlauf, sodass die Projektstundensumme erhalten bleibt.
+
+Eine QVP-Person und ihr zusätzliches QVP-Stundenbudget lassen sich im selben Formular erfassen. Das QVP-Budget kommt zum PL-Budget hinzu und wird für die QVP-Person in der Kapazitätsübersicht berücksichtigt. Es nutzt dieselben Gate-Prozentwerte und wird innerhalb jeder Phase gleichmäßig verteilt. Der bearbeitbare Stundenverlauf und die Planwertänderungen beziehen sich derzeit ausschließlich auf PL; eine eigenständige QVP-Feinplanung gibt es noch nicht. Ein QVP-Budget ohne QVP-Person wird als nicht zugeordnet ausgewiesen.
+
+Im Portfolio stehen die Zuordnungen in getrennten Spalten „PL“ und „QVP“. Bei zwei Projektleitern erscheinen beide Namen mit ihrem jeweiligen Anteil. Die Budgetsumme enthält PL und QVP. Bestehende Projekte behalten ihre bisherige Person als ersten Projektleiter; QVP-Budget und zweite Zuordnung sind anfangs leer beziehungsweise null.
+
 Der Projektstatus „Gewonnen“ oder „Erwartet“ steht als beschriftete Markierung im Portfolio, in der Projektliste und im Projektdetail. Er lässt sich über „Bearbeiten“ ändern.
 
 In der Projektliste sind die Karten nach „Gewonnen“ und „Erwartet“ gruppiert. Innerhalb jeder Gruppe stehen Projekte mit dem frühesten nächsten geplanten Gate zuerst. Projekte ohne weiteres Gate oder ohne gültige Gate-Termine stehen am Ende ihrer Gruppe. Bei gleichen Terminen bleibt die bisherige Reihenfolge erhalten. Abweichende oder fehlende Projektstatus erscheinen in einer zusätzlichen Gruppe „Weiterer Status“.
@@ -35,7 +41,7 @@ Die Gates G3, G5, G6, G7 und G8 erscheinen mit Datum, Verbindungslinie und Meile
 Zusätzliche ganze Stunden und das Gültigkeitsdatum eintragen. Die Stunden werden ab diesem Datum bis Gate 8 entsprechend den verbleibenden Basisstunden verteilt. Bestehende Spitzen werden dadurch berücksichtigt. Falls im verbleibenden Basisplan keine Stunden liegen, erfolgt eine gleichmäßige Verteilung auf die verbleibenden Tage. Die Änderung bleibt als eigene Zeile erkennbar und kann in der Feinplanung ebenfalls angepasst werden.
 
 ## Engpässe erkennen
-In der Übersicht Woche oder Monat auswählen und mit den Pfeilen den Zeitraum wechseln. Geplante Stunden werden projektübergreifend addiert. Mehr als 100 % bedeutet Überlastung. Erwartete Projekte zählen vollständig mit. Projekte ohne Personenzuweisung belasten noch keine Person.
+In der Übersicht Woche oder Monat auswählen und mit den Pfeilen den Zeitraum wechseln. Geplante Stunden werden projektübergreifend addiert. Mehr als 100 % bedeutet Überlastung. Erwartete Projekte zählen vollständig mit. Stunden ohne zugewiesene Person werden gesondert gemeldet und belasten keine Person.
 
 Die zusätzliche Grafik „Kapazität und Engpässe“ zeigt Team- und höchste Einzelauslastung über mehrere Zeiträume. Unter „Vorschau“ 12, 26 oder 52 Wochen beziehungsweise 12, 24 oder 36 Monate auswählen. Die gestrichelte Linie markiert 100 % Kapazität. Prozentwerte oberhalb und Ausrufezeichen in der Personenmatrix kennzeichnen Überlastung. Der erste Engpass und die Zahl betroffener Personen stehen über der Grafik.
 

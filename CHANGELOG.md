@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.0 – 11.11.2026
+- Projekte können zwei Projektleiter mit prozentualer Aufteilung sowie eine QVP-Person besitzen. Die Kapazitätsplanung verteilt PL-Stunden einschließlich Planwertänderungen in ganzen Stunden auf beide Projektleiter.
+- QVP erhält ein separates zusätzliches Budget. Es folgt derselben Gate-Verteilung und wird innerhalb jeder Phase gleichmäßig verteilt. Die Auswertung berücksichtigt QVP-Stunden zusätzlich; ohne zugewiesene QVP-Person werden sie als nicht zugeordnet gemeldet.
+- Die Projektübersicht zeigt getrennte PL- und QVP-Spalten. Bestandsprojekte behalten ihre bisherige Person und Stundenplanung.
+
 ## 0.9.8 – 10.11.2026
 - Die Kapazitätsvorschau vergleicht gewonnene Projekte mit der Summe aus gewonnenen und erwarteten Projekten. Eine zusätzliche Team-Gesamtkurve erscheint, wenn Projekte mit anderem Status zur Auslastung beitragen.
 

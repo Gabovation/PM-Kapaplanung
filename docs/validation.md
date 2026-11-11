@@ -34,7 +34,7 @@ GMA 4.9.1 `d7adb792b663419eed2955d446a0203a231b9057`; Designsystem 2.21.0 `7ee91
 
 Der erneute Remote-Abgleich vor Version 0.6.0 war ohne interaktive GitHub-Anmeldung nicht möglich. Verwendet und lokal geprüft wurden die genannten vorhandenen Stände.
 
-Vor einer Plattformfreigabe: serverseitige Fachvalidierung, Rollen und Portal-Anmeldung, MongoDB, bestätigte Organisationsdaten, echte Betriebs- und Sicherungsparameter und vollständige manuelle Regelprüfung. SAP-Verarbeitung und mehrere Rollenzuordnungen je Projekt sind weitere fachliche Schritte. Die aktuelle Version ist eine lokale Vorführung.
+Vor einer Plattformfreigabe: vollständige serverseitige Fachvalidierung, Rollen und Portal-Anmeldung, MongoDB, bestätigte Organisationsdaten, echte Betriebs- und Sicherungsparameter und vollständige manuelle Regelprüfung. SAP-Verarbeitung und eine eigenständige QVP-Feinplanung sind weitere fachliche Schritte. Die aktuelle Version ist eine lokale Vorführung.
 
 
 ## Prüfung Version 0.7.0
@@ -71,3 +71,6 @@ Die Änderung betrifft ausschließlich die Darstellung der bestehenden Kapazitä
 
 ## Prüfung Version 0.9.8
 41 Python-Tests und sieben JavaScript-Prüfgruppen waren erfolgreich. `tests/forecast.test.js` prüft gemischte Projekte, ausschließlich gewonnene oder erwartete Projekte, die Summe und den gemeinsamen Nenner sowie die zusätzliche Teamkurve bei anderem Status. Eine visuelle Browserprüfung steht noch aus.
+
+## Prüfung Version 0.10.0
+56 Python-Tests und acht JavaScript-Prüfgruppen waren erfolgreich. Geprüft wurden alte Ein-Personen-Projekte, die ganzzahlige PL-Aufteilung, Planwertänderungen, Wochen-/Monatssummen, zusätzliches und nicht zugeordnetes QVP-Budget, doppelte Personen, ungültige Prozent-/Stundenwerte sowie API-Speicherung und Sicherungsimport. Eine interaktive Browserprüfung steht noch aus. Der erneute Remote-Abgleich beider Referenz-Repositories scheiterte an der fehlenden nichtinteraktiven GitHub-Anmeldung. Verwendete lokale Stände: Standards `d7adb79`, Designsystem `eb00c95` (2.23.0); das eingebundene UI-Kit ist weiterhin 2.21.0 (`7ee9123`). Der Designsystem-Abgleich meldet drei Unterschiede an Time-Board-Dateien; diese waren nicht Teil der Änderung und wurden nicht überschrieben.
