@@ -12,6 +12,12 @@ Beim Anlegen und Zurücksetzen vergibt die Administration ein Einmalpasswort mit
 
 Lessons Learned: Die Kontoverwaltung muss im normalen Menü auffindbar sein; ein versteckter Kopfleistenknopf genügt nicht. Fachrollen und technische Verwaltungsrechte müssen getrennt erklärt werden. Formulare brauchen ausreichend Platz und Abstände, auch auf kleinen Bildschirmen. Einmalpasswörter müssen serverseitig durchgesetzt werden; ein bloßer Hinweis auf der Oberfläche schützt die Daten nicht.
 
+## Projektformular und Übersicht
+
+Das Projektformular gruppiert Stammdaten, Team, PL-Stunden, QVP-Stunden und Gate-Planung. Ohne zweiten Projektleiter beträgt der Anteil von Projektleiter 1 stets 100 %; das Feld ist dann schreibgeschützt. Wird ein zweiter Projektleiter gewählt, kann der Anteil angepasst werden. Die Übersicht zeigt beim Projektbudget die Anteile für PL einschließlich PL-Planwertänderungen und QVP getrennt. Die kompaktere Darstellung verändert keine Kapazitätsberechnungen.
+
+Lessons Learned: Eine automatisch geltende Verteilung muss bereits im Formular sichtbar sein; widersprüchliche Eingabewerte verwirren auch dann, wenn die Speicherung intern korrekt rechnet. Kennzahlen sollten bei gleichbleibender Lesbarkeit so wenig vertikalen Platz verbrauchen, dass die Auswertung schnell erreichbar bleibt.
+
 ## Lessons Learned: Vorbereitung des Serverbetriebs
 
 - Eine gemeinsam genutzte Datenbank braucht eindeutig abgegrenzte Collections; eine Bereitstellung darf bestehende Anwendungen oder Dienste nicht verändern. Präfix, Port und Dienstname müssen vor Ort geprüft werden.

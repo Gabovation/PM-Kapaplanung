@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.5 – 12.11.2026
+- Projektformular in Projektdaten, Team, Stundenbudget und Gates gegliedert; PL- und QVP-Stunden sind getrennt beschriftet.
+- Ohne zweiten Projektleiter wird der Anteil von Projektleiter 1 mit 100 % angezeigt. Bei zwei Projektleitern ist die Aufteilung bearbeitbar.
+- Startseite kompakter gestaltet und die Stundenbudgets für PL und QVP in der Kennzahl getrennt ausgewiesen.
+
 ## 0.10.4 – 12.11.2026
 - Neue Konten und durch Administratoren zurückgesetzte Passwörter erhalten ein Einmalpasswort, das vor der Nutzung geändert werden muss. Die Mindestlänge beträgt acht Zeichen.
 - Die eigene Passwortänderung ist über die Navigation und die Einstellungen erreichbar.

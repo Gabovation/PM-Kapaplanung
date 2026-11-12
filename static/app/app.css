@@ -9,6 +9,21 @@
 @media (max-width: 48rem) {.kapa-users-header {display:none}}
 .kapa-heading,.hero,.panelhead,.detailtop,.actions,.row,.toolbar {display:flex;align-items:center;justify-content:space-between;gap:var(--polytec-space-3)}
 .kapa-heading,.hero,.panelhead,.detailtop {margin-bottom:var(--polytec-space-4)}
+.kapa-heading h1 {margin:0}
+.kapa-overview .hero {margin-bottom:var(--polytec-space-3)}
+.kapa-overview .hero h2,.kapa-overview .panelhead h2 {margin:0}
+.kapa-overview .hero p {margin:var(--polytec-space-1) 0 0}
+.kapa-overview .card,.kapa-overview .panel {padding:var(--polytec-space-3)}
+.kapa-overview .value {font-size:1.5rem;margin:var(--polytec-space-2) 0}
+.kapa-overview .panelhead {margin-bottom:var(--polytec-space-3)}
+.kapa-overview .kapa-forecast-panel > p {margin:0}
+.kapa-overview .layout {margin-top:var(--polytec-space-3);gap:var(--polytec-space-3)}
+.kapa-overview > .spacer {height:var(--polytec-space-3)}
+.kapa-overview .empty {padding:var(--polytec-space-3)}
+.kapa-project-form {display:grid;gap:var(--polytec-space-4)}
+.kapa-project-section {display:grid;gap:var(--polytec-space-3);min-width:0}
+.kapa-project-section h3,.kapa-project-section p,.kapa-project-section .panelhead {margin:0}
+.kapa-gate-grid {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--polytec-space-3)}
 .grid,.phasegrid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--polytec-space-4)}
 .layout,.split {display:grid;gap:var(--polytec-space-4);margin-top:var(--polytec-space-4)}
 .layout {grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -113,6 +128,6 @@
 .kapa-capacity-cell.is-planned {background:var(--polytec-color-surface-subtle)}
 .kapa-capacity-cell.is-free {color:var(--polytec-color-text-secondary)}
 .kapa-capacity-cell.is-overloaded {background:color-mix(in srgb,var(--polytec-color-status-danger) 12%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-danger);font-weight:700}
-@media(max-width:64rem){.layout,.split{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:64rem){.layout,.split{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kapa-gate-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:40rem){.kapa-heading,.hero,.detailtop{align-items:flex-start;flex-wrap:wrap}.phasegrid,.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.panelhead{flex-wrap:wrap}}
-@media(max-width:30rem){.formgrid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:30rem){.formgrid,.kapa-gate-grid{grid-template-columns:minmax(0,1fr)}}
