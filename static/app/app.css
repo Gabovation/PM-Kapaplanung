@@ -6,6 +6,7 @@
 .kapa-users .panel h2 {margin-top:0}
 .kapa-user-actions {display:flex;align-items:center;flex-wrap:wrap;gap:var(--polytec-space-2)}
 .kapa-user-actions form {display:flex;align-items:center;flex-wrap:wrap;gap:var(--polytec-space-2)}
+@media (max-width: 48rem) {.kapa-users-header {display:none}}
 .kapa-heading,.hero,.panelhead,.detailtop,.actions,.row,.toolbar {display:flex;align-items:center;justify-content:space-between;gap:var(--polytec-space-3)}
 .kapa-heading,.hero,.panelhead,.detailtop {margin-bottom:var(--polytec-space-4)}
 .grid,.phasegrid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--polytec-space-4)}
