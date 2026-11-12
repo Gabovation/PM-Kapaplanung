@@ -22,6 +22,8 @@ Nach Installation der Abhängigkeiten und Konfiguration auf dem Zielsystem aus d
 
 1. `python tools/manage_server_accounts.py init-indexes` legt den Ablaufindex in der eigenen Session-Collection an.
 2. `python tools/manage_server_accounts.py create --username <benutzername> --role admin` fragt das Passwort verdeckt und zweimal ab. Benutzername und Passwort gehören ausschließlich zu dieser App. Administratoren können danach in der linken „Benutzerverwaltung“ Konten für PL, QVP und HO PM anlegen und Rollen ändern; Benutzer ändern ihr eigenes Passwort in den Einstellungen. Die drei Fachrollen haben vorerst alle Planungsrechte, die Kontenverwaltung bleibt Administratoren vorbehalten.
+
+   Das so erstellte Passwort sowie über die Benutzerverwaltung vergebene und zurückgesetzte Passwörter sind Einmalpasswörter. Nach Anmeldung muss ein neues persönliches Passwort mit mindestens acht Zeichen gesetzt werden. Bereits vorhandene Konten sind davon nur nach einer Zurücksetzung betroffen.
 3. Die Übernahme zunächst mit `python tools/import_local_planning.py <pfad-zur-planung.json>` prüfen. Der Prüflauf schreibt weder Datenbank noch Datei und zeigt die Anzahl der Projekte und Personen.
 4. Erst nach Kontrolle des Bestands und eines geschützten Sicherungsorts mit `python tools/import_local_planning.py <quelle> --apply --backup <neuer-sicherungspfad>` einmalig übernehmen. Die Sicherungsdatei wird exklusiv neu angelegt und anhand ihrer Prüfsumme geprüft. Ein vorhandener Serverbestand oder Sicherungspfad wird nicht überschrieben. Quell- und Sicherungsdatei vor Zugriff schützen.
 

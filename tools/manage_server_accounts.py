@@ -35,7 +35,7 @@ def main():
                 raise ValueError('Die Passwörter stimmen nicht überein.')
             encoded = hash_password(password)
             if args.action == 'create':
-                store.create_user(username, encoded, args.role)
+                store.create_user(username, encoded, args.role, must_change_password=True)
             elif not store.set_password(username, encoded):
                 raise ValueError('Dieses Konto existiert nicht.')
         elif not store.set_active(username, args.action == 'enable'):

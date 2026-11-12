@@ -82,17 +82,17 @@ class ServerStore:
     def find_user(self, username):
         return self._users.find_one({'_id': username})
 
-    def create_user(self, username, password_hash, role):
-        self._users.insert_one({'_id': username, 'password_hash': password_hash, 'role': role, 'active': True, 'session_version': 1})
+    def create_user(self, username, password_hash, role, *, must_change_password=False):
+        self._users.insert_one({'_id': username, 'password_hash': password_hash, 'role': role, 'active': True, 'session_version': 1, 'must_change_password': must_change_password})
 
     def list_users(self):
         return list(self._users.find({}, {'password_hash': 0}).sort('_id', 1))
 
-    def set_password(self, username, password_hash):
-        return self._users.update_one({'_id': username}, {'$set': {'password_hash': password_hash}, '$inc': {'session_version': 1}}).matched_count == 1
+    def set_password(self, username, password_hash, *, must_change_password=True):
+        return self._users.update_one({'_id': username}, {'$set': {'password_hash': password_hash, 'must_change_password': must_change_password}, '$inc': {'session_version': 1}}).matched_count == 1
 
     def change_password(self, username, old_hash, new_hash):
-        return self._users.update_one({'_id': username, 'password_hash': old_hash}, {'$set': {'password_hash': new_hash}, '$inc': {'session_version': 1}}).matched_count == 1
+        return self._users.update_one({'_id': username, 'password_hash': old_hash}, {'$set': {'password_hash': new_hash, 'must_change_password': False}, '$inc': {'session_version': 1}}).matched_count == 1
 
     def set_active(self, username, active):
         return self._users.update_one({'_id': username}, {'$set': {'active': active}, '$inc': {'session_version': 1}}).matched_count == 1

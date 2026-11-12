@@ -26,8 +26,8 @@ def normalize_username(value):
 
 
 def hash_password(password):
-    if not isinstance(password, str) or not 12 <= len(password) <= 256:
-        raise ValueError('Das Passwort muss 12 bis 256 Zeichen enthalten.')
+    if not isinstance(password, str) or not 8 <= len(password) <= 256:
+        raise ValueError('Das Passwort muss 8 bis 256 Zeichen enthalten.')
     return HASHER.hash(password)
 
 
@@ -51,12 +51,17 @@ def init_server_auth(app, store):
             if request.path.startswith('/api/'):
                 return jsonify(error='Bitte anmelden.'), 401
             return redirect(url_for('login'))
+        session['username'] = username
+        session['role'] = user['role']
+        session['password_change_required'] = bool(user.get('must_change_password', False))
+        if user.get('must_change_password', False) and endpoint not in ('logout', 'change_password'):
+            if request.path.startswith('/api/'):
+                return jsonify(error='Bitte zuerst das Einmalpasswort ändern.'), 403
+            return redirect(url_for('change_password'))
         if request.method not in ('GET', 'HEAD', 'OPTIONS') and user['role'] == 'reader' and endpoint not in ('logout', 'change_password'):
             return jsonify(error='Keine Berechtigung zum Ändern.'), 403
         if endpoint.startswith('admin_') and user['role'] != 'admin':
             abort(403)
-        session['username'] = username
-        session['role'] = user['role']
         return None
 
     @app.route('/login', methods=['GET', 'POST'])
@@ -84,7 +89,7 @@ def init_server_auth(app, store):
                 session.clear()
                 session.permanent = True
                 session.update(username=username, role=user['role'], sid=sid, csrf=secrets.token_urlsafe(32))
-                return redirect(url_for('index'))
+                return redirect(url_for('change_password' if user.get('must_change_password', False) else 'index'))
             store.record_event('login.denied', username or 'unbekannt')
             session['login_csrf'] = secrets.token_urlsafe(32)
             return render_template('login.html', csrf=session['login_csrf'], error='Anmeldung fehlgeschlagen.'), 401
@@ -118,7 +123,12 @@ def init_server_auth(app, store):
             try:
                 if not correct:
                     raise ValueError('Das bisherige Passwort ist nicht korrekt.')
-                new_hash = hash_password(request.form.get('new_password', ''))
+                new_password = request.form.get('new_password', '')
+                if new_password != request.form.get('confirm_password', ''):
+                    raise ValueError('Die neuen Passwörter stimmen nicht überein.')
+                if new_password == current:
+                    raise ValueError('Das neue Passwort muss sich vom bisherigen Passwort unterscheiden.')
+                new_hash = hash_password(new_password)
                 if not store.change_password(session['username'], user['password_hash'], new_hash):
                     raise ValueError('Das Konto wurde zwischenzeitlich geändert. Bitte erneut anmelden.')
                 store.record_event('account.password_changed', session['username'])
@@ -127,7 +137,7 @@ def init_server_auth(app, store):
                 return redirect(url_for('login'))
             except ValueError as exc:
                 error = str(exc)
-        return render_template('change_password.html', csrf=session.get('csrf', ''), error=error)
+        return render_template('change_password.html', csrf=session.get('csrf', ''), error=error, password_change_required=user.get('must_change_password', False) if request.method == 'POST' else session.get('password_change_required', False), active_nav='password')
 
     @app.route('/admin/users', methods=['GET', 'POST'])
     @rate_limit('kapa-users', env='KAPA_RATE_LIMIT_USERS_PER_MINUTE', default=30)
@@ -146,7 +156,7 @@ def init_server_auth(app, store):
                     role = request.form.get('role', '')
                     if role not in ASSIGNABLE_ROLES:
                         raise ValueError('Bitte eine gültige Berechtigung auswählen.')
-                    store.create_user(username, password_hash, role)
+                    store.create_user(username, password_hash, role, must_change_password=True)
                 elif action == 'role':
                     role = request.form.get('role', '')
                     if username == session.get('username'):

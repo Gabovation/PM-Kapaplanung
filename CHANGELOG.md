@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.4 – 12.11.2026
+- Neue Konten und durch Administratoren zurückgesetzte Passwörter erhalten ein Einmalpasswort, das vor der Nutzung geändert werden muss. Die Mindestlänge beträgt acht Zeichen.
+- Die eigene Passwortänderung ist über die Navigation und die Einstellungen erreichbar.
+
 ## 0.10.3 – 12.11.2026
 - Anmeldung kompakter gestaltet und die Benutzerverwaltung für Administratoren in der Navigation sichtbar gemacht.
 - Konten können mit den Rollen PL, QVP und HO PM angelegt und bestehende Rollen geändert werden. Die drei Rollen haben vorerst Zugriff auf alle Planungsfunktionen; die Verwaltung der Benutzer bleibt Administratoren vorbehalten.

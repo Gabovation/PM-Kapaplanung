@@ -10,7 +10,7 @@
     <div class="tablewrap"><table class="pt-table"><thead><tr><th scope="col">Benutzername</th><th scope="col">Rolle</th><th scope="col">Status</th><th scope="col">Aktionen</th></tr></thead><tbody>
       {% for user in users %}<tr>
         <td>{{ user['_id'] }}{% if user['_id'] == session.get('username') %} <span class="sub">(du)</span>{% endif %}</td>
-        <td>{{ role_names.get(user.role, user.role) }}</td><td>{{ 'Aktiv' if user.active else 'Gesperrt' }}</td>
+        <td>{{ role_names.get(user.role, user.role) }}</td><td>{{ 'Aktiv' if user.active else 'Gesperrt' }}{% if user.must_change_password %}<br><span class="sub">Passwortänderung ausstehend</span>{% endif %}</td>
         <td><div class="kapa-user-actions">{% if user['_id'] != session.get('username') %}
           <form method="post" action="{{ url_for('admin_users') }}">
             <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="role"><input type="hidden" name="username" value="{{ user['_id'] }}">
@@ -29,7 +29,7 @@
     <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
       <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="create">
       <div class="pt-field"><label class="pt-field__label" for="new-user">Benutzername</label><input class="pt-input" id="new-user" name="username" required minlength="3" maxlength="64" autocomplete="off"><span class="pt-field__help">3–64 Zeichen: a–z, 0–9, Punkt, Unterstrich oder Bindestrich.</span></div>
-      <div class="pt-field"><label class="pt-field__label" for="new-password">Passwort</label><input class="pt-input" id="new-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"><span class="pt-field__help">Mindestens 12 Zeichen.</span></div>
+      <div class="pt-field"><label class="pt-field__label" for="new-password">Einmalpasswort</label><input class="pt-input" id="new-password" name="password" type="password" required minlength="8" maxlength="256" autocomplete="new-password"><span class="pt-field__help">Mindestens 8 Zeichen. Die Person muss es beim ersten Anmelden ändern.</span></div>
       <div class="pt-field"><label class="pt-field__label" for="new-role">Rolle</label><select class="pt-select" id="new-role" name="role"><option value="pl">PL</option><option value="qvp">QVP</option><option value="ho_pm">HO PM</option><option value="admin">Administrator</option></select></div>
       <div><button class="pt-button pt-button--primary" type="submit">Benutzer anlegen</button></div>
     </form>
@@ -39,7 +39,7 @@
     <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
       <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="reset">
       <div class="pt-field"><label class="pt-field__label" for="reset-user">Benutzername</label><select class="pt-select" id="reset-user" name="username" required>{% for user in users %}<option value="{{ user['_id'] }}">{{ user['_id'] }}</option>{% endfor %}</select></div>
-      <div class="pt-field"><label class="pt-field__label" for="reset-password">Neues Passwort (mindestens 12 Zeichen)</label><input class="pt-input" id="reset-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></div>
+      <div class="pt-field"><label class="pt-field__label" for="reset-password">Neues Einmalpasswort (mindestens 8 Zeichen)</label><input class="pt-input" id="reset-password" name="password" type="password" required minlength="8" maxlength="256" autocomplete="new-password"><span class="pt-field__help">Nach dem Zurücksetzen muss die Person das Passwort erneut ändern.</span></div>
       <div><button class="pt-button pt-button--secondary" type="submit">Passwort zurücksetzen</button></div>
     </form>
   </section>

@@ -22,6 +22,7 @@ def server(monkeypatch):
     monkeypatch.setenv('KAPA_TRUSTED_HOSTS', 'localhost,127.0.0.1')
     monkeypatch.setenv('TRUSTED_PROXY_HOPS', '0')
     monkeypatch.setenv('KAPA_RATE_LIMIT_LOGIN_PER_MINUTE', '1000')
+    monkeypatch.setenv('KAPA_RATE_LIMIT_PASSWORD_PER_MINUTE', '1000')
     db = mongomock.MongoClient().get_database('test_only')
     store = ServerStore(db, 'kapa_test_')
     store.create_user('admin', hash_password('correct-password-123'), 'admin')
@@ -92,7 +93,7 @@ def test_reader_can_change_password_and_old_sessions_are_revoked(server):
     assert first.post('/account/password', data={}).status_code == 403
     with first.session_transaction() as session:
         token = session['csrf']
-    form = {'csrf': token, 'current_password': 'wrong', 'new_password': 'reader-new-password-123'}
+    form = {'csrf': token, 'current_password': 'wrong', 'new_password': 'reader-new-password-123', 'confirm_password': 'reader-new-password-123'}
     assert first.post('/account/password', data=form).status_code == 200
     form['current_password'] = 'reader-password-123'
     assert first.post('/account/password', data=form).status_code == 302
@@ -145,6 +146,10 @@ def test_professional_roles_can_plan_but_not_manage_accounts(server, role):
     assert store.find_user('test.user')['role'] == role
     client = app.test_client()
     assert login(client, 'test.user', 'test-password-123').status_code == 302
+    with client.session_transaction() as session:
+        token = session['csrf']
+    assert client.post('/account/password', data={'csrf': token, 'current_password': 'test-password-123', 'new_password': 'newpass8', 'confirm_password': 'newpass8'}).status_code == 302
+    assert login(client, 'test.user', 'newpass8').status_code == 302
     assert b'Benutzerverwaltung' not in client.get('/').data
     assert client.get('/admin/users').status_code == 403
     with client.session_transaction() as session:
@@ -168,6 +173,62 @@ def test_admin_can_change_roles_and_revoke_previous_sessions(server):
     data.update(username='admin', role='pl')
     assert admin.post('/admin/users', data=data).status_code == 200
     assert store.find_user('admin')['role'] == 'admin'
+
+
+def test_temporary_password_requires_change_before_access(server):
+    app, store, _ = server
+    admin, member = app.test_client(), app.test_client()
+    assert login(admin).status_code == 302
+    with admin.session_transaction() as session:
+        token = session['csrf']
+    assert admin.post('/admin/users', data={'csrf': token, 'action': 'create', 'username': 'new.user', 'password': '12345678', 'role': 'pl'}).status_code == 302
+    assert store.find_user('new.user')['must_change_password'] is True
+    response = login(member, 'new.user', '12345678')
+    assert response.status_code == 302 and response.headers['Location'].endswith('/account/password')
+    assert member.get('/').headers['Location'].endswith('/account/password')
+    assert member.get('/api/data').status_code == 403
+    assert member.get('/admin/users').headers['Location'].endswith('/account/password')
+    with member.session_transaction() as session:
+        member_token = session['csrf']
+    assert member.post('/api/data', json=snapshot(), headers={'X-Kapa-Token': member_token}).status_code == 403
+    form = {'csrf': member_token, 'current_password': '12345678', 'new_password': '12345678', 'confirm_password': '12345678'}
+    assert member.post('/account/password', data=form).status_code == 200
+    form.update(new_password='1234567', confirm_password='1234567')
+    assert member.post('/account/password', data=form).status_code == 200
+    form.update(new_password='newpass8', confirm_password='mismatch')
+    assert member.post('/account/password', data=form).status_code == 200
+    assert store.find_user('new.user')['must_change_password'] is True
+    form['confirm_password'] = 'newpass8'
+    assert member.post('/account/password', data=form).status_code == 302
+    assert store.find_user('new.user')['must_change_password'] is False
+    assert login(member, 'new.user', '12345678').status_code == 401
+    assert login(member, 'new.user', 'newpass8').status_code == 302
+    assert member.get('/api/data').status_code == 200
+
+
+def test_admin_reset_revokes_sessions_and_requires_new_password(server):
+    app, store, _ = server
+    admin, member = app.test_client(), app.test_client()
+    assert login(admin).status_code == 302
+    assert login(member, 'reader', 'reader-password-123').status_code == 302
+    with admin.session_transaction() as session:
+        csrf = session['csrf']
+    assert admin.post('/admin/users', data={'csrf': csrf, 'action': 'reset', 'username': 'reader', 'password': 'reset123'}).status_code == 302
+    assert member.get('/api/data').status_code == 401
+    assert login(member, 'reader', 'reader-password-123').status_code == 401
+    response = login(member, 'reader', 'reset123')
+    assert response.headers['Location'].endswith('/account/password')
+    assert member.get('/api/data').status_code == 403
+    assert store.find_user('reader')['must_change_password'] is True
+
+
+def test_existing_account_without_password_change_flag_remains_usable(server):
+    app, _, db = server
+    db.kapa_test_users.update_one({'_id': 'reader'}, {'$unset': {'must_change_password': ''}})
+    client = app.test_client()
+    response = login(client, 'reader', 'reader-password-123')
+    assert response.status_code == 302 and response.headers['Location'].endswith('/')
+    assert client.get('/api/data').status_code == 200
 
 
 def test_atomic_conflict_and_prefix_are_checked():
