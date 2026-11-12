@@ -16,11 +16,16 @@ def build_host() -> AppHost:
 
     manifest = load_manifest(PROJECT_ROOT)
     app = create_app()
+    def close_resources():
+        store = app.extensions.get('kapa_server_store')
+        if store is not None:
+            store.close()
+        mongo.close()
     return AppHost(
         app,
         host=os.getenv("APP_HOST", "127.0.0.1"),
         port=env_int("APP_PORT", manifest.default_port),
         threads=env_int("APP_THREADS", 8),
         workers=[],  # background workers: objects with name/start()/stop(), started before HTTP
-        on_stopped=mongo.close,
+        on_stopped=close_resources,
     )

@@ -1,5 +1,9 @@
 # Changelog
 
+## In Vorbereitung – Serverbetrieb
+- Eigenständige Konten und app-eigene MongoDB-Collections für den ausdrücklich gewünschten internen Test ergänzt. Gleichzeitiges Speichern wird über Revisionen geschützt.
+- Einmalige Übernahme einer bestehenden Planung mit Prüfung und Sicherung vorbereitet. Die Installation, Migration und Abnahme auf dem Server stehen aus.
+
 ## 0.10.2 – 12.11.2026
 - Der Doppelklick auf `start.bat` startet ohne `.venv` oder `.env` die lokale Vorführung und öffnet den Browser. Der lokale Start zeigt Fehler dauerhaft an. Die bisherigen Plattformpfade bleiben für eingerichtete Umgebungen und den Hintergrundparameter bestehen.
 - Bewusste lokale Abweichung von RUN-02: `start.bat` enthält den Fallback für die Vorführung und ist daher nicht mehr bytegleich mit dem Plattformstandard.

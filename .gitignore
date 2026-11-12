@@ -13,6 +13,8 @@ logs/
 coverage.xml
 .pytest_cache/
 .local_packages/
+.release_wheels/
+.release_verify/
 .local-server.lock
 /Kapazitätsplanung starten.lnk
 platform_neu/

@@ -1,5 +1,9 @@
 # Prüfstand – 10.11.2026
 
+## Servermodus: lokaler Prüfstand, 12.11.2026
+
+71 Python-Tests und acht JavaScript-Prüfgruppen bestanden. Die Serverprüfungen verwenden eine simulierte MongoDB und decken Anmeldung, Rechte, CSRF, Sitzungswiderruf, Passwortwechsel, isolierte Collections, konkurrierende Schreibzugriffe und den Import mit Sicherung ab. Der lokale Bestand wurde ohne Schreibzugriff geprüft: sieben Projekte und zwei Personen. Die gepinnten Windows-x64-Pakete wurden für CPython 3.14 offline auflösbar geprüft. Das belegt weder eine Installation auf dem Zielsystem noch die Verbindung zur echten Datenbank. Der Server antwortet auf WinRM-Erkennung, aber ein lesender Remoting-Zugriff scheiterte an der Vertrauenskonfiguration des Clients; Port und Dienstname bleiben ungeprüft.
+
 ## Nachgewiesene Korrekturen
 - Die Antwort des alten Servers enthielt zweimal U+FEFF vor dem Dokumenttyp. Dies erklärte das verschobene Raster im Screenshot. Die Vorlagen werden jetzt mit UTF-8-BOM-Behandlung geladen, lokal aktualisiert und als HTML ohne Cache ausgeliefert.
 - Alle im gerenderten HTML verwendeten Icon-Verweise werden gegen das offizielle Sprite geprüft. Die ungültigen Namen wurden ersetzt.

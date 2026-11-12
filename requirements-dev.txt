@@ -1,5 +1,6 @@
 -r requirements.txt
 pytest>=8,<10
+mongomock>=4.3,<5
 pytest-cov>=6,<8
 bandit[toml]>=1.8,<2
 pip-audit>=2.9,<3

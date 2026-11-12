@@ -1,5 +1,14 @@
 # Projekthandbuch – Kapazitätsplanung
 
+> Stand 12.11.2026: Ein eigenständiger Servermodus mit eigenen Konten und eigenen MongoDB-Collections ist für einen internen Test vorbereitet. Der lokale Modus bleibt erhalten. Frühere Aussagen, MongoDB sei noch nicht angebunden, beziehen sich auf den damaligen lokalen Prototyp. Installation, Migration und Abnahme auf dem Zielserver stehen noch aus. Einzelheiten: [Serverbetrieb](docs/serverbetrieb.md).
+
+## Lessons Learned: Vorbereitung des Serverbetriebs
+
+- Eine gemeinsam genutzte Datenbank braucht eindeutig abgegrenzte Collections; eine Bereitstellung darf bestehende Anwendungen oder Dienste nicht verändern. Präfix, Port und Dienstname müssen vor Ort geprüft werden.
+- Ein VPN ersetzt keine Verschlüsselung der HTTP-Anmeldung auf dem internen Netzweg. HTTPS bleibt für einen weitergehenden Betrieb zu klären.
+- Die einmalige Übernahme benötigt eine geprüfte Sicherung und darf vorhandene Serverdaten nicht überschreiben. Tests mit einer simulierten Datenbank belegen keine Server- oder Dienstabnahme.
+- Mehrbenutzerbetrieb benötigt eine Behandlung gleichzeitiger Änderungen. Veraltete Stände werden beim Speichern abgewiesen und müssen neu geladen werden.
+
 ## Zweck und Umfang
 Die lokale Anwendung unterstützt die projektübergreifende Kapazitätsplanung. Projekte besitzen eine Nummer, einen Namen, den Status gewonnen oder erwartet, bis zu zwei Projektleiter mit anteiligem PL-Budget, eine QVP-Person mit separatem Budget und fünf Gate-Termine. Rollen werden in Einstellungen verwaltet und bei Personen per Dropdown ausgewählt.
 

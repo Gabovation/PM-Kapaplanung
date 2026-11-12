@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="panel">
+  <h1>Konten verwalten</h1>
+  <p>Diese Konten gehören ausschließlich zur Kapazitätsplanung.</p>
+  {% if error %}<div class="pt-alert pt-alert--danger" role="alert">{{ error }}</div>{% endif %}
+  <table class="pt-table"><thead><tr><th>Benutzername</th><th>Berechtigung</th><th>Status</th><th>Aktion</th></tr></thead><tbody>
+    {% for user in users %}<tr><td>{{ user['_id'] }}</td><td>{{ {'admin':'Administration','editor':'Bearbeiten','reader':'Lesen'}.get(user.role, user.role) }}</td><td>{{ 'Aktiv' if user.active else 'Gesperrt' }}</td><td>{% if user['_id'] != session.get('username') %}<form method="post" action="{{ url_for('admin_users') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="toggle"><input type="hidden" name="username" value="{{ user['_id'] }}"><input type="hidden" name="active" value="{{ '0' if user.active else '1' }}"><button class="pt-button pt-button--secondary" type="submit">{{ 'Sperren' if user.active else 'Aktivieren' }}</button></form>{% endif %}</td></tr>{% endfor %}
+  </tbody></table>
+  <h2>Neues Konto</h2>
+  <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="create">
+    <div class="pt-field"><label class="pt-field__label" for="new-user">Benutzername</label><input class="pt-input" id="new-user" name="username" required maxlength="64" autocomplete="off"></div>
+    <div class="pt-field"><label class="pt-field__label" for="new-password">Passwort (mindestens 12 Zeichen)</label><input class="pt-input" id="new-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></div>
+    <div class="pt-field"><label class="pt-field__label" for="new-role">Berechtigung</label><select class="pt-select" id="new-role" name="role"><option value="reader">Lesen</option><option value="editor">Bearbeiten</option><option value="admin">Administration</option></select></div>
+    <div><button class="pt-button pt-button--primary" type="submit">Konto anlegen</button></div>
+  </form>
+  <h2>Passwort zurücksetzen</h2>
+  <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="reset">
+    <div class="pt-field"><label class="pt-field__label" for="reset-user">Benutzername</label><select class="pt-select" id="reset-user" name="username" required>{% for user in users %}<option value="{{ user['_id'] }}">{{ user['_id'] }}</option>{% endfor %}</select></div>
+    <div class="pt-field"><label class="pt-field__label" for="reset-password">Neues Passwort (mindestens 12 Zeichen)</label><input class="pt-input" id="reset-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></div>
+    <div><button class="pt-button pt-button--secondary" type="submit">Passwort zurücksetzen</button></div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "polytec_ui/base.html" %}
+{% set app_title = "Kapazitätsplanung" %}
+{% set document_language = "de" %}
+{% block styles %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='app/app.css') }}">{% endblock %}
+{% block content %}
+  <section class="pt-card" aria-labelledby="login-title">
+    <h1 id="login-title">Anmelden</h1>
+    <p>Bitte mit deinem Konto für die Kapazitätsplanung anmelden.</p>
+    {% if error %}<div class="pt-alert pt-alert--danger" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" action="{{ url_for('login') }}">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="pt-field"><label class="pt-field__label" for="username">Benutzername</label><input class="pt-input" id="username" name="username" autocomplete="username" required maxlength="64"></div>
+      <div class="pt-field"><label class="pt-field__label" for="password">Passwort</label><input class="pt-input" id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"></div>
+      <button class="pt-button pt-button--primary" type="submit">Anmelden</button>
+    </form>
+  </section>
+{% endblock %}

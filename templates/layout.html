@@ -5,6 +5,7 @@
 {% set app_home_url = url_for("index") %}
 {% set platform_home_url = false %}
 {% block styles %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='app/app.css') }}">{% endblock %}
+{% block header_actions %}{{ super() }}{% if server_auth_enabled %}{% if session.get('role') == 'admin' %}<a class="pt-button pt-button--secondary" href="{{ url_for('admin_users') }}">Konten</a>{% endif %}<form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf" value="{{ session.get('csrf', '') }}"><button class="pt-button pt-button--secondary" type="submit">Abmelden</button></form>{% endif %}{% endblock %}
 {% block sidebar_navigation %}
 {{ ops.navigation_item("Übersicht", url_for("index") ~ "#overview", "dashboard", active=true) }}
 {{ ops.navigation_item("Projekte", url_for("index") ~ "#projects", "work-order") }}
