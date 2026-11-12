@@ -1,6 +1,6 @@
 # Serverbetrieb: vorbereiteter interner Test
 
-Stand: 12.11.2026. Der Serverbetrieb ist vorbereitet, aber noch nicht auf dem Zielserver installiert oder abgenommen. Der lokale Modus und seine Datei `planung.json` bleiben unabhängig. HTTP wurde ausdrücklich für den ersten Test im Firmen-VPN gewählt; es verschlüsselt Passwörter und Sitzungsdaten auf dem internen Netzweg nicht. HTTPS und seine Vertrauenskonfiguration müssen noch eingerichtet und getestet werden.
+Stand: 12.11.2026. Der Dienst `PMcapacityplaning` läuft auf dem Zielserver auf Port 8002; Anmeldung, Datenbankverbindung und ein Update mit Dienstneustart wurden überprüft. Ein vollständiger Neustart des Servers und eine weitergehende Betriebsabnahme stehen aus. Der lokale Modus und seine Datei `planung.json` bleiben unabhängig. HTTP wurde ausdrücklich für den ersten Test im Firmen-VPN gewählt; es verschlüsselt Passwörter und Sitzungsdaten auf dem internen Netzweg nicht. HTTPS und seine Vertrauenskonfiguration müssen noch eingerichtet und getestet werden. Die nachfolgenden Einrichtungsschritte dokumentieren den Ablauf für eine Neueinrichtung und sind kein Auftrag, den laufenden Dienst erneut zu registrieren.
 
 ## Voraussetzungen
 
@@ -14,14 +14,14 @@ Stand: 12.11.2026. Der Serverbetrieb ist vorbereitet, aber noch nicht auf dem Zi
 
 Die Datei [server.env.example](server.env.example) zeigt die erforderlichen Einstellungen. Eine serverlokale `.env` anlegen, Werte vertraulich eintragen und eine zufällige eigene `APP_SECRET_KEY` mit mindestens 32 Zeichen erzeugen. Niemals den Sitzungsschlüssel einer anderen App übernehmen. `KAPA_TRUSTED_HOSTS` enthält nur tatsächlich genutzte Hostnamen oder IP-Adressen. Umgebungsvariablen des Dienstkontos haben Vorrang vor `.env` und sind auf unbeabsichtigte Überschneidungen zu prüfen.
 
-Vor Aktivierung Python-Version und Architektur, den Startvertrag, die Offline-Installation, den Dienstwrapper und das Dienstkonto auf dem Zielsystem prüfen. `requirements-server.lock` enthält gepinnte Pakete und Prüfsummen für Windows x64 / CPython 3.14; die Offline-Paketauflösung wurde geprüft, Installation und Dienststart auf dem Zielsystem stehen aus. Die vorhandenen `install.bat` und `update.bat` installieren aus `requirements.txt` und sind kein nachgewiesener Offline-Updateweg. `install.bat service` kann einen vorhandenen gleichnamigen Dienst aktualisieren: vor Verwendung Namen und Eigenschaften prüfen. Keines der Skripte wurde auf dem Server ausgeführt.
+Vor einer Neueinrichtung Python-Version und Architektur, den Startvertrag, die Offline-Installation, den Dienstwrapper und das Dienstkonto auf dem Zielsystem prüfen. `requirements-server.lock` enthält gepinnte Pakete und Prüfsummen für Windows x64 / CPython 3.14; diese wurden auf dem Zielserver installiert. Die vorhandenen `install.bat` und `update.bat` installieren aus `requirements.txt` und sind kein nachgewiesener Offline-Updateweg. `update.bat force` wurde auf dem Zielserver mit erfolgreichem Neustart und Healthcheck erprobt. `install.bat service` kann einen vorhandenen gleichnamigen Dienst aktualisieren: vor Verwendung Namen und Eigenschaften prüfen.
 
 ## Erstes Konto und Datenübernahme
 
 Nach Installation der Abhängigkeiten und Konfiguration auf dem Zielsystem aus dem App-Ordner mit dessen `.venv`:
 
 1. `python tools/manage_server_accounts.py init-indexes` legt den Ablaufindex in der eigenen Session-Collection an.
-2. `python tools/manage_server_accounts.py create --username <benutzername> --role admin` fragt das Passwort verdeckt und zweimal ab. Benutzername und Passwort gehören ausschließlich zu dieser App. Administratoren können danach unter „Konten“ weitere Konten anlegen; Benutzer ändern ihr eigenes Passwort in den Einstellungen.
+2. `python tools/manage_server_accounts.py create --username <benutzername> --role admin` fragt das Passwort verdeckt und zweimal ab. Benutzername und Passwort gehören ausschließlich zu dieser App. Administratoren können danach in der linken „Benutzerverwaltung“ Konten für PL, QVP und HO PM anlegen und Rollen ändern; Benutzer ändern ihr eigenes Passwort in den Einstellungen. Die drei Fachrollen haben vorerst alle Planungsrechte, die Kontenverwaltung bleibt Administratoren vorbehalten.
 3. Die Übernahme zunächst mit `python tools/import_local_planning.py <pfad-zur-planung.json>` prüfen. Der Prüflauf schreibt weder Datenbank noch Datei und zeigt die Anzahl der Projekte und Personen.
 4. Erst nach Kontrolle des Bestands und eines geschützten Sicherungsorts mit `python tools/import_local_planning.py <quelle> --apply --backup <neuer-sicherungspfad>` einmalig übernehmen. Die Sicherungsdatei wird exklusiv neu angelegt und anhand ihrer Prüfsumme geprüft. Ein vorhandener Serverbestand oder Sicherungspfad wird nicht überschrieben. Quell- und Sicherungsdatei vor Zugriff schützen.
 

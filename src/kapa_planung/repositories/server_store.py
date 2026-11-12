@@ -97,6 +97,9 @@ class ServerStore:
     def set_active(self, username, active):
         return self._users.update_one({'_id': username}, {'$set': {'active': active}, '$inc': {'session_version': 1}}).matched_count == 1
 
+    def set_role(self, username, role):
+        return self._users.update_one({'_id': username}, {'$set': {'role': role}, '$inc': {'session_version': 1}}).matched_count == 1
+
     def initialize_indexes(self):
         """Explicit setup action; not run by a read-only health check."""
         self._sessions.create_index('expires_at', expireAfterSeconds=0, name='session_expiry')

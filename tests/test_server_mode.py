@@ -122,16 +122,52 @@ def test_admin_can_create_account_only_with_csrf(server):
     client = app.test_client()
     assert login(client).status_code == 302
     assert client.get('/admin/users').status_code == 200
-    payload = {'action': 'create', 'username': 'new.user', 'password': 'new-password-123', 'role': 'editor'}
+    payload = {'action': 'create', 'username': 'new.user', 'password': 'new-password-123', 'role': 'pl'}
     assert client.post('/admin/users', data=payload).status_code == 403
     with client.session_transaction() as session:
         payload['csrf'] = session['csrf']
     assert client.post('/admin/users', data=payload).status_code == 302
-    assert store.find_user('new.user')['role'] == 'editor'
+    assert store.find_user('new.user')['role'] == 'pl'
     assert client.post('/admin/users', data={'action': 'toggle', 'username': 'reader', 'active': '0', 'csrf': payload['csrf']}).status_code == 302
     assert store.find_user('reader')['active'] is False
     assert client.post('/admin/users', data={'action': 'toggle', 'username': 'admin', 'active': '0', 'csrf': payload['csrf']}).status_code == 200
     assert store.find_user('admin')['active'] is True
+
+
+@pytest.mark.parametrize('role', ['pl', 'qvp', 'ho_pm'])
+def test_professional_roles_can_plan_but_not_manage_accounts(server, role):
+    app, store, _ = server
+    admin = app.test_client()
+    assert login(admin).status_code == 302
+    with admin.session_transaction() as session:
+        csrf = session['csrf']
+    assert admin.post('/admin/users', data={'csrf': csrf, 'action': 'create', 'username': 'test.user', 'password': 'test-password-123', 'role': role}).status_code == 302
+    assert store.find_user('test.user')['role'] == role
+    client = app.test_client()
+    assert login(client, 'test.user', 'test-password-123').status_code == 302
+    assert b'Benutzerverwaltung' not in client.get('/').data
+    assert client.get('/admin/users').status_code == 403
+    with client.session_transaction() as session:
+        token = session['csrf']
+    assert client.post('/api/data', json=snapshot(), headers={'X-Kapa-Token': token}).status_code == 200
+
+
+def test_admin_can_change_roles_and_revoke_previous_sessions(server):
+    app, store, _ = server
+    store.create_user('test.user', hash_password('test-password-123'), 'pl')
+    admin, member = app.test_client(), app.test_client()
+    assert login(admin).status_code == 302
+    assert b'Benutzerverwaltung' in admin.get('/').data
+    assert login(member, 'test.user', 'test-password-123').status_code == 302
+    with admin.session_transaction() as session:
+        token = session['csrf']
+    data = {'csrf': token, 'action': 'role', 'username': 'test.user', 'role': 'qvp'}
+    assert admin.post('/admin/users', data=data).status_code == 302
+    assert store.find_user('test.user')['role'] == 'qvp'
+    assert member.get('/api/data').status_code == 401
+    data.update(username='admin', role='pl')
+    assert admin.post('/admin/users', data=data).status_code == 200
+    assert store.find_user('admin')['role'] == 'admin'
 
 
 def test_atomic_conflict_and_prefix_are_checked():

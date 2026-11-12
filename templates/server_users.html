@@ -1,26 +1,47 @@
 {% extends "layout.html" %}
+{% set role_names = {'admin': 'Administrator', 'pl': 'PL', 'qvp': 'QVP', 'ho_pm': 'HO PM', 'editor': 'Bearbeiten (bisher)', 'reader': 'Lesen (bisher)'} %}
 {% block content %}
-<section class="panel">
-  <h1>Konten verwalten</h1>
-  <p>Diese Konten gehören ausschließlich zur Kapazitätsplanung.</p>
+<div class="kapa-users">
+  <div><h1>Benutzerverwaltung</h1><p>Konten und Rollen für den Zugang zur Kapazitätsplanung verwalten.</p></div>
   {% if error %}<div class="pt-alert pt-alert--danger" role="alert">{{ error }}</div>{% endif %}
-  <table class="pt-table"><thead><tr><th>Benutzername</th><th>Berechtigung</th><th>Status</th><th>Aktion</th></tr></thead><tbody>
-    {% for user in users %}<tr><td>{{ user['_id'] }}</td><td>{{ {'admin':'Administration','editor':'Bearbeiten','reader':'Lesen'}.get(user.role, user.role) }}</td><td>{{ 'Aktiv' if user.active else 'Gesperrt' }}</td><td>{% if user['_id'] != session.get('username') %}<form method="post" action="{{ url_for('admin_users') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="toggle"><input type="hidden" name="username" value="{{ user['_id'] }}"><input type="hidden" name="active" value="{{ '0' if user.active else '1' }}"><button class="pt-button pt-button--secondary" type="submit">{{ 'Sperren' if user.active else 'Aktivieren' }}</button></form>{% endif %}</td></tr>{% endfor %}
-  </tbody></table>
-  <h2>Neues Konto</h2>
-  <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
-    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="create">
-    <div class="pt-field"><label class="pt-field__label" for="new-user">Benutzername</label><input class="pt-input" id="new-user" name="username" required maxlength="64" autocomplete="off"></div>
-    <div class="pt-field"><label class="pt-field__label" for="new-password">Passwort (mindestens 12 Zeichen)</label><input class="pt-input" id="new-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></div>
-    <div class="pt-field"><label class="pt-field__label" for="new-role">Berechtigung</label><select class="pt-select" id="new-role" name="role"><option value="reader">Lesen</option><option value="editor">Bearbeiten</option><option value="admin">Administration</option></select></div>
-    <div><button class="pt-button pt-button--primary" type="submit">Konto anlegen</button></div>
-  </form>
-  <h2>Passwort zurücksetzen</h2>
-  <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
-    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="reset">
-    <div class="pt-field"><label class="pt-field__label" for="reset-user">Benutzername</label><select class="pt-select" id="reset-user" name="username" required>{% for user in users %}<option value="{{ user['_id'] }}">{{ user['_id'] }}</option>{% endfor %}</select></div>
-    <div class="pt-field"><label class="pt-field__label" for="reset-password">Neues Passwort (mindestens 12 Zeichen)</label><input class="pt-input" id="reset-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></div>
-    <div><button class="pt-button pt-button--secondary" type="submit">Passwort zurücksetzen</button></div>
-  </form>
-</section>
+  <section class="panel" aria-labelledby="users-heading">
+    <h2 id="users-heading">Benutzerkonten</h2>
+    <p>PL, QVP und HO PM können vorerst alle Planungsfunktionen nutzen. Die Benutzerverwaltung ist Administratoren vorbehalten.</p>
+    <div class="tablewrap"><table class="pt-table"><thead><tr><th scope="col">Benutzername</th><th scope="col">Rolle</th><th scope="col">Status</th><th scope="col">Aktionen</th></tr></thead><tbody>
+      {% for user in users %}<tr>
+        <td>{{ user['_id'] }}{% if user['_id'] == session.get('username') %} <span class="sub">(du)</span>{% endif %}</td>
+        <td>{{ role_names.get(user.role, user.role) }}</td><td>{{ 'Aktiv' if user.active else 'Gesperrt' }}</td>
+        <td><div class="kapa-user-actions">{% if user['_id'] != session.get('username') %}
+          <form method="post" action="{{ url_for('admin_users') }}">
+            <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="role"><input type="hidden" name="username" value="{{ user['_id'] }}">
+            <select class="pt-select" name="role" aria-label="Neue Rolle für {{ user['_id'] }}">
+              {% if user.role not in ['pl', 'qvp', 'ho_pm', 'admin'] %}<option value="" selected disabled>Rolle auswählen</option>{% endif %}
+              {% for value, label in [('pl', 'PL'), ('qvp', 'QVP'), ('ho_pm', 'HO PM'), ('admin', 'Administrator')] %}<option value="{{ value }}"{% if user.role == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select><button class="pt-button pt-button--secondary" type="submit">Rolle speichern</button>
+          </form>
+          <form method="post" action="{{ url_for('admin_users') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="toggle"><input type="hidden" name="username" value="{{ user['_id'] }}"><input type="hidden" name="active" value="{{ '0' if user.active else '1' }}"><button class="pt-button pt-button--secondary" type="submit">{{ 'Sperren' if user.active else 'Aktivieren' }}</button></form>
+        {% else %}<span class="sub">Eigenes Administratorkonto</span>{% endif %}</div></td>
+      </tr>{% endfor %}
+    </tbody></table></div>
+  </section>
+  <section class="panel" aria-labelledby="create-heading">
+    <h2 id="create-heading">Benutzer anlegen</h2>
+    <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="create">
+      <div class="pt-field"><label class="pt-field__label" for="new-user">Benutzername</label><input class="pt-input" id="new-user" name="username" required minlength="3" maxlength="64" autocomplete="off"><span class="pt-field__help">3–64 Zeichen: a–z, 0–9, Punkt, Unterstrich oder Bindestrich.</span></div>
+      <div class="pt-field"><label class="pt-field__label" for="new-password">Passwort</label><input class="pt-input" id="new-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"><span class="pt-field__help">Mindestens 12 Zeichen.</span></div>
+      <div class="pt-field"><label class="pt-field__label" for="new-role">Rolle</label><select class="pt-select" id="new-role" name="role"><option value="pl">PL</option><option value="qvp">QVP</option><option value="ho_pm">HO PM</option><option value="admin">Administrator</option></select></div>
+      <div><button class="pt-button pt-button--primary" type="submit">Benutzer anlegen</button></div>
+    </form>
+  </section>
+  <section class="panel" aria-labelledby="reset-heading">
+    <h2 id="reset-heading">Passwort zurücksetzen</h2>
+    <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="reset">
+      <div class="pt-field"><label class="pt-field__label" for="reset-user">Benutzername</label><select class="pt-select" id="reset-user" name="username" required>{% for user in users %}<option value="{{ user['_id'] }}">{{ user['_id'] }}</option>{% endfor %}</select></div>
+      <div class="pt-field"><label class="pt-field__label" for="reset-password">Neues Passwort (mindestens 12 Zeichen)</label><input class="pt-input" id="reset-password" name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></div>
+      <div><button class="pt-button pt-button--secondary" type="submit">Passwort zurücksetzen</button></div>
+    </form>
+  </section>
+</div>
 {% endblock %}

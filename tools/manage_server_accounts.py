@@ -19,7 +19,7 @@ def main():
     parser = argparse.ArgumentParser(description='Serverkonten der Kapazitätsplanung verwalten.')
     parser.add_argument('action', choices=['init-indexes', 'create', 'reset', 'enable', 'disable'])
     parser.add_argument('--username', help='Benutzername, niemals ein Passwort')
-    parser.add_argument('--role', choices=['admin', 'editor', 'reader'], default='editor')
+    parser.add_argument('--role', choices=['admin', 'pl', 'qvp', 'ho_pm', 'editor', 'reader'], default='pl')
     args = parser.parse_args()
     load_project_env(ROOT)
     try:

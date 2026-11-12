@@ -14,7 +14,8 @@ from pymongo.errors import DuplicateKeyError
 from kapa_planung.ops_platform.rate_limiter import rate_limit
 
 HASHER = PasswordHasher(time_cost=3, memory_cost=65536, parallelism=2)
-ROLES = ('admin', 'editor', 'reader')
+ROLES = ('admin', 'pl', 'qvp', 'ho_pm', 'editor', 'reader')
+ASSIGNABLE_ROLES = ('admin', 'pl', 'qvp', 'ho_pm')
 
 
 def normalize_username(value):
@@ -143,9 +144,17 @@ def init_server_auth(app, store):
                     password_hash = hash_password(request.form.get('password', ''))
                 if action == 'create':
                     role = request.form.get('role', '')
-                    if role not in ROLES:
+                    if role not in ASSIGNABLE_ROLES:
                         raise ValueError('Bitte eine gültige Berechtigung auswählen.')
                     store.create_user(username, password_hash, role)
+                elif action == 'role':
+                    role = request.form.get('role', '')
+                    if username == session.get('username'):
+                        raise ValueError('Die eigene Administratorrolle kann nicht geändert werden.')
+                    if role not in ASSIGNABLE_ROLES:
+                        raise ValueError('Bitte eine gültige Rolle auswählen.')
+                    if not store.set_role(username, role):
+                        raise ValueError('Dieses Konto existiert nicht.')
                 elif action == 'reset':
                     if not store.set_password(username, password_hash):
                         raise ValueError('Dieses Konto existiert nicht.')
@@ -163,4 +172,4 @@ def init_server_auth(app, store):
                 error = 'Dieser Benutzername ist bereits vergeben.'
             except ValueError as exc:
                 error = str(exc)
-        return render_template('server_users.html', users=store.list_users(), csrf=session.get('csrf', ''), error=error)
+        return render_template('server_users.html', users=store.list_users(), csrf=session.get('csrf', ''), error=error, active_nav='users')

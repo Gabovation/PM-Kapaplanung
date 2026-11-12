@@ -1,8 +1,14 @@
 # Projekthandbuch – Kapazitätsplanung
 
-> Stand 12.11.2026: Ein eigenständiger Servermodus mit eigenen Konten und eigenen MongoDB-Collections ist für einen internen Test vorbereitet. Der lokale Modus bleibt erhalten. Frühere Aussagen, MongoDB sei noch nicht angebunden, beziehen sich auf den damaligen lokalen Prototyp. Installation, Migration und Abnahme auf dem Zielserver stehen noch aus. Einzelheiten: [Serverbetrieb](docs/serverbetrieb.md).
+> Stand 12.11.2026: Der Servermodus läuft für einen internen Test mit eigenen Konten und MongoDB-Collections. Der Dienst und ein Update-Neustart wurden geprüft; ein vollständiger Serverneustart und eine weitergehende Betriebsabnahme stehen aus. Der lokale Modus bleibt erhalten. Frühere Aussagen, MongoDB sei noch nicht angebunden, beziehen sich auf den damaligen lokalen Prototyp. Einzelheiten: [Serverbetrieb](docs/serverbetrieb.md).
 
-Der vorgesehene Windows-Dienst heißt auf Wunsch `PMcapacityplaning`. Seine Verfügbarkeit muss vor der Registrierung auf dem Server geprüft werden.
+Der Windows-Dienst heißt `PMcapacityplaning`, verwendet Port 8002 und ist für automatischen Start eingerichtet. Ein vollständiger Neustart des Servers wurde noch nicht getestet.
+
+## Benutzerverwaltung und Anmeldung
+
+Administratoren öffnen links die **Benutzerverwaltung**. Dort legen sie Konten an, weisen PL, QVP oder HO PM zu, ändern Rollen, sperren Konten und setzen Passwörter zurück. Diese Fachrollen haben vorerst dieselben Rechte für alle Planungsfunktionen; die Benutzerverwaltung bleibt Administratoren vorbehalten. Bestehende Konten der älteren Berechtigungsstufen bleiben verwendbar und behalten ihre bisherigen Rechte. Bei einer Rollenänderung muss sich die betroffene Person erneut anmelden. Benutzerkonten sind unabhängig von den als Ressourcen gepflegten Personen in der Planung.
+
+Lessons Learned: Die Kontoverwaltung muss im normalen Menü auffindbar sein; ein versteckter Kopfleistenknopf genügt nicht. Fachrollen und technische Verwaltungsrechte müssen getrennt erklärt werden. Formulare brauchen ausreichend Platz und Abstände, auch auf kleinen Bildschirmen.
 
 ## Lessons Learned: Vorbereitung des Serverbetriebs
 
