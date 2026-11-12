@@ -4,7 +4,7 @@ Stand: 12.11.2026. Der Serverbetrieb ist vorbereitet, aber noch nicht auf dem Zi
 
 ## Voraussetzungen
 
-- Bestehende Anwendungen und Dienste auf Ports 8000 und 8001 nicht ändern oder beenden. Port 8002 ist nur ein Vorschlag; vor Ort auf freie Belegung und Firewall-Regeln prüfen. Auch den Dienstnamen `KapazitTsplanung` vorher prüfen. Einen unbekannten bestehenden Dienst nicht überschreiben.
+- Bestehende Anwendungen und Dienste auf Ports 8000 und 8001 nicht ändern oder beenden. Port 8002 ist nur ein Vorschlag; vor Ort auf freie Belegung und Firewall-Regeln prüfen. Auch den Dienstnamen `PMcapacityplaning` vorher prüfen. Einen unbekannten bestehenden Dienst nicht überschreiben.
 - Zielpfad, Dienstkonto, Verzeichnisberechtigungen und Sicherungsort mit dem Serverbetrieb festlegen. `.env`, Sicherungen und Logs nur dem Dienstkonto und berechtigten Administratoren zugänglich machen. `0.0.0.0` bindet an alle Netzwerkschnittstellen; Zugriff per Firewall auf berechtigte Netze begrenzen.
 - Den vorhandenen MongoDB-Zugang für den Test verwenden, ohne Zugangsdaten im Repository, in Befehlszeilen, Bildschirmfotos oder Supportmeldungen zu veröffentlichen. Die App verwendet ausschließlich die vier Collections mit dem konfigurierten `KAPA_COLLECTION_PREFIX`: `planning`, `users`, `sessions`, `audit`. Das Präfix vorab gegen vorhandene Collections abgleichen. Eine leere Planung ist für den erstmaligen Import Pflicht.
 - Die App verwendet eigene Konten; Materialwissen-Konten und dessen Authentifizierung bleiben getrennt. Damit wird auf ausdrücklichen Wunsch von IAM-01 sowie durch gemeinsame Datenbank und Zugang von DB-01/DB-02 abgewichen. Zentraler Login und isolierter Datenbankzugang sind separate spätere Aufgaben.

@@ -1,6 +1,7 @@
 # Changelog
 
 ## In Vorbereitung – Serverbetrieb
+- Windows-Dienstname auf Wunsch auf `PMcapacityplaning` festgelegt; der Name muss vor der Registrierung auf dem Server geprüft werden.
 - Eigenständige Konten und app-eigene MongoDB-Collections für den ausdrücklich gewünschten internen Test ergänzt. Gleichzeitiges Speichern wird über Revisionen geschützt.
 - Einmalige Übernahme einer bestehenden Planung mit Prüfung und Sicherung vorbereitet. Die Installation, Migration und Abnahme auf dem Server stehen aus.
 

@@ -21,7 +21,7 @@ support_contact = "TBD"            # named people, e.g. "First Last, First Last"
 path = "/kapa-planung"               # path segment behind the app proxy, no trailing slash
 default_port = 5123        # = APP_PORT in .env; the portal routes the proxy to this port (REG-05)
 deployment_mode = "windows-service"  # or "console"
-service_name = "KapazitTsplanung"
+service_name = "PMcapacityplaning"
 database = "gma-kapa-planung-q"           # gma-<app-id>-<q|prod>; omit if the module stores no data (DB-01)
 
 [permissions]

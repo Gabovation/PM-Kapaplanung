@@ -2,6 +2,8 @@
 
 > Stand 12.11.2026: Ein eigenständiger Servermodus mit eigenen Konten und eigenen MongoDB-Collections ist für einen internen Test vorbereitet. Der lokale Modus bleibt erhalten. Frühere Aussagen, MongoDB sei noch nicht angebunden, beziehen sich auf den damaligen lokalen Prototyp. Installation, Migration und Abnahme auf dem Zielserver stehen noch aus. Einzelheiten: [Serverbetrieb](docs/serverbetrieb.md).
 
+Der vorgesehene Windows-Dienst heißt auf Wunsch `PMcapacityplaning`. Seine Verfügbarkeit muss vor der Registrierung auf dem Server geprüft werden.
+
 ## Lessons Learned: Vorbereitung des Serverbetriebs
 
 - Eine gemeinsam genutzte Datenbank braucht eindeutig abgegrenzte Collections; eine Bereitstellung darf bestehende Anwendungen oder Dienste nicht verändern. Präfix, Port und Dienstname müssen vor Ort geprüft werden.

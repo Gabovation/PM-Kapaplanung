@@ -1,7 +1,7 @@
 @rem App-specific values for the standard .bat scripts (RUN-02). The .bat files themselves
 @rem are identical in every app - change behaviour in gma-app-standards, not here.
 set "APP_PACKAGE=kapa_planung"
-set "SERVICE_NAME=KapazitTsplanung"
+set "SERVICE_NAME=PMcapacityplaning"
 set "VENV_PY=%ROOT%\.venv\Scripts\python.exe"
 set "PYTHONPATH=%ROOT%\src"
 set "OPS="%VENV_PY%" -m %APP_PACKAGE%.ops_platform.cli --root "%ROOT%""
