@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.2 – 12.11.2026
+- Der Doppelklick auf `start.bat` startet ohne `.venv` oder `.env` die lokale Vorführung und öffnet den Browser. Der lokale Start zeigt Fehler dauerhaft an. Die bisherigen Plattformpfade bleiben für eingerichtete Umgebungen und den Hintergrundparameter bestehen.
+- Bewusste lokale Abweichung von RUN-02: `start.bat` enthält den Fallback für die Vorführung und ist daher nicht mehr bytegleich mit dem Plattformstandard.
+
 ## 0.10.1 – 11.11.2026
 - Für die lokale Vorführung gibt es die Windows-Verknüpfung „Kapazitätsplanung starten“. Sie öffnet den Browser und hält Fehlermeldungen sichtbar; der Plattformstarter `start.bat` bleibt unverändert.
 - Eine lokale Dateisperre verhindert, dass zwei lokale Server desselben Projektordners gleichzeitig dieselbe Planung bearbeiten.

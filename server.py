@@ -36,7 +36,7 @@ port = int(os.environ.get('KAPA_PORT', '0'))
 server = create_server(create_app(), host='127.0.0.1', port=port)
 url = f'http://127.0.0.1:{server.effective_port}/'
 print(f'Kapazitätsplanung läuft unter {url} (Beenden mit Strg+C)', flush=True)
-if '--no-browser' not in sys.argv:
+if '--no-browser' not in sys.argv and os.environ.get('KAPA_NO_BROWSER') != '1':
     webbrowser.open(url)
 try:
     server.run()

@@ -77,3 +77,6 @@ Die Änderung betrifft ausschließlich die Darstellung der bestehenden Kapazitä
 
 ## Prüfung Version 0.10.1
 59 Python-Tests und acht JavaScript-Prüfgruppen waren erfolgreich. Die generierte Windows-Verknüpfung wurde auf vorhandenen Python-Pfad, Startprogramm und Arbeitsordner geprüft. Der lokale Launcher wurde mit freiem Port ohne Browser gestartet und über `/health` geprüft. Ein zweiter lokaler Server wurde durch die Dateisperre abgewiesen; der Testserver wurde anschließend beendet. Eine interaktive Doppelklick- und Browserprüfung steht noch aus. Der Standard-Plattformstarter bleibt unverändert.
+
+## Prüfung Version 0.10.2
+59 Python-Tests und acht JavaScript-Prüfgruppen waren erfolgreich. `cmd.exe /c start.bat` wurde ohne Argumente mit unterdrücktem Browserstart ausgeführt; der lokale Server war über `/health` erreichbar. Der Parameter `--no-browser` und die Sperre gegen einen zweiten lokalen Server wurden ebenfalls geprüft. `start.bat background` blieb auf dem Plattformpfad und meldete die fehlende `.venv`. Der Testserver wurde beendet. Eine interaktive Explorer-Doppelklick- und Browserprüfung steht noch aus. Der lokale Fallback ist eine bewusste Abweichung von RUN-02.
