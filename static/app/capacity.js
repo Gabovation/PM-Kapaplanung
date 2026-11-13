@@ -52,16 +52,24 @@ const KapaCapacity = (()=>{
       const wonLoad=total(period.days.map(day=>won.get(person.id)[day.key]||0)), expectedLoad=total(period.days.map(day=>expected.get(person.id)[day.key]||0));
       return {load,wonLoad,expectedLoad,capacity,ratio:ratio(load,capacity),overloaded:load-capacity>1e-9};
     })}));
+    const unassignedByPeriod=columns.map(period=>total(period.days.map(day=>unassigned[day.key]||0)));
+    return summarize(columns,people,unassignedByPeriod);
+  }
+  function summarize(columns,people,unassignedByPeriod=[]) {
     const team=columns.map((period,index)=>{
       const cells=people.map(row=>row.cells[index]), load=total(cells.map(cell=>cell.load)), capacity=total(cells.map(cell=>cell.capacity));
       const peak=people.reduce((current,row)=>!current||row.cells[index].ratio>current.ratio?{...row.cells[index],person:row.person}:current,null);
       const wonLoad=total(cells.map(cell=>cell.wonLoad)), expectedLoad=total(cells.map(cell=>cell.expectedLoad));
-      return {...period,load,wonLoad,expectedLoad,wonRatio:ratio(wonLoad,capacity),expectedRatio:ratio(expectedLoad,capacity),combinedRatio:ratio(wonLoad+expectedLoad,capacity),capacity,ratio:ratio(load,capacity),peak:peak?.ratio||0,peakPerson:peak?.person,overloadedPeople:people.filter(row=>row.cells[index].overloaded).length,unassigned:total(period.days.map(day=>unassigned[day.key]||0))};
+      return {...period,load,wonLoad,expectedLoad,wonRatio:ratio(wonLoad,capacity),expectedRatio:ratio(expectedLoad,capacity),combinedRatio:ratio(wonLoad+expectedLoad,capacity),capacity,ratio:ratio(load,capacity),peak:peak?.ratio||0,peakPerson:peak?.person,overloadedPeople:people.filter(row=>row.cells[index].overloaded).length,unassigned:unassignedByPeriod[index]||0};
     });
     const firstIndex=team.findIndex(period=>period.overloadedPeople>0);
     return {columns,people,team,firstBottleneck:firstIndex<0?null:{periodIndex:firstIndex,period:team[firstIndex],person:team[firstIndex].peakPerson},
       affectedPeople:people.filter(row=>row.cells.some(cell=>cell.overloaded)).length,unassigned:total(team.map(period=>period.unassigned)),peak:Math.max(0,...team.map(period=>period.peak))};
   }
+  function scope(model,ids) {
+    const included=new Set(ids), people=model.people.filter(row=>included.has(row.person.id));
+    return {...summarize(model.columns,people),globalUnassigned:model.globalUnassigned??model.unassigned};
+  }
   function percent(value) { return Number.isFinite(value)?value.toLocaleString('de-AT',{maximumFractionDigits:1}):'∞'; }
-  return {build,periods,percent};
+  return {build,scope,periods,percent};
 })();

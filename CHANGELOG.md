@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.6 – 13.11.2026
+- Kapazitätsvorschau nach Gesamtteam, Rolle oder ausgewählter Person filterbar gemacht. Ein Klick auf eine Person in der Teamübersicht zeigt deren Verlauf.
+- Matrix unter dem Diagramm nach Rollen gruppiert; Gruppen lassen sich aufklappen und weisen auch auf einzelne überlastete Personen hin.
+
 ## 0.10.5 – 12.11.2026
 - Projektformular in Projektdaten, Team, Stundenbudget und Gates gegliedert; PL- und QVP-Stunden sind getrennt beschriftet.
 - Ohne zweiten Projektleiter wird der Anteil von Projektleiter 1 mit 100 % angezeigt. Bei zwei Projektleitern ist die Aufteilung bearbeitbar.

@@ -90,7 +90,7 @@
 .kapa-forecast-panel .panelhead,.kapa-forecast-panel .kapa-hours-legend {margin:0}
 .kapa-forecast-panel .kapa-hours-legend {font-size:1rem;font-weight:600;gap:var(--polytec-space-4) var(--polytec-space-6)}
 .kapa-forecast-panel .kapa-hours-legend i {width:calc(2 * var(--polytec-space-6));flex:none}
-.kapa-forecast-controls {display:flex;align-items:center;gap:var(--polytec-space-2)}
+.kapa-forecast-controls {display:flex;align-items:center;flex-wrap:wrap;gap:var(--polytec-space-2)}
 .kapa-forecast-controls .pt-select,.kapa-forecast-controls .pt-select-wrap {min-width:9rem}
 .kapa-capacity-timeline {min-width:100%}
 .kapa-capacity-scroll {container-type:inline-size}
@@ -121,8 +121,13 @@
 .kapa-capacity-table thead th {white-space:nowrap}
 .kapa-capacity-table thead th:not(:first-child),.kapa-capacity-table tfoot td {text-align:center}
 .kapa-capacity-table td {padding:var(--polytec-space-1)}
-.kapa-capacity-table tfoot td.kapa-team-warning {background:color-mix(in srgb,var(--polytec-chart-series-5) 55%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-warning);font-weight:700}
-.kapa-capacity-table tfoot td.kapa-team-critical {background:color-mix(in srgb,var(--polytec-color-status-danger) 18%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-danger);font-weight:700}
+.kapa-capacity-table td.kapa-team-warning {background:color-mix(in srgb,var(--polytec-chart-series-5) 55%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-warning);font-weight:700}
+.kapa-capacity-table td.kapa-team-critical {background:color-mix(in srgb,var(--polytec-color-status-danger) 18%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-danger);font-weight:700}
+.kapa-capacity-group th {background:var(--polytec-color-surface-subtle)!important}
+.kapa-group-toggle {justify-content:flex-start;white-space:normal;text-align:left}
+.kapa-group-overload {font-size:.75rem;color:var(--polytec-color-status-danger);font-weight:700;white-space:normal}
+.kapa-person-select {font-weight:700;text-align:left}
+.kapa-person-select[aria-pressed="true"] {outline:2px solid var(--polytec-color-focus-ring)}
 .kapa-capacity-cell {width:100%;white-space:nowrap;flex-direction:column;gap:0}
 .kapa-capacity-split {display:block;font-size:.75rem;font-weight:400;white-space:normal;overflow-wrap:anywhere}
 .kapa-capacity-cell.is-planned {background:var(--polytec-color-surface-subtle)}

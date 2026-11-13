@@ -18,6 +18,14 @@ Das Projektformular gruppiert Stammdaten, Team, PL-Stunden, QVP-Stunden und Gate
 
 Lessons Learned: Eine automatisch geltende Verteilung muss bereits im Formular sichtbar sein; widersprüchliche Eingabewerte verwirren auch dann, wenn die Speicherung intern korrekt rechnet. Kennzahlen sollten bei gleichbleibender Lesbarkeit so wenig vertikalen Platz verbrauchen, dass die Auswertung schnell erreichbar bleibt.
 
+## Kapazitätsvorschau nach Rollen und Personen
+
+In der Übersicht lässt sich die Vorschau über „Auswertung“ auf das gesamte Team oder eine hinterlegte Rolle einschränken. Ein Klick auf einen Namen in „Auslastung nach Person“ zeigt den Verlauf dieser Person; über „Gesamt“ lässt sich der Filter zurücksetzen. Der Filter betrifft Diagramm, Engpassmeldung und Matrix, während Teamübersicht und Kennzahlen das gesamte Team zeigen. Die Auswahl gilt für die laufende Ansicht und wird nicht in der gemeinsamen Planung gespeichert.
+
+Unter dem Diagramm stehen zunächst zusammengefasste Rollen. Ein Klick auf eine Rollenbezeichnung zeigt oder verbirgt die einzelnen Personen. Gruppenstunden und Gruppenkapazität sind die jeweiligen Summen der Personen im Zeitraum; die Auslastung ist Stunden geteilt durch Kapazität und daher kein einfacher Durchschnitt der Prozentwerte. Ein Hinweis zeigt überlastete Personen auch dann an, wenn die gesamte Rolle noch unter 100 % liegt. Die Farben markieren ab 85 % orange und ab 100 % rot; tatsächlich überlastet bedeutet mehr geplante Stunden als verfügbare Kapazität. Nicht zugewiesene Stunden werden weiterhin für das gesamte Portfolio gemeldet und keiner Rolle zugeschrieben. Bei einer Auswahl ohne Personen erscheint ein entsprechender Hinweis.
+
+Lessons Learned: Bei gefilterten Grafiken müssen Zähler, FTE-Nenner und Engpassmeldung dieselbe Personenauswahl verwenden. Eine Gruppensumme kann eine Überlastung einzelner Personen verdecken; deshalb ist ein Hinweis auf Einzelebene schon in der zugeklappten Gruppe erforderlich.
+
 ## Lessons Learned: Vorbereitung des Serverbetriebs
 
 - Eine gemeinsam genutzte Datenbank braucht eindeutig abgegrenzte Collections; eine Bereitstellung darf bestehende Anwendungen oder Dienste nicht verändern. Präfix, Port und Dienstname müssen vor Ort geprüft werden.
