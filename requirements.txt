@@ -10,3 +10,6 @@ psutil>=6.0,<8
 Markdown>=3.9,<4                 # user manual under Help (docs/user-manual*.md, DOC-05)
 bleach>=6.2,<7                   # its HTML is sanitised before it is shown
 pywin32>=308; sys_platform == "win32"
+
+openpyxl>=3.1.5,<4
+defusedxml>=0.7.1,<1

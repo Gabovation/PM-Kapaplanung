@@ -63,7 +63,9 @@ Die Auswahl „Vorschau mindestens“ bestimmt, wie viele Wochen beziehungsweise
 In Einstellungen eine JSON-Sicherung exportieren. Wiederherstellen ersetzt die aktuelle Planung nach Bestätigung. Auch ältere Sicherungen mit frei eingegebenen Rollen werden übernommen. Ein veraltetes Browserfenster erhält beim Speichern einen Konfliktfehler. Dann zuerst die Eingaben als Sicherung exportieren und die Seite danach neu laden.
 
 ## SAP
-SAP-Buchungen, Ist- und Reststunden sind noch nicht enthalten.
+Unter Einstellungen ? SAP-Stunden kann eine XLSX-Datei aus SAP eingelesen werden. Die Vorschau zeigt die Anzahl der Buchungen, den Zeitraum, nicht eindeutig zugeordnete Buchungen und die Zahl der zu ersetzenden Zeilen. Der Export muss f?r jede enthaltene Personalnummer und jedes enthaltene Datum s?mtliche Buchungen umfassen. Bei ?bernahme ersetzt er die bereits gespeicherten Buchungen dieser Person an diesem Datum. Andere Tage bleiben erhalten; identische Zeilen im Export werden nicht entfernt. Ein Tag, f?r den ?berhaupt keine Zeile mehr vorhanden ist, wird nicht gel?scht.
+
+Das PSP-Element wird anhand der Projektnummer vor den letzten zwei Segmenten zugeordnet. Nicht zugeordnete Buchungen bleiben gespeichert und z?hlen nicht zur Projektsumme. Die Projektansicht zeigt Ist, Plan bis zum letzten importierten Projektbuchungsdatum und eine Hochrechnung aus Ist plus anschlie?endem Plan. Liegt diese ?ber dem Gesamtbudget, erscheint ein Hinweis auf eine m?gliche Planwert?nderung. Alle importierten Abteilungen werden zusammen mit dem Gesamtbudget PL und QVP verglichen; eine getrennte Abteilungsauswertung ist noch nicht vorhanden. Die Hochrechnung ben?tigt vollst?ndige und aktuelle Exporte aller Beteiligten und ausschlie?lich budgetrelevante Abteilungen. Sie ber?cksichtigt keinen tats?chlichen Projektfortschritt. Die Kapazit?tsvorschau zeigt weiterhin Planstunden; Iststunden werden dort nicht abgezogen.
 
 
 ## Gate-Status und nächstes Gate

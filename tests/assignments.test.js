@@ -8,7 +8,7 @@ const document={querySelector:selector=>{
  return nodes.get(selector);
 },querySelectorAll:()=>[],addEventListener(){}};
 const context=vm.createContext({document,window:{addEventListener(){}},location:{hash:''},fetch:()=>new Promise(()=>{}),alert:message=>alerts.push(message),console});
-for(const file of ['hours.js','capacity.js','capacity-view.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
+for(const file of ['hours.js','capacity.js','capacity-view.js','sap.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
 const run=source=>vm.runInContext(source,context);
 run(`state={fte:40,favorite:[100,0,0,0],roles:[{id:'project-manager',name:'Projektleiter'},{id:'qvp',name:'QVP'}],people:[
  {id:'a',name:'Anna',roleId:'project-manager',fte:100},{id:'b',name:'Berta',roleId:'project-manager',fte:100},{id:'q',name:'Quentin',roleId:'qvp',fte:100}],projects:[]};

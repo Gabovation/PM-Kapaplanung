@@ -112,6 +112,8 @@ def create_app(*, server_repository=None) -> Flask:
                 validate_roles(incoming)
                 validate_assignments(incoming)
                 validate_hour_plans(incoming)
+                from kapa_planung.services.sap_import import validate_actuals
+                validate_actuals(incoming)
             except ValueError as exc:
                 return jsonify(error=str(exc)), 400
             revision = current.get('_revision', 0) if current else 0
@@ -148,6 +150,29 @@ def create_app(*, server_repository=None) -> Flask:
                         app.logger.warning('Temporary planning file could not be removed.')
             return jsonify(revision=incoming['_revision'])
 
+    @app.post('/api/sap-preview')
+    @require_permission('kapa-planung.editor')
+    @rate_limit('sap-import', env='RATE_LIMIT_WRITE_PER_MINUTE', default=30)
+    def sap_preview():
+        supplied = request.headers.get('X-Kapa-Token', '')
+        expected = session.get('csrf', '') if mode == 'server' else TOKEN
+        if not supplied or not expected or not hmac.compare_digest(supplied, expected):
+            abort(403)
+        file = request.files.get('file')
+        if file is None or not file.filename.lower().endswith('.xlsx'):
+            return jsonify(error='Bitte eine XLSX-Datei ausw?hlen.'), 400
+        from kapa_planung.services.sap_import import read_export
+        try:
+            rows = read_export(file.read())
+            from kapa_planung.services.sap_import import validate_actuals
+            validate_actuals({'sapActuals': rows})
+        except ValueError as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            app.logger.warning('Ung?ltiger SAP-Export (%s).', type(exc).__name__)
+            return jsonify(error='Die Excel-Datei konnte nicht sicher gelesen werden.'), 400
+        return jsonify(rows=rows)
+
     @app.post('/api/prepare-import')
     @require_permission('kapa-planung.editor')
     @rate_limit('planning-import', env='RATE_LIMIT_WRITE_PER_MINUTE', default=120)
@@ -160,6 +185,8 @@ def create_app(*, server_repository=None) -> Flask:
             snapshot = prepare_snapshot(request.get_json(silent=True))
             validate_assignments(snapshot)
             validate_hour_plans(snapshot)
+            from kapa_planung.services.sap_import import validate_actuals
+            validate_actuals(snapshot)
         except (ValueError, TypeError) as exc:
             return jsonify(error=str(exc)), 400
         # Preparing an import is read-only; the normal write still compares the revision.

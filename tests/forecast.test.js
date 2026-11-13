@@ -8,7 +8,7 @@ const document={querySelector:selector=>{
   return nodes.get(selector);
 },querySelectorAll:()=>[],addEventListener(){}};
 const context=vm.createContext({document,window:{addEventListener(){}},location:{hash:''},fetch:()=>new Promise(()=>{}),console});
-for(const file of ['hours.js','capacity.js','capacity-view.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
+for(const file of ['hours.js','capacity.js','capacity-view.js','sap.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
 const run=script=>vm.runInContext(script,context);
 
 run(`const project={id:'p1',person:'a',budget:64,percent:[100,0,0,0],dates:['2026-11-09','2026-11-16','2026-11-23','2026-11-30','2026-12-07'],weights:{},changes:[]};

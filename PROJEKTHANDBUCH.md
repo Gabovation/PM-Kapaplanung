@@ -277,3 +277,44 @@ Bestandsprojekte ohne die neuen optionalen Felder verwenden die bisherige `perso
 - Eine pro Tag unabhängige Rundung würde bei kleinen Tageswerten systematisch eine Person bevorzugen. Kumulierte Rundung erhält die Gesamtstunden und das gewünschte Gesamtverhältnis.
 - Ein zusätzliches QVP-Budget darf nicht aus dem PL-Budget abgezogen oder einer nicht zugeordneten Person zugerechnet werden. Teamstatus und Engpässe müssen beide Budgets enthalten.
 - Ein rückwirkend geänderter Split ist keine dokumentierte Übergabe zu einem Stichtag. Falls Ist-Stunden oder Übergaben eingeführt werden, benötigen sie eigene zeitliche Zuordnungen.
+
+
+## Einstellungen und SAP-Istabgleich
+
+Die Einstellungen trennen Datensicherung und SAP-Istabgleich in eigene Bereiche. Die Sicherungsaktionen stehen nebeneinander; die doppelte Kontokarte in den Einstellungen entf?llt. Die bestehende Kennwortfunktion f?r die Anmeldung bleibt erhalten.
+
+### Import und Zuordnung
+
+Unter ?SAP-Stunden? lesen Projektleiter XLSX-Exporte mit den Spalten Nachname Vorname, Personalnummer, Empf?nger-PSP-Element, Datum, Anzahl (Ma?einheit), Interne Ma?einheit und Kontierungstext ein. Der Server verarbeitet die Datei vor?bergehend im Speicher; die Excel-Datei selbst wird nicht gespeichert. SAP-Summenzeilen ohne Datum, Name, PSP und Kontierungstext werden nur dann ?bersprungen, wenn ihre Summe den vorangehenden Buchungen entspricht. Andere ung?ltige Buchungen blockieren den Import. Die unterst?tzte Einheit ist H; Dezimalstunden und negative Korrekturen bleiben erhalten.
+
+Beim PSP `10-02763-000-99` werden die letzten beiden Segmente abgetrennt: `10-02763` ist die Projektnummer, `99` die Abteilung. Die Zuordnung erfolgt anhand der vollst?ndigen Projektnummer und nur bei genau einem passenden Projekt. Fehlende, ung?ltige und mehrdeutige Zuordnungen bleiben gespeichert, werden gez?hlt und nicht in Projektsummen eingerechnet. Eine sp?tere Projektanlage beziehungsweise Korrektur der Projektnummer kann die Zuordnung erm?glichen. Die Abteilungsnummer und Personalnummer bleiben pro Zeile erhalten. Das System verkn?pft SAP-Personalnummern noch nicht mit Planungspersonen und unterscheidet PL- und QVP-Istbudgets noch nicht; importierte Abteilungen werden im Projekt zusammengefasst.
+
+Vor der ?bernahme erscheint eine Vorschau. Der Export muss je enthaltener Kombination aus Personalnummer und Buchungsdatum vollst?ndig sein. Bei der ?bernahme ersetzen seine Zeilen die zuvor f?r dieselbe Kombination gespeicherten Zeilen; andere Kombinationen bleiben erhalten. Wiederholte identische Zeilen innerhalb eines Exports k?nnen verschiedene Buchungen sein und bleiben erhalten. Tage, die im Export ?berhaupt nicht vorkommen, werden nicht gel?scht. Enth?lt ein sp?terer Export f?r eine Person und einen Tag nur einen Teil der Buchungen, w?rden ?brige Buchungen dieses Tages ersetzt; deshalb ist diese Vollst?ndigkeit Voraussetzung und wird in der Vorschau ausdr?cklich genannt. Eine L?schung aller Buchungen eines Tages, der im Export nicht mehr vorkommt, ist derzeit nicht m?glich. Buchungen ohne PSP bleiben ungeordnet erhalten.
+
+Die normalisierten Buchungen werden als optionales Feld `sapActuals` zusammen mit der Planung gespeichert und in JSON-Sicherungen eingeschlossen. Alte Daten und Sicherungen ohne das Feld bleiben g?ltig. Dieselbe Revisionspr?fung wie f?r die Planung sch?tzt vor ?berschreiben durch ein veraltetes Fenster. Vorschau und gespeicherte Daten werden serverseitig gepr?ft. Der Import ist auf 10.000 Buchungen begrenzt und eine XLSX-Datei auf 5 MB HTTP-Gr??e; zus?tzlich ist die entpackte Excel-Datei begrenzt.
+
+### Plan-Ist-Vergleich und Hochrechnung
+
+Die Projektdetailseite zeigt Iststunden, Restbudget nach importiertem Ist, Planstunden bis einschlie?lich letztem importierten Buchungsdatum des Projekts, den verbleibenden Plan danach und deren Hochrechnung zum Gesamtbudget PL und QVP. Die Hochrechnung ist `importiertes Projekt-Ist + Plan nach dem letzten importierten Projekt-Buchungsdatum`. Sie nimmt weder k?nftige Verbrauchsraten noch einen Fortschrittsgrad an. Liegt sie ?ber dem Gesamtbudget, erscheint ein Hinweis auf eine m?gliche Planwert?nderung; die ?bersicht fasst solche Projekte zusammen. Dies ist keine getrennte PL-/QVP-Prognose. Die Aussage setzt vollst?ndige und aktuelle Exporte aller Beteiligten und ausschlie?lich f?r das Budget relevante Abteilungen voraus. Ein Projekt ohne zugeordnete Istbuchungen erh?lt keine Hochrechnung. Stornierungen sind nur enthalten, wenn sie als Buchung exportiert werden.
+
+Die bestehende Kapazit?tsvorschau bleibt eine Planstundenbetrachtung und zieht Iststunden nicht automatisch von zuk?nftiger Personenkapazit?t ab. Abwesenheiten und Feiertage werden weiterhin nicht ber?cksichtigt. Ein sp?terer Ausbau ben?tigt die fachlich eindeutige Zuordnung von SAP-Personalnummern und Abteilungen zu Planungspersonen und Rollen sowie einen abgestimmten Umgang mit nicht mehr im Export enthaltenen Buchungen.
+
+### Lessons Learned
+
+- Identische Zeilen ohne eindeutige SAP-Buchungskennung k?nnen eigenst?ndige Buchungen sein; automatisches Entfernen w?rde Stunden verlieren.
+- Ein Buchungsdatum zeigt nicht, ob ein Export alle Buchungen dieses Tages enth?lt. Die Ersetzungslogik ben?tigt daher einen klaren Vollst?ndigkeitshinweis.
+- SAP-Summenzeilen d?rfen nicht zus?tzlich zu ihren Einzelbuchungen gez?hlt werden; Buchungen ohne PSP d?rfen nicht versehentlich einem Projekt zugerechnet werden.
+- Die Hochrechnung aus Ist und verbleibendem Plan ist keine Fortschrittsprognose und ersetzt keine Pr?fung auf Vollst?ndigkeit, aktuelle Daten und passende Abteilungen.
+- SAP-Istabgleich und JSON-Datensicherung erf?llen unterschiedliche Aufgaben und sind getrennt dargestellt.
+
+
+## ?bergabe des SAP-Istabgleichs an den bestehenden Server
+
+Das bestehende `update.bat` verwendet `requirements.txt`, installiert neue Abh?ngigkeiten vor dem Dienstneustart und f?hrt `pip check` sowie den vorhandenen Healthcheck aus. Der Server ben?tigt Zugriff auf seine konfigurierte Paketquelle f?r `openpyxl`, `et-xmlfile` und `defusedxml`. Der feste Dienstname `PMcapacityplaning`, die `.env` und die bestehenden MongoDB-Collections bleiben unver?ndert. Die SAP-Buchungen liegen als Teil des bestehenden Planungssnapshots und sind in der JSON-Sicherung enthalten.
+
+Lokale Pr?fung: 107 Python-Tests, zehn JavaScript-Testgruppen und der mitgelieferte Excel-Beispielexport. Die drei reinen Python-Wheels f?r openpyxl 3.1.5, et-xmlfile 2.0.0 und defusedxml 0.7.1 wurden f?r Windows x64/Python 3.14 heruntergeladen und ihre SHA-256-Hashes mit der Lockdatei abgeglichen. Eine Installation unter der Ziel-Python-Version 3.14.7 und eine Durchf?hrung unter dem tats?chlichen Dienstkonto stehen noch aus. Die Zielserver-Abnahme umfasst Git-Stand, Paketimport, `pip check`, Dienststatus, Healthcheck, Anmeldung und eine kontrollierte Importvorschau. Import?bernahme setzt vollst?ndige Buchungen je enthaltener Person und Tag voraus. Die Datenbank ist vor ?nderungen betriebs?blich zu sichern.
+
+### Lessons Learned
+- Ein erfolgreiches lokales Paket- und Anwendungstesting ersetzt keine Installation mit dem tats?chlichen Serverinterpreter und Dienstkonto.
+- Das bestehende Online-Update installiert aus `requirements.txt`, nicht aus der Lockdatei; eine vorhandene Lockdatei allein belegt daher keine reproduzierbare Offlineinstallation.
+- Ein aktiver Dienst und ein erfolgreicher Healthcheck belegen nicht, dass der erwartete Commit und der Excel-Import funktionieren.

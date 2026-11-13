@@ -4,7 +4,7 @@ import fs from 'node:fs';
 
 const document={querySelector:()=>({dataset:{}}),querySelectorAll:()=>[],addEventListener(){}};
 const context=vm.createContext({document,window:{addEventListener(){}},location:{hash:''},fetch:()=>new Promise(()=>{}),console});
-for(const file of ['hours.js','capacity.js','capacity-view.js','plan.js','fine-editor.js']) {
+for(const file of ['hours.js','capacity.js','capacity-view.js','sap.js','plan.js','fine-editor.js']) {
   vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
 }
 const run=source=>vm.runInContext(source,context);

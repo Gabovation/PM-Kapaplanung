@@ -9,7 +9,7 @@ class TestDate extends RealDate {
 }
 const document={querySelector:()=>({dataset:{}}),querySelectorAll:()=>[],addEventListener(){}};
 const context=vm.createContext({Date:TestDate,document,window:{addEventListener(){}},location:{hash:''},fetch:()=>new Promise(()=>{}),console});
-for(const file of ['hours.js','capacity.js','capacity-view.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
+for(const file of ['hours.js','capacity.js','capacity-view.js','sap.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
 const run=source=>vm.runInContext(source,context);
 run(`const project={id:'p1',number:'11-111-111',name:'Testprojekt',status:'Gewonnen',person:'',budget:800,percent:[20,20,20,40],dates:['2026-01-01','2026-04-01','2026-07-01','2027-01-01','2027-07-01'],weights:{},changes:[]};`);
 const status=date=>run(`gateStatus(project, '${date}')`);

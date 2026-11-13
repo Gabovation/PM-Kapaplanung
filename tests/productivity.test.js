@@ -5,7 +5,7 @@ import fs from 'node:fs';
 const nodes=new Map();
 const document={querySelector:selector=>{if(!nodes.has(selector))nodes.set(selector,{dataset:{},classList:{toggle(){}},showModal(){},close(){}});return nodes.get(selector)},querySelectorAll:()=>[],addEventListener(){}};
 const context=vm.createContext({document,window:{addEventListener(){}},location:{hash:''},fetch:()=>new Promise(()=>{}),console});
-for(const file of ['hours.js','capacity.js','capacity-view.js','plan.js','fine-editor.js'])vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
+for(const file of ['hours.js','capacity.js','capacity-view.js','sap.js','plan.js','fine-editor.js'])vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
 const run=source=>vm.runInContext(source,context);
 run(`const base={name:'Test',number:'1',person:'a',secondPerson:'',budget:4,percent:[100,0,0,0],dates:['2026-11-09','2026-11-16','2026-11-23','2026-11-30','2026-12-07'],weights:{},changes:[]};
 state={fte:40,roles:[{id:'pl',name:'Projektleiter',productivityTarget:80},{id:'qvp',name:'QVP',productivityTarget:0}],people:[{id:'a',name:'Anna',roleId:'pl',fte:100},{id:'b',name:'Bernd',roleId:'pl',fte:50,productivityTarget:50},{id:'q',name:'Quentin',roleId:'qvp',fte:100}],projects:[

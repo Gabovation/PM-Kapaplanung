@@ -21,6 +21,7 @@
 .kapa-overview > .spacer {height:var(--polytec-space-3)}
 .kapa-overview .empty {padding:var(--polytec-space-3)}
 .kapa-project-form {display:grid;gap:var(--polytec-space-4)}
+.kapa-backup-actions {display:flex;flex-wrap:wrap;gap:var(--polytec-space-3)}
 .kapa-project-section {display:grid;gap:var(--polytec-space-3);min-width:0}
 .kapa-project-section h3,.kapa-project-section p,.kapa-project-section .panelhead {margin:0}
 .kapa-gate-grid {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--polytec-space-3)}

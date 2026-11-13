@@ -19,6 +19,7 @@ const context = vm.createContext({
 vm.runInContext(fs.readFileSync('static/app/hours.js','utf8'), context);
 vm.runInContext(fs.readFileSync('static/app/capacity.js','utf8'), context);
 vm.runInContext(fs.readFileSync('static/app/capacity-view.js','utf8'), context);
+vm.runInContext(fs.readFileSync('static/app/sap.js','utf8'), context);
 vm.runInContext(fs.readFileSync('static/app/plan.js','utf8'), context);
 vm.runInContext('init(); persist = () => {}; editPerson();', context);
 assert.equal(vm.runInContext('state.version', context), 2);

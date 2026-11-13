@@ -6,7 +6,7 @@ const handlers={};
 const document={querySelector:()=>({dataset:{}}),querySelectorAll:()=>[],addEventListener:(name,handler)=>{handlers[name]=handler;}};
 const location={hash:'#overview',origin:'http://localhost:54343',pathname:'/',search:''};
 const context=vm.createContext({document,location,window:{addEventListener(){}},fetch:()=>new Promise(()=>{}),console});
-for(const file of ['hours.js','capacity.js','capacity-view.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
+for(const file of ['hours.js','capacity.js','capacity-view.js','sap.js','plan.js','fine-editor.js']) vm.runInContext(fs.readFileSync('static/app/'+file,'utf8'),context);
 const run=source=>vm.runInContext(source,context);
 run('let renders=0;render=()=>{renders++};');
 
