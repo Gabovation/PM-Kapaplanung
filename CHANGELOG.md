@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.8 – 13.11.2026
+- Projektstunden nach gewonnen und erwartet als Gesamtbudget und im gewählten Zeitraum ergänzt.
+- Produktivitätsvorschau für Rollen und Personen mit individuell einstellbaren Zielen, Planungsreserve und rechnerischem FTE-Mehrbedarf ergänzt.
+
 ## 0.10.7 – 13.11.2026
 - Gate-Favoriten können für jede Planungsrolle getrennt hinterlegt werden. Bei neuen Projekten werden die Favoriten für PL und QVP unabhängig vorbelegt.
 - Projekte besitzen separate Gate-Verteilungen für PL und QVP; bestehende Projekte verwenden unverändert ihre bisherige Verteilung, bis sie gezielt geändert wird.

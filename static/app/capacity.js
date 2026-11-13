@@ -20,7 +20,7 @@ const KapaCapacity = (()=>{
   }
   const ratio=(load,capacity)=>capacity>0?(Math.abs(load-capacity)<1e-9?100:load/capacity*100):load>0?Infinity:0;
   function build(state,start,granularity,count=12) {
-    const columns=periods(start,granularity,count), loads=new Map(state.people.map(person=>[person.id,{}])), won=new Map(state.people.map(person=>[person.id,{}])), expected=new Map(state.people.map(person=>[person.id,{}])), unassigned={};
+    const columns=periods(start,granularity,count), loads=new Map(state.people.map(person=>[person.id,{}])), won=new Map(state.people.map(person=>[person.id,{}])), expected=new Map(state.people.map(person=>[person.id,{}])), unassigned={}, unassignedWon={}, unassignedExpected={};
     for(const project of state.projects) {
       const daily=KapaHours.materialize(project).daily, split=Boolean(project.secondPerson), share=split?Number(project.leadPercent):100;
       let cumulative=0, assignedFirst=0;
@@ -35,6 +35,7 @@ const KapaCapacity = (()=>{
           const category=project.status==='Gewonnen'?won.get(id):project.status==='Erwartet'?expected.get(id):null;
           target[day]=(target[day]||0)+part;
           if(category) category[day]=(category[day]||0)+part;
+          if(!loads.has(id)) {const bucket=project.status==='Gewonnen'?unassignedWon:project.status==='Erwartet'?unassignedExpected:null;if(bucket)bucket[day]=(bucket[day]||0)+part;}
         }
       }
       if(project.qvpBudget>0) {
@@ -44,16 +45,20 @@ const KapaCapacity = (()=>{
         for(const [day,hours] of Object.entries(KapaHours.materialize(qualityPlan).daily)) {
           target[day]=(target[day]||0)+hours;
           if(category) category[day]=(category[day]||0)+hours;
+          if(!loads.has(project.qvpPerson)) {const bucket=project.status==='Gewonnen'?unassignedWon:project.status==='Erwartet'?unassignedExpected:null;if(bucket)bucket[day]=(bucket[day]||0)+hours;}
         }
       }
     }
     const people=state.people.map(person=>({person,cells:columns.map(period=>{
       const load=total(period.days.map(day=>loads.get(person.id)[day.key]||0)), capacity=Math.max(0,Number(state.fte)||0)*Math.max(0,Number(person.fte)||0)/100*period.workingDays/5;
       const wonLoad=total(period.days.map(day=>won.get(person.id)[day.key]||0)), expectedLoad=total(period.days.map(day=>expected.get(person.id)[day.key]||0));
-      return {load,wonLoad,expectedLoad,capacity,ratio:ratio(load,capacity),overloaded:load-capacity>1e-9};
+      const role=state.roles?.find(role=>role.id===person.roleId), targetPercent=person.productivityTarget??role?.productivityTarget??80;
+      return {load,wonLoad,expectedLoad,capacity,targetPercent,targetCapacity:capacity*targetPercent/100,ratio:ratio(load,capacity),overloaded:load-capacity>1e-9};
     })}));
     const unassignedByPeriod=columns.map(period=>total(period.days.map(day=>unassigned[day.key]||0)));
-    return summarize(columns,people,unassignedByPeriod);
+    const result=summarize(columns,people,unassignedByPeriod);
+    result.portfolio=columns.map((period,index)=>({won:result.team[index].wonLoad+total(period.days.map(day=>unassignedWon[day.key]||0)),expected:result.team[index].expectedLoad+total(period.days.map(day=>unassignedExpected[day.key]||0)),unassignedWon:total(period.days.map(day=>unassignedWon[day.key]||0)),unassignedExpected:total(period.days.map(day=>unassignedExpected[day.key]||0))}));
+    return result;
   }
   function summarize(columns,people,unassignedByPeriod=[]) {
     const team=columns.map((period,index)=>{
@@ -70,6 +75,15 @@ const KapaCapacity = (()=>{
     const included=new Set(ids), people=model.people.filter(row=>included.has(row.person.id));
     return {...summarize(model.columns,people),globalUnassigned:model.globalUnassigned??model.unassigned};
   }
+  function productivity(model,ids,referenceTarget,weeklyFte) {
+    const scoped=scope(model,ids);
+    return scoped.team.map((period,index)=>{
+      const cells=scoped.people.map(row=>row.cells[index]), planned=period.wonLoad+period.expectedLoad;
+      const target=total(cells.map(cell=>cell.targetCapacity)), difference=target-planned;
+      const reference=Math.max(0,Number(weeklyFte)||0)*period.workingDays/5*referenceTarget/100;
+      return {...period,planned,target,difference,fteDifference:reference>0?difference/reference:null,productivity:ratio(planned,period.capacity)};
+    });
+  }
   function percent(value) { return Number.isFinite(value)?value.toLocaleString('de-AT',{maximumFractionDigits:1}):'∞'; }
-  return {build,scope,periods,percent};
+  return {build,scope,productivity,periods,percent};
 })();

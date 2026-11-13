@@ -6,6 +6,8 @@ Die linke Navigation öffnet Übersicht, Projekte, Personen und Einstellungen. M
 ## Personen und Kapazität
 Person mit Name, Rolle und FTE-Prozent anlegen. Die Rolle wird aus einem Dropdown gewählt. Zu Beginn sind Projektleiter und QVP vorhanden. In Einstellungen gilt zunächst: 100 % FTE = 40 Stunden pro Woche. Eine Person mit 50 % FTE hat dadurch 20 Wochenstunden. Feiertage und Abwesenheiten sind noch nicht enthalten.
 
+Das Produktivitätsziel wird unter Einstellungen → Rollen je Rolle festgelegt und beträgt zunächst 80 %. Beim Bearbeiten einer Person kann ein eigenes Ziel eingetragen werden; ein leeres Feld übernimmt das Rollenziel. Die Übersicht zeigt gewonnene und erwartete Projektstunden als Gesamtbudget und im gewählten Zeitraum sowie die Produktivität nach Rolle und aufklappbar nach Person. Reserve und Mehrbedarf vergleichen geplante Projektstunden mit der Zielkapazität; die bestehende Engpassprüfung verwendet weiterhin die volle FTE-Arbeitszeit. Es handelt sich um Planstunden, nicht um SAP-Buchungen.
+
 ## Rollen bearbeiten und hinzufügen
 Unter Einstellungen → Rollen mit „Rolle hinzufügen“ eine neue Bezeichnung anlegen. „Bearbeiten“ benennt eine vorhandene Rolle um. Bereits zugewiesene Personen behalten ihre Rolle und zeigen automatisch die neue Bezeichnung. Rollennamen müssen ausgefüllt und eindeutig sein. Die Rollen gelten für die lokale Kapazitätsplanung.
 

@@ -103,4 +103,14 @@ node('#qvpPct2').value='33';
 node('#projectForm').dataset.qvpEdited='false';
 vm.runInContext("applyAutomaticFavorite('qvp')",context);
 assert.equal(node('#qvpPct2').value,'33');
+// Role defaults and optional person overrides can be edited without replacing other fields.
+node('#roleForm').elements={roleName:{value:'Qualitätsvorausplanung'},roleTarget:{value:'72.5'}};
+vm.runInContext("submitRole('qvp')",context);
+assert.equal(vm.runInContext("state.roles.find(r=>r.id==='qvp').productivityTarget",context),72.5);
+node('#personForm').elements={name:{value:'Test'},roleId:{value:'qvp'},fteValue:{value:'50'},personTarget:{value:'10'}};
+vm.runInContext('submitPerson(state.people[0].id)',context);
+assert.equal(vm.runInContext('state.people[0].productivityTarget',context),10);
+node('#personForm').elements.personTarget.value='';
+vm.runInContext('submitPerson(state.people[0].id)',context);
+assert.equal(vm.runInContext('state.people[0].productivityTarget',context),null);
 console.log('Rollen: Dropdown, Personen-Zuweisung, Umbenennen, Hinzufügen und Dubletten geprüft.');

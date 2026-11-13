@@ -90,7 +90,7 @@ function capacityRows(forecast=null) {
  const model=forecast||KapaCapacity.build(state,currentPeriod(),mode,1);
  return model.people.map(row=>({u:row.person,load:row.cells[0].load,cap:row.cells[0].capacity,pct:row.cells[0].ratio,overloaded:row.cells[0].overloaded}));
 }
-function overview(){let horizon=forecastHorizon(currentPeriod(),mode,forecastCounts[mode],state.projects),forecast=KapaCapacity.build(state,currentPeriod(),mode,horizon.count),rows=capacityRows(forecast),over=rows.filter(x=>x.overloaded), plHours=state.projects.reduce((a,p)=>a+totals(p),0),qvpHours=state.projects.reduce((a,p)=>a+(Number(p.qvpBudget)||0),0),sum=plHours+qvpHours,d=currentPeriod();return `<div class="hero"><div><h2>Kapazität im Blick</h2><p>Projektübergreifende Auslastung und verfügbare Kapazität</p></div><div class="toolbar">${forecastGrainSelector()}</div></div><div class="grid"><div class="card"><div class="label">Aktive Projekte</div><div class="value">${state.projects.length}</div><div class="caption">in der Planung</div></div><div class="card"><div class="label">Teammitglieder</div><div class="value">${state.people.length}</div><div class="caption">mit hinterlegter Kapazität</div></div><div class="card"><div class="label">Projektbudget</div><div class="value">${sum.toLocaleString('de-AT')} <small>h</small></div><div class="caption">PL: ${plHours.toLocaleString('de-AT')} h · QVP: ${qvpHours.toLocaleString('de-AT')} h</div></div><div class="card ${over.length?'alert':''}"><div class="label">Überlastet</div><div class="value">${over.length}</div><div class="caption">Gesamtes Team im gewählten Zeitraum</div></div></div><div class="spacer"></div>${capacityForecast(forecast,horizon.truncated)}<div class="layout"><section class="panel"><div class="panelhead"><div><span class="section-kicker">TEAMÜBERSICHT</span><h2>Auslastung nach Person</h2></div><div class="row"><button class="smallbtn" onclick="shift(-1)">‹</button><b class="quiet nowrap">${periodLabel(d)}</b><button class="smallbtn" onclick="shift(1)">›</button></div></div><div class="tablewrap"><table><thead><tr><th>Person</th><th>Geplant / Kapazität</th><th>Auslastung</th><th>Status</th></tr></thead><tbody>${rows.map(x=>`<tr><td><div class="person"><span class="avatar">${esc(x.u.name.slice(0,1).toUpperCase())}</span><div><button type="button" class="pt-button pt-button--subtle kapa-person-select" data-person-id="${esc(x.u.id)}" aria-pressed="${forecastFilter.type==='person'&&forecastFilter.id===x.u.id}" onclick="selectForecastPerson(this.dataset.personId)">${esc(x.u.name)}</button><div class="sub">${esc(roleName(x.u.roleId))} · ${x.u.fte} % FTE</div></div></div></td><td>${Math.round(x.load)} / ${Math.round(x.cap)} h</td><td><div class="row"><div class="bar"><span class="${x.overloaded?'over':''}" style="width:${Math.min(x.pct,100)}%"></span></div><b>${KapaCapacity.percent(x.pct)} %</b></div></td><td><span class="pt-status pt-status--${x.overloaded?'danger':'success'}">${x.overloaded?'Überlastet':'Im Rahmen'}</span></td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="empty">Noch keine Personen angelegt.</div>'}</div></section><section class="panel"><div class="panelhead"><div><span class="section-kicker">PORTFOLIO</span><h2>Projekte</h2></div><button class="link" onclick="go('projects')">Alle ansehen →</button></div>${portfolioTable()}</section></div><div class="spacer"></div><div class="notice">Die Auslastung zeigt Planstunden. SAP-Buchungen und Abwesenheiten sind in dieser Version noch nicht berücksichtigt.</div>`}
+function overview(){let horizon=forecastHorizon(currentPeriod(),mode,forecastCounts[mode],state.projects),forecast=KapaCapacity.build(state,currentPeriod(),mode,horizon.count),rows=capacityRows(forecast),over=rows.filter(x=>x.overloaded), plHours=state.projects.reduce((a,p)=>a+totals(p),0),qvpHours=state.projects.reduce((a,p)=>a+(Number(p.qvpBudget)||0),0),sum=plHours+qvpHours,wonBudget=state.projects.filter(p=>p.status==='Gewonnen').reduce((n,p)=>n+projectTotal(p),0),expectedBudget=state.projects.filter(p=>p.status==='Erwartet').reduce((n,p)=>n+projectTotal(p),0),d=currentPeriod();return `<div class="hero"><div><h2>Kapazität im Blick</h2><p>Projektübergreifende Auslastung und verfügbare Kapazität</p></div><div class="toolbar">${forecastGrainSelector()}</div></div><div class="grid"><div class="card"><div class="label">Aktive Projekte</div><div class="value">${state.projects.length}</div><div class="caption">in der Planung</div></div><div class="card"><div class="label">Teammitglieder</div><div class="value">${state.people.length}</div><div class="caption">mit hinterlegter Kapazität</div></div><div class="card"><div class="label">Projektbudget</div><div class="value">${sum.toLocaleString('de-AT')} <small>h</small></div><div class="caption">PL: ${plHours.toLocaleString('de-AT')} h · QVP: ${qvpHours.toLocaleString('de-AT')} h</div></div><div class="card"><div class="label">Gewonnene Projektstunden</div><div class="value">${wonBudget.toLocaleString('de-AT')} <small>h</small></div><div class="caption">Gesamtbudget · ${periodLabel(d)}: ${(forecast.portfolio[0]?.won||0).toLocaleString('de-AT')} h</div></div><div class="card"><div class="label">Erwartete Projektstunden</div><div class="value">${expectedBudget.toLocaleString('de-AT')} <small>h</small></div><div class="caption">Gesamtbudget · ${periodLabel(d)}: ${(forecast.portfolio[0]?.expected||0).toLocaleString('de-AT')} h</div></div><div class="card ${over.length?'alert':''}"><div class="label">Überlastet</div><div class="value">${over.length}</div><div class="caption">Gesamtes Team im gewählten Zeitraum</div></div></div><div class="spacer"></div>${capacityForecast(forecast,horizon.truncated)}<div class="spacer"></div>${productivityOverview(forecast)}<div class="layout"><section class="panel"><div class="panelhead"><div><span class="section-kicker">TEAMÜBERSICHT</span><h2>Auslastung nach Person</h2></div><div class="row"><button class="smallbtn" onclick="shift(-1)">‹</button><b class="quiet nowrap">${periodLabel(d)}</b><button class="smallbtn" onclick="shift(1)">›</button></div></div><div class="tablewrap"><table><thead><tr><th>Person</th><th>Geplant / Kapazität</th><th>Auslastung</th><th>Status</th></tr></thead><tbody>${rows.map(x=>`<tr><td><div class="person"><span class="avatar">${esc(x.u.name.slice(0,1).toUpperCase())}</span><div><button type="button" class="pt-button pt-button--subtle kapa-person-select" data-person-id="${esc(x.u.id)}" aria-pressed="${forecastFilter.type==='person'&&forecastFilter.id===x.u.id}" onclick="selectForecastPerson(this.dataset.personId)">${esc(x.u.name)}</button><div class="sub">${esc(roleName(x.u.roleId))} · ${x.u.fte} % FTE</div></div></div></td><td>${Math.round(x.load)} / ${Math.round(x.cap)} h</td><td><div class="row"><div class="bar"><span class="${x.overloaded?'over':''}" style="width:${Math.min(x.pct,100)}%"></span></div><b>${KapaCapacity.percent(x.pct)} %</b></div></td><td><span class="pt-status pt-status--${x.overloaded?'danger':'success'}">${x.overloaded?'Überlastet':'Im Rahmen'}</span></td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="empty">Noch keine Personen angelegt.</div>'}</div></section><section class="panel"><div class="panelhead"><div><span class="section-kicker">PORTFOLIO</span><h2>Projekte</h2></div><button class="link" onclick="go('projects')">Alle ansehen →</button></div>${portfolioTable()}</section></div><div class="spacer"></div><div class="notice">Die Auslastung zeigt Planstunden. SAP-Buchungen und Abwesenheiten sind in dieser Version noch nicht berücksichtigt.</div>`}
 function sortedProjectsByNextGate(projects, onDate=iso(new Date())) {
  return projects.map((project,index)=>({project,index,next:gateStatus(project,onDate).next?.date||null}))
    .sort((a,b)=>a.next&&b.next?a.next.localeCompare(b.next)||a.index-b.index:a.next?-1:b.next?1:a.index-b.index)
@@ -109,8 +109,8 @@ function roleOptions(selectedId) {
 function roleSettings() {
  return `<section class="panel" aria-labelledby="roles-heading">
    <div class="panelhead"><h2 id="roles-heading">Rollen</h2><button class="secondary" onclick="editRole()">Rolle hinzufügen</button></div>
-   <div class="tablewrap"><table><thead><tr><th>Rolle</th><th>Zugewiesene Personen</th><th></th></tr></thead><tbody>
-   ${state.roles.map(role => `<tr><td>${esc(role.name)}</td><td>${state.people.filter(person => person.roleId === role.id).length}</td><td><button class="link" aria-label="Rolle ${esc(role.name)} bearbeiten" onclick="editRole('${role.id}')">Bearbeiten</button></td></tr>`).join('')}
+   <div class="tablewrap"><table><thead><tr><th>Rolle</th><th>Produktivitätsziel</th><th>Zugewiesene Personen</th><th></th></tr></thead><tbody>
+   ${state.roles.map(role => `<tr><td>${esc(role.name)}</td><td>${role.productivityTarget??80} %</td><td>${state.people.filter(person => person.roleId === role.id).length}</td><td><button class="link" aria-label="Rolle ${esc(role.name)} bearbeiten" onclick="editRole('${role.id}')">Bearbeiten</button></td></tr>`).join('')}
    </tbody></table></div>
  </section>`;
 }
@@ -153,6 +153,7 @@ function editPerson(id) {
    <select id="roleId" name="roleId" class="pt-select" required aria-describedby="role-help">${roleOptions(person.roleId)}</select>
    <div class="pt-field__help" id="role-help">Rollen kannst du unter Einstellungen verwalten.</div></div>
    ${field('Beschäftigungsgrad (% FTE)','fteValue',person.fte,'number','required min="1" max="100" step="1"')}
+   <div class="field pt-field"><label class="pt-field__label" for="personTarget">Produktivitätsziel (%)</label><input id="personTarget" name="personTarget" type="number" min="0" max="100" step="any" value="${person.productivityTarget??''}"><div class="pt-field__help">Leer lassen, um das Ziel der Rolle zu übernehmen.</div></div>
  </form>`;
  const actions = `${id ? `<button class="danger" onclick="deletePerson('${id}')">Löschen</button>` : ''}
    <button class="secondary" onclick="closeModal()">Abbrechen</button>
@@ -164,7 +165,9 @@ function submitPerson(id) {
  if (!form.reportValidity()) return;
  const roleId = form.elements.roleId.value;
  if (!state.roles.some(role => role.id === roleId)) return alert('Bitte eine vorhandene Rolle auswählen.');
- const person = {id:id || uid(),name:form.elements.name.value.trim(),roleId,fte:Number(form.elements.fteValue.value)};
+ const rawTarget=form.elements.personTarget?.value??'', target=rawTarget===''?null:Number(rawTarget);
+ if(target!==null&&(!Number.isFinite(target)||target<0||target>100))return alert('Das Produktivitätsziel muss zwischen 0 und 100 % liegen.');
+ const person = {id:id || uid(),name:form.elements.name.value.trim(),roleId,fte:Number(form.elements.fteValue.value),productivityTarget:target};
  if (!person.name) return alert('Bitte einen Namen eingeben.');
  if (id) Object.assign(state.people.find(item => item.id === id), person);
  else state.people.push(person);
@@ -175,13 +178,15 @@ function editRole(id) {
  const role = state.roles.find(item => item.id === id);
  if (id && !role) return alert('Die Rolle ist nicht mehr vorhanden. Bitte neu laden.');
  openModal(id ? 'Rolle bearbeiten' : 'Rolle hinzufügen',
-   `<form id="roleForm" onsubmit="event.preventDefault();submitRole('${id || ''}')">${field('Bezeichnung','roleName',role?.name || '', 'text','required maxlength="100"')}</form>`,
+   `<form id="roleForm" class="kapa-project-form" onsubmit="event.preventDefault();submitRole('${id || ''}')">${field('Bezeichnung','roleName',role?.name || '', 'text','required maxlength="100"')}${field('Produktivitätsziel (%)','roleTarget',role?.productivityTarget??80,'number','required min="0" max="100" step="any"')}<p class="quiet">Anteil der FTE-Arbeitszeit, der für Projektarbeit vorgesehen ist.</p></form>`,
    `<button class="secondary" onclick="closeModal()">Abbrechen</button><button class="primary" type="submit" form="roleForm">Speichern</button>`, 'form');
 }
 function submitRole(id) {
  const form = $('#roleForm');
  if (!form.reportValidity()) return;
  const name = form.elements.roleName.value.trim();
+ const target=Number(form.elements.roleTarget?.value??80);
+ if(!Number.isFinite(target)||target<0||target>100)return alert('Das Produktivitätsziel muss zwischen 0 und 100 % liegen.');
  if (!name) return alert('Bitte eine Rollenbezeichnung eingeben.');
  const comparable = value => value.toLocaleLowerCase('de-AT').replaceAll('ß','ss');
  if (state.roles.some(role => role.id !== id && comparable(role.name) === comparable(name))) return alert('Diese Rollenbezeichnung ist bereits vorhanden.');
@@ -189,9 +194,10 @@ function submitRole(id) {
    const role = state.roles.find(item => item.id === id);
    if (!role) return alert('Die Rolle ist nicht mehr vorhanden.');
    role.name = name;
+   role.productivityTarget = target;
  } else {
    if (state.roles.length >= 100) return alert('Es können höchstens 100 Rollen angelegt werden.');
-   state.roles.push({id:uid(),name});
+   state.roles.push({id:uid(),name,productivityTarget:target});
  }
  closeModal();
  persist();

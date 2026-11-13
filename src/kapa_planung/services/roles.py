@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import hashlib
+import math
 import re
 
 
@@ -14,6 +15,9 @@ def default_roles() -> list[dict[str, str]]:
 
 
 def validate_roles(snapshot: dict) -> None:
+    def valid_target(value):
+        return value is None or (isinstance(value, (int, float)) and not isinstance(value, bool)
+                                 and 0 <= value <= 100 and math.isfinite(value))
     roles = snapshot.get("roles")
     if not isinstance(roles, list) or not 1 <= len(roles) <= 100:
         raise ValueError("Bitte zwischen einer und 100 Rollen hinterlegen.")
@@ -28,6 +32,8 @@ def validate_roles(snapshot: dict) -> None:
             raise ValueError("Eine Rollenbezeichnung muss zwischen 1 und 100 Zeichen enthalten.")
         if key in ids or name.casefold() in names:
             raise ValueError("Rollen müssen eindeutige IDs und Bezeichnungen haben.")
+        if not valid_target(role.get('productivityTarget')):
+            raise ValueError('Das Produktivitätsziel der Rolle muss zwischen 0 und 100 % liegen.')
         ids.add(key)
         names.add(name.casefold())
     favorites = snapshot.get('roleFavorites')
@@ -46,6 +52,8 @@ def validate_roles(snapshot: dict) -> None:
         if (not isinstance(person, dict) or not isinstance(person.get("roleId"), str)
                 or person["roleId"] not in ids or "role" in person):
             raise ValueError("Jede Person benötigt eine gültige Rolle aus der Rollenverwaltung.")
+        if not valid_target(person.get('productivityTarget')):
+            raise ValueError('Das Produktivitätsziel der Person muss zwischen 0 und 100 % liegen.')
 
 
 def prepare_snapshot(source: dict) -> dict:

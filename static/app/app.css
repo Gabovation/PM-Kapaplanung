@@ -128,6 +128,18 @@
 .kapa-group-overload {font-size:.75rem;color:var(--polytec-color-status-danger);font-weight:700;white-space:normal}
 .kapa-person-select {font-weight:700;text-align:left}
 .kapa-person-select[aria-pressed="true"] {outline:2px solid var(--polytec-color-focus-ring)}
+.kapa-overview .grid {grid-template-columns:repeat(auto-fit,minmax(min(12rem,100%),1fr))}
+.kapa-productivity {display:grid;gap:var(--polytec-space-3)}
+.kapa-productivity .panelhead,.kapa-productivity p {margin:0}
+.kapa-productivity-table {table-layout:fixed;width:calc(12rem + var(--kapa-period-count) * 14rem)}
+.kapa-productivity-label {width:12rem}
+.kapa-productivity-period {width:14rem}
+.kapa-productivity-table th:first-child {position:sticky;left:0;z-index:1;background:var(--polytec-color-surface-panel);white-space:normal;border-right:1px solid var(--polytec-color-border-default)}
+.kapa-productivity-table th .sub,.kapa-productivity-cell span {display:block}
+.kapa-productivity-cell {display:grid;gap:var(--polytec-space-1);font-size:.875rem}
+.kapa-productivity-deficit {color:var(--polytec-color-status-danger);font-weight:700}
+.kapa-productivity-reserve {color:var(--polytec-color-text-secondary)}
+.kapa-productivity-toggle {justify-content:flex-start;white-space:normal;text-align:left}
 .kapa-capacity-cell {width:100%;white-space:nowrap;flex-direction:column;gap:0}
 .kapa-capacity-split {display:block;font-size:.75rem;font-weight:400;white-space:normal;overflow-wrap:anywhere}
 .kapa-capacity-cell.is-planned {background:var(--polytec-color-surface-subtle)}

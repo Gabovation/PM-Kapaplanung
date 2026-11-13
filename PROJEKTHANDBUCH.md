@@ -36,6 +36,16 @@ Unter dem Diagramm stehen zunächst zusammengefasste Rollen. Ein Klick auf eine 
 
 Lessons Learned: Bei gefilterten Grafiken müssen Zähler, FTE-Nenner und Engpassmeldung dieselbe Personenauswahl verwenden. Eine Gruppensumme kann eine Überlastung einzelner Personen verdecken; deshalb ist ein Hinweis auf Einzelebene schon in der zugeklappten Gruppe erforderlich.
 
+## Projektstunden und Produktivität
+
+Die Übersicht zeigt Projektstunden für gewonnene und erwartete Projekte getrennt als vollständiges Budget und für die ausgewählte Woche beziehungsweise den ausgewählten Monat. Enthalten sind PL-Basisstunden, PL-Planwertänderungen und QVP-Stunden, auch wenn sie noch keiner Person zugeordnet sind.
+
+Im Bereich „Produktivität und Personalbedarf“ zeigen Wochen beziehungsweise Monate je Rolle und auf Wunsch je Person die geplanten gewonnenen Stunden, gewonnenen plus erwarteten Stunden, FTE-Arbeitszeit, Zielkapazität sowie Reserve oder Mehrbedarf. Das Prozent ist die Summe der geplanten gewonnenen und erwarteten Stunden geteilt durch die FTE-Arbeitszeit. Das Ziel steuert ausschließlich diesen zusätzlichen Vergleich, nicht die bestehende Engpassberechnung. Standardziel je Rolle sind 80 %. Unter Einstellungen → Rollen → Bearbeiten ist es anpassbar. Beim Bearbeiten einer Person kann ein eigener Wert gesetzt werden; ein leeres Feld übernimmt das Rollenziel. Beide Werte liegen zwischen 0 und 100 %. Alte Daten ohne die optionalen Felder behalten den 80-%-Standard beziehungsweise die Rollenvererbung.
+
+Die Zielkapazität einer Rolle summiert die individuellen FTE-Kapazitäten multipliziert mit ihrem jeweils gültigen Ziel. Reserve oder Mehrbedarf ist Zielkapazität minus geplante Stunden. Das FTE-Äquivalent teilt diese Differenz bei Rollen durch die Projektkapazität eines Vollzeit-FTE mit Rollenziel, bei Personen durch diejenige mit ihrem eigenen Ziel. Bei einem Referenzziel von 0 % ist die Umrechnung nicht definiert. Reserve bedeutet nicht automatisch einen Personalüberhang. Ohne Personenzuordnung erscheinen gewonnene und erwartete Stunden gesondert, nicht in Rollen- oder Personenwerten. Aktuelle FTE und Ziele werden für alle dargestellten Perioden verwendet; SAP-Iststunden, Feiertage und Abwesenheiten sind nicht enthalten.
+
+Lessons Learned: Produktivität, Zielerreichung und Engpass sind unterschiedliche Kennzahlen. Für Teilzeit und persönliche Ziele sind Kapazitäten zu summieren; Prozentwerte dürfen nicht einfach gemittelt werden. Nicht zugeordnete Stunden müssen im Portfolio erhalten bleiben und zugleich als Lücke in der Personalauswertung erkennbar sein.
+
 ## Lessons Learned: Vorbereitung des Serverbetriebs
 
 - Eine gemeinsam genutzte Datenbank braucht eindeutig abgegrenzte Collections; eine Bereitstellung darf bestehende Anwendungen oder Dienste nicht verändern. Präfix, Port und Dienstname müssen vor Ort geprüft werden.

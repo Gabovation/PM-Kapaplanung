@@ -2,6 +2,46 @@
 const forecastCounts={week:12,month:12};
 let forecastFilter={type:'all',id:''};
 const expandedForecastRoles=new Set();
+const expandedProductivityRoles=new Set();
+
+function toggleProductivityRole(id) {
+  const left=document.querySelector('.kapa-productivity-scroll')?.scrollLeft||0;
+  if(expandedProductivityRoles.has(id)) expandedProductivityRoles.delete(id); else expandedProductivityRoles.add(id);
+  render();
+  const scroll=document.querySelector('.kapa-productivity-scroll');
+  if(scroll) scroll.scrollLeft=left;
+  Array.from(document.querySelectorAll('.kapa-productivity-toggle')).find(button=>button.dataset.roleId===id)?.focus?.({preventScroll:true});
+}
+
+function productivityOverview(source) {
+  const model=scopedForecast(source), fmt=value=>Number(value).toLocaleString('de-AT',{maximumFractionDigits:1});
+  const groups=new Map();
+  if(forecastFilter.type==='all') for(const role of state.roles) groups.set(role.id,[]);
+  if(forecastFilter.type==='role') groups.set(forecastFilter.id,[]);
+  for(const row of model.people) {const id=row.person.roleId||'';if(!groups.has(id))groups.set(id,[]);groups.get(id).push(row);}
+  const rows=[...groups].map(([id,members])=>{
+    const role=state.roles.find(item=>item.id===id), roleTarget=role?.productivityTarget??80, name=role?.name||'Unbekannte Rolle';
+    const expanded=forecastFilter.type==='person'||expandedProductivityRoles.has(id);
+    const cell=(period)=>{
+      const delta=period.difference, label=delta>=0?'Reserve':'Mehrbedarf', fte=period.fteDifference===null?'–':`${fmt(Math.abs(period.fteDifference))} FTE`;
+      return `<td><div class="kapa-productivity-cell"><strong>${KapaCapacity.percent(period.productivity)} %</strong><span>G ${fmt(period.wonLoad)} h · G+E ${fmt(period.planned)} h</span><span>Arbeitszeit ${fmt(period.capacity)} h · Ziel ${fmt(period.target)} h</span><span class="${delta< -1e-9?'kapa-productivity-deficit':'kapa-productivity-reserve'}">${label} ${fmt(Math.abs(delta))} h · ${fte}</span></div></td>`;
+    };
+    const roleRows=KapaCapacity.productivity(model,members.map(row=>row.person.id),roleTarget,state.fte);
+    const groupTitle=forecastFilter.type==='person'||!members.length?`<strong>${esc(name)}</strong>`:`<button type="button" class="pt-button pt-button--subtle kapa-productivity-toggle" aria-expanded="${expanded}" data-role-id="${esc(id)}" onclick="toggleProductivityRole(this.dataset.roleId)"><span aria-hidden="true">${expanded?'▾':'▸'}</span> ${esc(name)}</button>`;
+    const group=`<tr><th scope="row">${groupTitle}<span class="sub">Rollenziel ${fmt(roleTarget)} % · ${members.length} ${members.length===1?'Person':'Personen'}</span></th>${roleRows.map(cell).join('')}</tr>`;
+    if(!expanded)return group;
+    return group+members.map(row=>{
+      const target=row.person.productivityTarget??roleTarget;
+      const periods=KapaCapacity.productivity(model,[row.person.id],target,state.fte);
+      return `<tr><th scope="row"><strong>${esc(row.person.name)}</strong><span class="sub">${fmt(row.person.fte)} % FTE · Ziel ${fmt(target)} %</span></th>${periods.map(cell).join('')}</tr>`;
+    }).join('');
+  }).join('');
+  const header='<div class="panelhead"><div><span class="section-kicker">PROJEKTARBEIT</span><h2>Produktivität und Personalbedarf</h2></div></div>';
+  if(!groups.size)return `<section class="panel kapa-productivity">${header}<p class="muted">Für diese Auswahl sind keine Personen vorhanden.</p></section>`;
+  const unassignedWon=source.portfolio.reduce((sum,period)=>sum+period.unassignedWon,0), unassignedExpected=source.portfolio.reduce((sum,period)=>sum+period.unassignedExpected,0);
+  const unassigned=unassignedWon||unassignedExpected?`<div class="pt-alert pt-alert--warning">Im gesamten Vorschauzeitraum nicht zugeordnet: gewonnen ${fmt(unassignedWon)} h · erwartet ${fmt(unassignedExpected)} h. Diese Stunden fehlen in den Rollen- und Personenwerten.</div>`:'';
+  return `<section class="panel kapa-productivity">${header}<p class="quiet">Geplante Projektstunden im Verhältnis zur FTE-Arbeitszeit. G = gewonnen, G+E = gewonnen und erwartet. Die Auswahl und der Zeitraum entsprechen der Kapazitätsvorschau.</p>${unassigned}<div class="kapa-timeline-scroll kapa-productivity-scroll" role="region" tabindex="0" aria-label="Produktivität nach Rolle und Zeitraum, horizontal scrollbar"><table class="pt-table kapa-productivity-table" style="--kapa-period-count:${model.columns.length}"><caption class="pt-visually-hidden">Projektproduktivität nach Rolle und Zeitraum</caption><colgroup><col class="kapa-productivity-label">${model.columns.map(()=>'<col class="kapa-productivity-period">').join('')}</colgroup><thead><tr><th scope="col">Rolle / Person</th>${model.columns.map(period=>`<th scope="col">${esc(period.label)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div><p class="quiet">Reserve und Mehrbedarf vergleichen G+E mit dem Produktivitätsziel. FTE-Werte sind rechnerische Äquivalente; bei 0 % Ziel ist keine Umrechnung möglich. Nicht zugewiesene Stunden sind keiner Person oder Rolle zugerechnet. SAP-Iststunden, Feiertage und Abwesenheiten sind nicht enthalten.</p></section>`;
+}
 
 function scopedForecast(model) {
   if(forecastFilter.type==='person') {
