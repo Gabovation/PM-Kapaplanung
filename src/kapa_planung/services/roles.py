@@ -30,6 +30,15 @@ def validate_roles(snapshot: dict) -> None:
             raise ValueError("Rollen müssen eindeutige IDs und Bezeichnungen haben.")
         ids.add(key)
         names.add(name.casefold())
+    favorites = snapshot.get('roleFavorites')
+    if favorites is not None:
+        if not isinstance(favorites, dict):
+            raise ValueError('Ungültige Rollenfavoriten.')
+        for role_id, distribution in favorites.items():
+            if (role_id not in ids or not isinstance(distribution, list) or len(distribution) != 4
+                    or not all(isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 100 for value in distribution)
+                    or sum(distribution) != 100):
+                raise ValueError('Jeder Rollenfavorit benötigt vier ganze Prozentwerte mit zusammen 100 %.')
     people = snapshot.get("people")
     if not isinstance(people, list):
         raise ValueError("Ungültige Personenliste.")

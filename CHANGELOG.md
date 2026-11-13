@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.7 – 13.11.2026
+- Gate-Favoriten können für jede Planungsrolle getrennt hinterlegt werden. Bei neuen Projekten werden die Favoriten für PL und QVP unabhängig vorbelegt.
+- Projekte besitzen separate Gate-Verteilungen für PL und QVP; bestehende Projekte verwenden unverändert ihre bisherige Verteilung, bis sie gezielt geändert wird.
+
 ## 0.10.6 – 13.11.2026
 - Kapazitätsvorschau nach Gesamtteam, Rolle oder ausgewählter Person filterbar gemacht. Ein Klick auf eine Person in der Teamübersicht zeigt deren Verlauf.
 - Matrix unter dem Diagramm nach Rollen gruppiert; Gruppen lassen sich aufklappen und weisen auch auf einzelne überlastete Personen hin.

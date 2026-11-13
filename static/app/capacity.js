@@ -38,7 +38,7 @@ const KapaCapacity = (()=>{
         }
       }
       if(project.qvpBudget>0) {
-        const qualityPlan={...project,budget:project.qvpBudget,weights:{},changes:[],hourPlan:undefined};
+        const qualityPlan={...project,budget:project.qvpBudget,percent:project.qvpPercent??project.percent,weights:{},changes:[],hourPlan:undefined};
         const target=loads.get(project.qvpPerson)||unassigned;
         const category=project.status==='Gewonnen'?won.get(project.qvpPerson):project.status==='Erwartet'?expected.get(project.qvpPerson):null;
         for(const [day,hours] of Object.entries(KapaHours.materialize(qualityPlan).daily)) {

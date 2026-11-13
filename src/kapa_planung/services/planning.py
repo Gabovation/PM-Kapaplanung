@@ -24,6 +24,11 @@ def validate_assignments(snapshot: dict) -> None:
         qvp = project.get('qvpPerson', '')
         share = project.get('leadPercent', 100)
         budget = project.get('qvpBudget', 0)
+        if 'qvpPercent' in project:
+            distribution = project['qvpPercent']
+            if (not isinstance(distribution, list) or len(distribution) != 4
+                    or not all(_whole(value, 100) for value in distribution) or sum(distribution) != 100):
+                raise ValueError('Die QVP-Gate-Verteilung benötigt vier ganze Prozentwerte mit zusammen 100 %.')
         if not isinstance(second, str) or not isinstance(qvp, str):
             raise ValueError('Ungültige Projektzuweisung.')
         if not _whole(share, 100) or not _whole(budget):
