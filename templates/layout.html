@@ -11,16 +11,16 @@
 {{ ops.navigation_item("Projekte", url_for("index") ~ "#projects", "work-order") }}
 {{ ops.navigation_divider() }}
 {{ ops.navigation_item("Personen", url_for("index") ~ "#people", "user") }}
-{{ ops.navigation_item("Einstellungen", url_for("index") ~ "#settings", "parameters") }}
-{% if server_auth_enabled %}{{ ops.navigation_item("Passwort ändern", url_for("change_password"), "user", active=active_nav == 'password') }}{% endif %}
+{{ ops.navigation_item("Einstellungen", url_for("index") ~ "#settings", "settings") }}
+{% if server_auth_enabled %}{{ ops.navigation_item("Passwort ändern", url_for("change_password"), "quality", active=active_nav == 'password') }}{% endif %}
 {% if server_auth_enabled and session.get('role') == 'admin' %}
 {{ ops.navigation_divider() }}
-{{ ops.navigation_item("Benutzerverwaltung", url_for("admin_users"), "user", active=active_nav == 'users') }}
+{{ ops.navigation_item("Benutzerverwaltung", url_for("admin_users"), "list", active=active_nav == 'users') }}
 {% endif %}
 {% endblock %}
 {% block mobile_navigation %}
 {{ ops.mobile_navigation_item("Übersicht", url_for("index") ~ "#overview", "dashboard", active=true) }}
 {{ ops.mobile_navigation_item("Projekte", url_for("index") ~ "#projects", "work-order") }}
 {{ ops.mobile_navigation_item("Personen", url_for("index") ~ "#people", "user") }}
-{{ ops.mobile_navigation_item("Einstellungen", url_for("index") ~ "#settings", "parameters") }}
+{{ ops.mobile_navigation_item("Einstellungen", url_for("index") ~ "#settings", "settings") }}
 {% endblock %}

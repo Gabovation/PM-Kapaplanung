@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.10 – 13.11.2026
+- Navigationssymbole für Einstellungen, Passwortänderung und Benutzerverwaltung unterscheidbar zugeordnet.
+
 ## 0.10.9 – 13.11.2026
 - Separate Tabelle „Produktivität und Personalbedarf“ aus der Übersicht entfernt; die Kapazitätsvorschau und vorhandene Zielwerte bleiben erhalten.
 

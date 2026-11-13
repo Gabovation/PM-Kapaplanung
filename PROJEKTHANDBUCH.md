@@ -6,6 +6,10 @@ Der Windows-Dienst heißt `PMcapacityplaning`, verwendet Port 8002 und ist für 
 
 ## Benutzerverwaltung und Anmeldung
 
+Die Navigation verwendet für Personen das Personensymbol, für Einstellungen das Zahnrad, für die Passwortänderung ein Schutzschild und für die Benutzerverwaltung eine Liste. Die Symbole stammen aus dem vorhandenen POLYTEC-UI-Kit; Beschriftungen und Tooltipps bleiben verfügbar.
+
+Lessons Learned: Ähnliche Navigationspunkte benötigen unterscheidbare Symbole und beschriftete Ziele, besonders bei eingeklappter Navigation.
+
 Administratoren öffnen links die **Benutzerverwaltung**. Dort legen sie Konten an, weisen PL, QVP oder HO PM zu, ändern Rollen, sperren Konten und setzen Passwörter zurück. Diese Fachrollen haben vorerst dieselben Rechte für alle Planungsfunktionen; die Benutzerverwaltung bleibt Administratoren vorbehalten. Bestehende Konten der älteren Berechtigungsstufen bleiben verwendbar und behalten ihre bisherigen Rechte. Bei einer Rollenänderung muss sich die betroffene Person erneut anmelden. Benutzerkonten sind unabhängig von den als Ressourcen gepflegten Personen in der Planung.
 
 Beim Anlegen und Zurücksetzen vergibt die Administration ein Einmalpasswort mit mindestens acht Zeichen. Die Person muss nach der Anmeldung ein anderes persönliches Passwort festlegen und sich damit neu anmelden. Bis dahin sind Planungsdaten und Verwaltungsfunktionen gesperrt. Die Benutzerverwaltung zeigt eine ausstehende Passwortänderung an. Vorhandene Konten ohne diese Kennzeichnung bleiben unverändert. Alle angemeldeten Personen können ihr Passwort jederzeit über „Passwort ändern“ in der Navigation oder in den Einstellungen ändern. Ein Passwortwechsel beendet bestehende Sitzungen des betreffenden Kontos.

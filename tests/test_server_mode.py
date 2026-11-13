@@ -53,6 +53,9 @@ def test_anonymous_login_csrf_and_bad_host(server):
     assert login(client, password='wrong-password').status_code == 401
     assert login(client).status_code == 302
     assert client.get('/').status_code == 200
+    html = client.get('/').get_data(as_text=True)
+    assert 'title="Passwort ändern"' in html and '#pt-icon-quality' in html
+    assert 'title="Benutzerverwaltung"' in html and '#pt-icon-list' in html
 
 
 def test_authenticated_save_csrf_revision_and_isolated_collections(server):
