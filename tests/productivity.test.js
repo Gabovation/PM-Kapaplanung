@@ -24,6 +24,8 @@ assert.equal(run('week.portfolio[0].unassignedExpected'),2);
 run("currentPeriod=()=>date('2026-11-09')");
 assert.match(run('overview()'),/Gewonnene Projektstunden<\/div><div class="value">12 <small>h<\/small><\/div><div class="caption">Gesamtbudget · 09\.11\.26 – 15\.11\.26: 12 h/);
 assert.match(run('overview()'),/Erwartete Projektstunden<\/div><div class="value">8 <small>h<\/small><\/div><div class="caption">Gesamtbudget · 09\.11\.26 – 15\.11\.26: 8 h/);
+assert.doesNotMatch(run('overview()'),/Produktivität und Personalbedarf/);
+assert.match(run('overview()'),/Kapazität und Engpässe/);
 assert.equal(run('pl.capacity'),60);
 assert.equal(run('pl.target'),42);
 assert.equal(run('pl.planned'),10);

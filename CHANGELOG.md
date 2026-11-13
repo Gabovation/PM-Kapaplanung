@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.9 – 13.11.2026
+- Separate Tabelle „Produktivität und Personalbedarf“ aus der Übersicht entfernt; die Kapazitätsvorschau und vorhandene Zielwerte bleiben erhalten.
+
 ## 0.10.8 – 13.11.2026
 - Projektstunden nach gewonnen und erwartet als Gesamtbudget und im gewählten Zeitraum ergänzt.
 - Produktivitätsvorschau für Rollen und Personen mit individuell einstellbaren Zielen, Planungsreserve und rechnerischem FTE-Mehrbedarf ergänzt.

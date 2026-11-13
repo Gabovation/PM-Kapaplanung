@@ -38,6 +38,8 @@ Lessons Learned: Bei gefilterten Grafiken müssen Zähler, FTE-Nenner und Engpas
 
 ## Projektstunden und Produktivität
 
+Die separate Tabelle „Produktivität und Personalbedarf“ wurde auf Wunsch wieder aus der Übersicht entfernt. Die nachfolgenden Erläuterungen zur Tabelle beschreiben den bisherigen Stand; vorhandene Zielwerte und die bestehende Kapazitätsvorschau bleiben erhalten.
+
 Die Übersicht zeigt Projektstunden für gewonnene und erwartete Projekte getrennt als vollständiges Budget und für die ausgewählte Woche beziehungsweise den ausgewählten Monat. Enthalten sind PL-Basisstunden, PL-Planwertänderungen und QVP-Stunden, auch wenn sie noch keiner Person zugeordnet sind.
 
 Im Bereich „Produktivität und Personalbedarf“ zeigen Wochen beziehungsweise Monate je Rolle und auf Wunsch je Person die geplanten gewonnenen Stunden, gewonnenen plus erwarteten Stunden, FTE-Arbeitszeit, Zielkapazität sowie Reserve oder Mehrbedarf. Das Prozent ist die Summe der geplanten gewonnenen und erwarteten Stunden geteilt durch die FTE-Arbeitszeit. Das Ziel steuert ausschließlich diesen zusätzlichen Vergleich, nicht die bestehende Engpassberechnung. Standardziel je Rolle sind 80 %. Unter Einstellungen → Rollen → Bearbeiten ist es anpassbar. Beim Bearbeiten einer Person kann ein eigener Wert gesetzt werden; ein leeres Feld übernimmt das Rollenziel. Beide Werte liegen zwischen 0 und 100 %. Alte Daten ohne die optionalen Felder behalten den 80-%-Standard beziehungsweise die Rollenvererbung.
