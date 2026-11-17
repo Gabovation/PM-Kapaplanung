@@ -287,7 +287,7 @@ Die Einstellungen trennen Datensicherung und SAP-Istabgleich in eigene Bereiche.
 
 Unter ?SAP-Stunden? lesen Projektleiter XLSX-Exporte mit den Spalten Nachname Vorname, Personalnummer, Empf?nger-PSP-Element, Datum, Anzahl (Ma?einheit), Interne Ma?einheit und Kontierungstext ein. Der Server verarbeitet die Datei vor?bergehend im Speicher; die Excel-Datei selbst wird nicht gespeichert. SAP-Summenzeilen ohne Datum, Name, PSP und Kontierungstext werden nur dann ?bersprungen, wenn ihre Summe den vorangehenden Buchungen entspricht. Andere ung?ltige Buchungen blockieren den Import. Die unterst?tzte Einheit ist H; Dezimalstunden und negative Korrekturen bleiben erhalten.
 
-Beim PSP `10-02763-000-99` werden die letzten beiden Segmente abgetrennt: `10-02763` ist die Projektnummer, `99` die Abteilung. Die Zuordnung erfolgt anhand der vollst?ndigen Projektnummer und nur bei genau einem passenden Projekt. Fehlende, ung?ltige und mehrdeutige Zuordnungen bleiben gespeichert, werden gez?hlt und nicht in Projektsummen eingerechnet. Eine sp?tere Projektanlage beziehungsweise Korrektur der Projektnummer kann die Zuordnung erm?glichen. Die Abteilungsnummer und Personalnummer bleiben pro Zeile erhalten. Das System verkn?pft SAP-Personalnummern noch nicht mit Planungspersonen und unterscheidet PL- und QVP-Istbudgets noch nicht; importierte Abteilungen werden im Projekt zusammengefasst.
+Beim neuen PSP `10-02763-000-99` werden die letzten beiden Segmente abgetrennt: `10-02763` ist die Projektnummer, `99` die Abteilung. Die Zuordnung erfolgt anhand der vollst?ndigen Projektnummer und nur bei genau einem passenden Projekt. Fehlende, ung?ltige und mehrdeutige Zuordnungen bleiben gespeichert, werden gez?hlt und nicht in Projektsummen eingerechnet. Eine sp?tere Projektanlage beziehungsweise Korrektur der Projektnummer kann die Zuordnung erm?glichen. Die Abteilungsnummer und Personalnummer bleiben pro Zeile erhalten. Das System verkn?pft SAP-Personalnummern noch nicht mit Planungspersonen und unterscheidet PL- und QVP-Istbudgets noch nicht; importierte Abteilungen werden im Projekt zusammengefasst.
 
 Vor der ?bernahme erscheint eine Vorschau. Der Export muss je enthaltener Kombination aus Personalnummer und Buchungsdatum vollst?ndig sein. Bei der ?bernahme ersetzen seine Zeilen die zuvor f?r dieselbe Kombination gespeicherten Zeilen; andere Kombinationen bleiben erhalten. Wiederholte identische Zeilen innerhalb eines Exports k?nnen verschiedene Buchungen sein und bleiben erhalten. Tage, die im Export ?berhaupt nicht vorkommen, werden nicht gel?scht. Enth?lt ein sp?terer Export f?r eine Person und einen Tag nur einen Teil der Buchungen, w?rden ?brige Buchungen dieses Tages ersetzt; deshalb ist diese Vollst?ndigkeit Voraussetzung und wird in der Vorschau ausdr?cklich genannt. Eine L?schung aller Buchungen eines Tages, der im Export nicht mehr vorkommt, ist derzeit nicht m?glich. Buchungen ohne PSP bleiben ungeordnet erhalten.
 
@@ -318,3 +318,15 @@ Lokale Pr?fung: 107 Python-Tests, zehn JavaScript-Testgruppen und der mitgeliefe
 - Ein erfolgreiches lokales Paket- und Anwendungstesting ersetzt keine Installation mit dem tats?chlichen Serverinterpreter und Dienstkonto.
 - Das bestehende Online-Update installiert aus `requirements.txt`, nicht aus der Lockdatei; eine vorhandene Lockdatei allein belegt daher keine reproduzierbare Offlineinstallation.
 - Ein aktiver Dienst und ein erfolgreicher Healthcheck belegen nicht, dass der erwartete Commit und der Excel-Import funktionieren.
+
+
+## SAP: alte und neue PSP-Formate
+
+Beim alten PSP `41-22-030-00-00-99` lautet die Projektnummer `41-22-030`; die drei nachfolgenden Segmente gehören nicht zur Projektnummer. Die letzten zwei Ziffern `99` stehen für Projektmanagement. Das neue Format `10-02763-000-99` wird weiterhin dem Projekt `10-02763` und der Abteilung `99` zugeordnet. Ein Projekt wird nur bei einer eindeutigen vorhandenen Projektnummer zugeordnet.
+
+Früher gespeicherte Altformat-Buchungen mit der damaligen Zuordnung `41-22-030-00` werden weiterhin akzeptiert; die Anzeige und Auswertung leiten die korrekte Nummer aus dem unverändert gespeicherten PSP ab. Das ermöglicht den Abgleich ohne Datenmigration oder erneuten Import.
+
+### Lessons Learned
+
+- Unterschiedliche PSP-Formate dürfen nicht pauschal durch Abtrennen einer festen Zahl von Segmenten interpretiert werden. Beispiele aus beiden Formaten gehören in die Tests.
+- Bereits gespeicherte Buchungen müssen nach einer Zuordnungskorrektur lesbar und speicherbar bleiben.

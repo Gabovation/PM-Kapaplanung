@@ -64,3 +64,21 @@ def test_validate_actuals_rejects_inconsistent_project_number():
     row['projectNumber'] = '10-99999'
     with pytest.raises(ValueError, match='PSP'):
         validate_actuals({'sapActuals': [row]})
+
+
+def test_legacy_psp_uses_three_project_segments_and_department():
+    assert project_from_psp('41-22-030-00-00-99') == ('41-22-030', '99')
+    assert project_from_psp('41-22-104-00-00-99') == ('41-22-104', '99')
+    row = ['Test', '123', '41-22-030-00-00-99', datetime(2026, 10, 1), 7.75, 'H', 'Projektmanagement']
+    assert read_export(workbook([row]))[0]['projectNumber'] == '41-22-030'
+
+
+def test_previously_imported_legacy_psp_remains_valid():
+    from kapa_planung.services.sap_import import validate_actuals
+    row = read_export(workbook([['Test', '123', '41-22-030-00-00-99', datetime(2026, 10, 1), 1, 'H', 'Projekt']]))[0]
+    validate_actuals({'sapActuals': [row]})
+    row['projectNumber'] = '41-22-030-00'
+    validate_actuals({'sapActuals': [row]})
+    row['projectNumber'] = '41-22-031'
+    with pytest.raises(ValueError, match='PSP'):
+        validate_actuals({'sapActuals': [row]})

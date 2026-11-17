@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import fs from 'node:fs';
 
@@ -16,3 +16,8 @@ assert.equal(run('sapProjectData(state.projects[0]).actual'),16);
 run(`state.projects.push({...state.projects[0],id:'duplicate'})`);
 assert.equal(run('sapProjectData(state.projects[0])'),null);
 console.log('SAP: Hochrechnung, Austausch je Person/Datum, identische Zeilen und Mehrdeutigkeiten geprüft.');
+
+run(`state.projects=[{id:'legacy',number:'41-22-030'}]; state.sapActuals=[{psp:'41-22-030-00-00-99',projectNumber:'41-22-030-00',department:'99',hours:1}]`);
+assert.equal(run('sapMatches(state.sapActuals[0])[0].id'),'legacy');
+run(`state.projects.push({id:'wrong',number:'41-22-030-00'})`);
+assert.equal(run('sapMatches(state.sapActuals[0]).length'),1);

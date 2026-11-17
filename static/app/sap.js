@@ -3,8 +3,10 @@ let sapPending = null;
 const sapFormat = n => Number(n).toLocaleString('de-AT',{maximumFractionDigits:2});
 const sapRows = () => Array.isArray(state.sapActuals) ? state.sapActuals : [];
 function sapMatches(row) {
-  if (!row.projectNumber) return [];
-  return state.projects.filter(p => String(p.number).trim().toLowerCase() === row.projectNumber.trim().toLowerCase());
+  const legacy = typeof row.psp === 'string' && row.psp.trim().match(/^([0-9]{2}-[0-9]{2}-[0-9]{3})-[0-9]{2}-[0-9]{2}-([0-9]{2})$/);
+  const number = legacy ? legacy[1] : row.projectNumber;
+  if (!number) return [];
+  return state.projects.filter(p => String(p.number).trim().toLowerCase() === number.trim().toLowerCase());
 }
 function sapProjectData(project) {
   const rows = sapRows().filter(row => { const matches=sapMatches(row); return matches.length===1 && matches[0].id===project.id; });

@@ -15,10 +15,14 @@ HEADERS = ('Nachname Vorname', 'Personalnummer', 'Empfänger-PSP-Element', 'Datu
 MAX_EXPANDED = 30_000_000
 MAX_ROWS = 10_000
 PSP = re.compile(r'^(.+)-([0-9]+)-([0-9]+)$')
+LEGACY_PSP = re.compile(r'^([0-9]{2}-[0-9]{2}-[0-9]{3})-[0-9]{2}-[0-9]{2}-([0-9]{2})$')
 
 
 def project_from_psp(value: str) -> tuple[str, str] | None:
     """Separate project and department; retain the complete project part exactly."""
+    legacy = LEGACY_PSP.fullmatch(value.strip())
+    if legacy:
+        return legacy.group(1), legacy.group(2)
     match = PSP.fullmatch(value.strip())
     return (match.group(1), match.group(3)) if match else None
 
@@ -91,25 +95,31 @@ def validate_actuals(snapshot: dict) -> None:
     """Validate optional imported rows in ordinary writes and restored backups."""
     rows = snapshot.get('sapActuals', [])
     if not isinstance(rows, list) or len(rows) > MAX_ROWS:
-        raise ValueError('Ung?ltige Anzahl SAP-Buchungen.')
+        raise ValueError('Ung\u00fcltige Anzahl SAP-Buchungen.')
     for row in rows:
         if not isinstance(row, dict):
-            raise ValueError('Ung?ltige SAP-Buchung.')
+            raise ValueError('Ung\u00fcltige SAP-Buchung.')
         for key in ('name', 'personnelNumber', 'psp', 'description'):
             if not isinstance(row.get(key), str) or len(row[key]) > 500:
-                raise ValueError('Ung?ltige Angaben in einer SAP-Buchung.')
+                raise ValueError('Ung\u00fcltige Angaben in einer SAP-Buchung.')
         if not row['personnelNumber']:
-            raise ValueError('Eine SAP-Buchung ben?tigt eine Personalnummer.')
+            raise ValueError('Eine SAP-Buchung ben\u00f6tigt eine Personalnummer.')
         for key in ('projectNumber', 'department'):
             if row.get(key) is not None and (not isinstance(row[key], str) or len(row[key]) > 500):
-                raise ValueError('Ung?ltige PSP-Zuordnung.')
-        if project_from_psp(row['psp']) != ((row['projectNumber'], row['department']) if row.get('projectNumber') is not None else None):
-            raise ValueError('Die PSP-Zuordnung stimmt nicht mit dem PSP-Element ?berein.')
+                raise ValueError('Ung\u00fcltige PSP-Zuordnung.')
+        stored = (row['projectNumber'], row['department']) if row.get('projectNumber') is not None else None
+        current = project_from_psp(row['psp'])
+        # Older imports stripped two segments even for legacy PSPs. Keep them
+        # loadable and editable; the UI derives the corrected project from PSP.
+        old = PSP.fullmatch(row['psp'].strip()) if LEGACY_PSP.fullmatch(row['psp'].strip()) else None
+        old_mapping = (old.group(1), old.group(3)) if old else None
+        if stored != current and (not old or stored != old_mapping):
+            raise ValueError('Die PSP-Zuordnung stimmt nicht mit dem PSP-Element \u00fcberein.')
         try:
             if date.fromisoformat(row['date']).isoformat() != row['date']:
                 raise ValueError
         except (KeyError, TypeError, ValueError):
-            raise ValueError('Ung?ltiges SAP-Buchungsdatum.') from None
+            raise ValueError('Ung\u00fcltiges SAP-Buchungsdatum.') from None
         hours = row.get('hours')
         if isinstance(hours, bool) or not isinstance(hours, (float, int)) or not isfinite(hours) or abs(hours) > 10000:
-            raise ValueError('Ung?ltige SAP-Stundenzahl.')
+            raise ValueError('Ung\u00fcltige SAP-Stundenzahl.')
