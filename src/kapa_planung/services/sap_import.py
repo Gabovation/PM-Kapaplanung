@@ -93,6 +93,38 @@ def read_export(data: bytes) -> list[dict]:
 
 def validate_actuals(snapshot: dict) -> None:
     """Validate optional imported rows in ordinary writes and restored backups."""
+    departments = snapshot.get('sapDepartments')
+    if departments is not None:
+        codes = departments.get('qvp') if isinstance(departments, dict) else None
+        if (not isinstance(codes, list) or len(codes) > 20
+                or any(not isinstance(code, str) or not re.fullmatch(r'[0-9A-Za-z]{1,10}', code) for code in codes)):
+            raise ValueError('Ung\u00fcltige QVP-Abteilungscodes.')
+    for project in snapshot.get('projects', []):
+        pending = project.get('changePending') if isinstance(project, dict) else None
+        if pending is not None:
+            try:
+                ok = (isinstance(pending, dict) and date.fromisoformat(pending['date']).isoformat() == pending['date']
+                      and date.fromisoformat(pending['cutoff']).isoformat() == pending['cutoff']
+                      and isinstance(pending['hours'], int) and not isinstance(pending['hours'], bool)
+                      and 0 <= pending['hours'] <= 1_000_000)
+            except (KeyError, TypeError, ValueError):
+                ok = False
+            if not ok:
+                raise ValueError('Ung\u00fcltiger Hinweis zur Planwert\u00e4nderung.')
+        balance = project.get('sapBalance') if isinstance(project, dict) else None
+        if balance is None:
+            continue
+        daily = balance.get('daily') if isinstance(balance, dict) else None
+        try:
+            valid = (isinstance(daily, dict) and len(daily) <= 3700
+                     and date.fromisoformat(balance.get('cutoff')).isoformat() == balance['cutoff']
+                     and all(date.fromisoformat(day).isoformat() == day and isinstance(hours, int)
+                             and not isinstance(hours, bool) and abs(hours) <= 1_000_000
+                             for day, hours in daily.items()))
+        except (TypeError, ValueError):
+            valid = False
+        if not valid:
+            raise ValueError('Ung\u00fcltiger SAP-Istabgleich.')
     rows = snapshot.get('sapActuals', [])
     if not isinstance(rows, list) or len(rows) > MAX_ROWS:
         raise ValueError('Ung\u00fcltige Anzahl SAP-Buchungen.')

@@ -82,3 +82,38 @@ def test_previously_imported_legacy_psp_remains_valid():
     row['projectNumber'] = '41-22-031'
     with pytest.raises(ValueError, match='PSP'):
         validate_actuals({'sapActuals': [row]})
+
+
+def test_department_settings_are_validated():
+    from kapa_planung.services.sap_import import validate_actuals
+    validate_actuals({'sapDepartments': {'qvp': ['41', 'Q1']}})
+    for bad in ({'qvp': 'x'}, {'qvp': ['a b']}, {'qvp': [1]}, [], {'qvp': ['1'] * 21}):
+        try:
+            validate_actuals({'sapDepartments': bad})
+        except ValueError:
+            continue
+        raise AssertionError(bad)
+
+
+def test_sap_balance_is_validated():
+    from kapa_planung.services.sap_import import validate_actuals
+    validate_actuals({'projects': [{'sapBalance': {'cutoff': '2026-01-31', 'daily': {'2026-02-01': 5, '2026-02-02': -3}}}, {}]})
+    for bad in ({'cutoff': 'x', 'daily': {}}, {'cutoff': '2026-01-31', 'daily': {'2026-02-01': 1.5}},
+                {'cutoff': '2026-01-31', 'daily': {'2026-13-01': 1}}, {'cutoff': '2026-01-31'}, 'x'):
+        try:
+            validate_actuals({'projects': [{'sapBalance': bad}]})
+        except ValueError:
+            continue
+        raise AssertionError(bad)
+
+
+def test_pending_change_flag_is_validated():
+    from kapa_planung.services.sap_import import validate_actuals
+    validate_actuals({'projects': [{'changePending': {'date': '2026-11-17', 'cutoff': '2026-11-13', 'hours': 40}}]})
+    for bad in ({'date': 'x', 'cutoff': '2026-11-13', 'hours': 1}, {'date': '2026-11-17', 'cutoff': '2026-11-13'},
+                {'date': '2026-11-17', 'cutoff': '2026-11-13', 'hours': -1}, 'x'):
+        try:
+            validate_actuals({'projects': [{'changePending': bad}]})
+        except ValueError:
+            continue
+        raise AssertionError(bad)

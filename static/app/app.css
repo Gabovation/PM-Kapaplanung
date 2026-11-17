@@ -48,6 +48,15 @@
 .kapa-favorite-row {display:grid;grid-template-columns:minmax(9rem,2fr) repeat(4,minmax(4.5rem,1fr)) auto;align-items:end;gap:var(--polytec-space-3);margin-top:var(--polytec-space-3)}
 .kapa-favorite-row .pt-field {min-width:0}
 @media(max-width:64rem){.kapa-favorite-row{grid-template-columns:repeat(4,minmax(0,1fr))}.kapa-favorite-row > .pt-field:first-child,.kapa-favorite-row > button{grid-column:1/-1;justify-self:start}.kapa-favorite-row > .pt-field:first-child{justify-self:stretch}}
+.kapa-phase-actual {display:grid;gap:var(--polytec-space-1);margin-top:var(--polytec-space-2);padding-top:var(--polytec-space-2);border-top:1px solid var(--polytec-color-border-default);font-size:.875rem}
+.kapa-sap-over {color:var(--polytec-color-status-danger)}
+.kapa-sap-codes {display:flex;flex-wrap:wrap;align-items:end;gap:var(--polytec-space-3);margin-block:var(--polytec-space-3)}
+.kapa-sap-codes .pt-field {flex:0 1 20rem}
+.kapa-hours-table .kapa-source-balance th {border-left:var(--polytec-space-1) solid var(--polytec-color-status-warning)}
+.kapa-sap-balance {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--polytec-space-3);margin-block:var(--polytec-space-3)}
+.kapa-sap-actions {display:flex;flex-wrap:wrap;gap:var(--polytec-space-2)}
+.kapa-gate-confirm {display:flex;align-items:center;gap:var(--polytec-space-2);margin-top:var(--polytec-space-2);font-weight:600}
+#gateWarning:not(:empty) {margin-top:var(--polytec-space-3)}
 .kapa-version {font-size:.75rem;white-space:nowrap;opacity:.85}
 .field.full {grid-column:1/-1}
 .card,.panel {background:var(--polytec-color-surface-panel);border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);padding:var(--polytec-space-4)}

@@ -22,7 +22,7 @@ function gateMarkerLayout(project, columns) {
 function hoursChart(rows, columns, chartId, project=null) {
   const data=KapaHours.summary(rows,columns), labelWidth=192, periodWidth=96, width=labelWidth+periodWidth*columns.length;
   const markers=gateMarkerLayout(project,columns);
-  const top=markers.length?54+Math.max(...markers.map(marker=>marker.lane))*32:30, bottom=top+142, ceiling=Math.max(4,Math.ceil(Math.max(0,...data.map(item=>item.total))/4)*4);
+  const top=markers.length?54+Math.max(...markers.map(marker=>marker.lane))*32:30, bottom=top+142, ceiling=Math.max(4,Math.ceil(Math.max(0,...data.map(item=>Math.max(item.total,item.base+item.change)))/4)*4);
   const y=value=>bottom-(bottom-top)*value/ceiling;
   const grid=Array.from({length:5},(_,i)=>{
     const value=ceiling*i/4, at=y(value);
@@ -30,9 +30,9 @@ function hoursChart(rows, columns, chartId, project=null) {
   }).join('');
   const bars=data.map((item,index)=>{
     const x=labelWidth+(index+.5)*periodWidth;
-    return `<g><title>${esc(item.title)}: Basis ${item.base} h, Planwertänderung ${item.change} h, Gesamt ${item.total} h</title>
+    return `<g><title>${esc(item.title)}: Basis ${item.base} h, Planwertänderung ${item.change} h${item.adjust?`, SAP-Istabgleich ${item.adjust>0?'+':''}${item.adjust} h`:''}, Gesamt ${item.total} h</title>
       <rect class="kapa-hours-base" x="${x-15}" y="${y(item.base)}" width="30" height="${bottom-y(item.base)}"/>
-      <rect class="kapa-hours-change" x="${x-15}" y="${y(item.total)}" width="30" height="${y(item.base)-y(item.total)}"/>
+      <rect class="kapa-hours-change" x="${x-15}" y="${y(item.base+item.change)}" width="30" height="${y(item.base)-y(item.base+item.change)}"/>
       <circle class="kapa-hours-point" cx="${x}" cy="${y(item.total)}" r="3"/>
       <text class="kapa-hours-reading" x="${x}" y="${Math.max(14,y(item.total)-9)}" text-anchor="middle">${item.total}</text></g>`;
   }).join('');
@@ -62,7 +62,7 @@ function hoursTimeline(rows, columns, editable=false, project=null) {
       <table class="pt-table kapa-hours-table"><caption class="pt-visually-hidden">${editable?'Ganze Stunden pro Zeitraum bearbeiten':'Geplante Stunden pro Zeitraum'}</caption>
       <colgroup><col class="kapa-hours-label-column">${columns.map(()=>'<col class="kapa-hours-period-column">').join('')}</colgroup>
       <thead><tr><th scope="col">${editable?'Stunden je Phase':'Phase'}</th>${columns.map(period=>`<th scope="col" title="${esc(period.title)}">${esc(period.label)}</th>`).join('')}</tr></thead>
-      <tbody>${rows.map((row,rowIndex)=>`<tr class="${row.kind==='change'?'kapa-source-change':''}"><th scope="row"><strong>${esc(row.label)}</strong><span class="sub">Budget: ${row.budget} h</span>${editable?`<span id="fine-row-${rowIndex}" class="pt-status"></span><button class="pt-button pt-button--subtle" type="button" onclick="balanceFineRow(${rowIndex})">Ausgleichen</button>`:''}</th>
+      <tbody>${rows.map((row,rowIndex)=>`<tr class="${row.kind==='change'?'kapa-source-change':row.kind==='balance'?'kapa-source-balance':''}"><th scope="row"><strong>${esc(row.label)}</strong><span class="sub">${row.kind==='balance'?`Verschiebung: ${row.budget>0?'+':''}${row.budget} h`:`Budget: ${row.budget} h`}</span>${editable?`<span id="fine-row-${rowIndex}" class="pt-status"></span><button class="pt-button pt-button--subtle" type="button" onclick="balanceFineRow(${rowIndex})">Ausgleichen</button>`:''}</th>
         ${columns.map((period,columnIndex)=>{
           const active=KapaHours.activeDays(row,period).length>0, value=KapaHours.periodTotal(row,period);
           const locked=project&&active&&sapPeriodLocked(project,period);
@@ -78,7 +78,8 @@ function hoursTimeline(rows, columns, editable=false, project=null) {
 
 function projectHoursSection(project) {
   const granularity=detailGranularity||KapaHours.defaultGranularity(project);
-  const rows=KapaHours.sources(project), columns=KapaHours.periods(project,granularity);
+  const rows=KapaHours.sources(project), columns=KapaHours.periods(project,granularity), balance=sapBalanceRow(project);
+  if(balance) rows.push(balance);
   return `<section class="panel"><div class="panelhead"><div><span class="section-kicker">FEINPLANUNG</span><h2>PL-Stundenverlauf</h2></div><div class="actions">${grainSelector('project-grain',granularity,'setProjectGranularity')}<button class="secondary" onclick="editHours('${project.id}')">Verlauf bearbeiten</button></div></div>
   ${hoursLegend()}${hoursTimeline(rows,columns,false,project)}</section>`;
 }

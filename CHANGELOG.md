@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.12 – 17.11.2026
+- SAP-Ist kann nach PL und QVP getrennt angesehen werden; die QVP-Abteilungscodes werden unter Einstellungen → SAP-Stunden hinterlegt.
+- Budgetverteilung zeigt je Gate-Phase Ist gegen Plan sowie Planwertänderungen.
+- SAP-Istabgleich: Nach dem Import wird die Differenz zwischen Ist (PL) und Plan bis zum Stichtag auf die Restlaufzeit verteilt. Bei Mehraufwand wahlweise eine Planwertänderung vormerken (Hinweis am Projekt, kein Eintrag im Plan) oder die Restlaufzeit kürzen. Die Verschiebung erscheint als eigene Zeile im Stundenverlauf.
+
+- Gates dürfen am selben Tag liegen, wenn der Hinweis im Projektformular bestätigt wird. Die Phase ohne Tage erhält kein Budget; ihr Anteil wird im Verhältnis auf die übrigen Phasen verteilt.
+
 ## 0.10.11 – 17.11.2026
 - SAP-Ist je Zeitraum in der Stundentabelle; bereits durch SAP-Ist abgedeckte Zeiträume sind im Stundenverlauf gesperrt.
 - Formular-Schaltflächen (Benutzer anlegen, Passwort zurücksetzen/ändern) stehen nach dem Designsystem in einer eigenen Aktionszeile; Aktionsgruppen und Zeilen richten sich einheitlich aus.

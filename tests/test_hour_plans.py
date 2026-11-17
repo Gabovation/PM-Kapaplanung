@@ -73,3 +73,30 @@ def test_api_validates_hour_sums_before_saving(client, monkeypatch):
     response = client.post('/api/data', json=data, headers={'X-Kapa-Token': web.TOKEN})
     assert response.status_code == 400
     assert not web.DATA.exists()
+
+
+def test_gates_on_the_same_day_redistribute_the_empty_phase():
+    from kapa_planung.services.planning import validate_hour_plans
+    base = {'budget': 300, 'percent': [20, 20, 20, 40], 'changes': [],
+            'dates': ['2026-01-01', '2026-02-01', '2026-02-01', '2026-04-01', '2026-05-01']}
+    def source(start, end, hours):
+        days = []
+        from datetime import date, timedelta
+        day = date.fromisoformat(start)
+        while day.isoformat() < end:
+            days.append(day.isoformat()); day += timedelta(days=1)
+        daily = {d: 0 for d in days}
+        for index in range(hours):
+            daily[days[index % len(days)]] += 1
+        return {'start': start, 'end': end, 'budget': hours, 'daily': {k: v for k, v in daily.items() if v}}
+    d = base['dates']
+    base['hourPlan'] = {'version': 1, 'granularity': 'week', 'sources': {
+        'phase-0': source(d[0], d[1], 75), 'phase-1': source(d[1], d[2], 0),
+        'phase-2': source(d[2], d[3], 75), 'phase-3': source(d[3], d[4], 150)}}
+    validate_hour_plans({'projects': [base]})
+    broken = dict(base, dates=['2026-01-01', '2026-03-01', '2026-02-01', '2026-04-01', '2026-05-01'])
+    try:
+        validate_hour_plans({'projects': [broken]})
+    except ValueError:
+        return
+    raise AssertionError('descending gates must stay invalid')

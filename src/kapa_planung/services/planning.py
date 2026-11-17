@@ -54,11 +54,18 @@ def validate_hour_plans(snapshot: dict) -> None:
                 or not isinstance(gates, list) or len(gates) != 5):
             raise ValueError("Ungültiges Projektbudget oder ungültige Gate-Verteilung.")
         gates = [_calendar(value) for value in gates]
-        if any(gates[index] >= gates[index + 1] for index in range(4)):
+        if any(gates[index] > gates[index + 1] for index in range(4)) or gates[0] >= gates[4]:
             raise ValueError("Die Gate-Termine müssen aufsteigend sein.")
         expected = {}
-        phase_hours = [budget * value // 100 for value in percent]
-        remainder_order = sorted(range(4), key=lambda index: (-(budget * percent[index] % 100), index))
+        # A phase whose gates share a date has no days; its share goes to the other phases.
+        is_open = [gates[index] < gates[index + 1] for index in range(4)]
+        weights = [value if is_open[index] else 0 for index, value in enumerate(percent)]
+        denominator = sum(weights)
+        if not denominator:
+            weights = [1 if flag else 0 for flag in is_open]
+            denominator = sum(weights)
+        phase_hours = [budget * value // denominator for value in weights]
+        remainder_order = sorted(range(4), key=lambda index: (-(budget * weights[index] % denominator), index))
         for index in remainder_order[:budget - sum(phase_hours)]:
             phase_hours[index] += 1
         for index, hours in enumerate(phase_hours):

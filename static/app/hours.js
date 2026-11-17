@@ -20,8 +20,13 @@ const KapaHours = (() => {
     return Object.fromEntries(allocate(total,active).flatMap((hours,index)=>hours ? [[days[index],hours]] : []));
   }
   function phaseBudgets(project) {
-    const products=project.percent.map(value=>project.budget*value), result=products.map(value=>Math.floor(value/100));
-    products.map((value,index)=>({index,remainder:value%100})).sort((a,b)=>b.remainder-a.remainder||a.index-b.index)
+    /* A phase whose gates share a date has no days: its share is redistributed over the other phases. */
+    const open=project.percent.map((value,index)=>project.dates[index]<project.dates[index+1]);
+    let weights=project.percent.map((value,index)=>open[index]?value:0), denominator=sum(weights);
+    if(!denominator) { weights=open.map(isOpen=>isOpen?1:0); denominator=sum(weights); }
+    if(!denominator) { weights=[...project.percent]; denominator=100; }
+    const products=weights.map(value=>project.budget*value), result=products.map(value=>Math.floor(value/denominator));
+    products.map((value,index)=>({index,remainder:value%denominator})).sort((a,b)=>b.remainder-a.remainder||a.index-b.index)
       .slice(0,project.budget-sum(result)).forEach(item=>result[item.index]++);
     return result;
   }
@@ -63,12 +68,18 @@ const KapaHours = (() => {
       const target=row.kind==='base'?dailyBase:dailyChange;
       target[date]=(target[date]||0)+hours;
     }
+    const dailyAdjust={};
+    for(const [date,hours] of Object.entries(project.sapBalance?.daily||{})) {
+      if(!Number.isInteger(hours)) continue;
+      dailyAdjust[date]=hours;
+      daily[date]=Math.max(0,(daily[date]||0)+hours);
+    }
     const weeks=[];
     for(let d=monday(day(project.dates[0]));key(d)<project.dates[4];d=next(d,7)) {
       const active=dates(key(d),key(next(d,7))), base=sum(active.map(date=>dailyBase[date]||0)), change=sum(active.map(date=>dailyChange[date]||0));
       weeks.push({week:key(d),base,change,total:base+change});
     }
-    return {weeks,daily,dailyBase,dailyChange,sources:rows};
+    return {weeks,daily,dailyBase,dailyChange,dailyAdjust,sources:rows};
   }
   function periods(project, granularity) {
     const result=[], start=day(project.dates[0]);
@@ -110,7 +121,8 @@ const KapaHours = (() => {
     return columns.map(period=>{
       const base=sum(rows.filter(row=>row.kind==='base').map(row=>periodTotal(row,period)));
       const change=sum(rows.filter(row=>row.kind==='change').map(row=>periodTotal(row,period)));
-      return {...period,base,change,total:base+change};
+      const adjust=sum(rows.filter(row=>row.kind==='balance').map(row=>periodTotal(row,period)));
+      return {...period,base,change,adjust,total:base+change+adjust};
     });
   }
   function milestones(project, columns) {
