@@ -66,15 +66,55 @@ function sapPhaseInfo(project, index) {
   return lines.length ? `<div class="kapa-phase-actual">${lines.join('')}</div>` : '';
 }
 function sapViewSelector() {
-  if (!sapSplit()) return '<p class="quiet">Für eine getrennte Ansicht PL / QVP die QVP-Abteilungscodes unter Einstellungen → SAP-Stunden hinterlegen.</p>';
+  if (!sapSplit()) return '<p class="quiet">Für eine getrennte Ansicht PL / QVP die Abteilungen unter Einstellungen → SAP-Stunden dem QVP zuordnen.</p>';
   return `<div class="pt-segmented" role="group" aria-label="Ansicht">${[['all','PL + QVP'],['pl','Nur PL'],['qvp','Nur QVP']].map(([value,label]) => `<label class="pt-segmented__option"><input class="pt-segmented__input" type="radio" name="sap-view" value="${value}" ${sapView===value?'checked':''} onchange="sapSetView(this.value)"><span class="pt-segmented__label">${label}</span></label>`).join('')}</div>`;
 }
-function saveSapDepartments() {
-  const codes = [...new Set($('#sapQvpCodes').value.split(/[\s,;]+/).filter(Boolean))];
-  if (codes.length > 20 || codes.some(code => !/^[0-9A-Za-z]{1,10}$/.test(code))) return alert('Bitte Abteilungscodes aus Ziffern oder Buchstaben, durch Komma getrennt, eingeben.');
-  state.sapDepartments = {qvp:codes};
-  if (!codes.length) sapView = 'all';
+const SAP_CODE = /^[0-9A-Za-z]{1,10}$/;
+const sapDepartmentNames = () => state.sapDepartments?.names && typeof state.sapDepartments.names === 'object' ? state.sapDepartments.names : {};
+/* All departments found in the imported bookings plus the ones added by hand. */
+function sapDepartmentList() {
+  const list = new Map(), entry = code => { if (!list.has(code)) list.set(code, {code, count:0, hours:0}); return list.get(code); };
+  sapRows().forEach(row => { const code = sapDept(row); if (code) { const item = entry(code); item.count++; item.hours += row.hours; } });
+  Object.keys(sapDepartmentNames()).concat(sapQvpCodes()).forEach(entry);
+  return [...list.values()].map(item => ({...item, name:sapDepartmentNames()[item.code]||'', qvp:sapQvpCodes().includes(item.code)}))
+    .sort((a,b) => a.code.localeCompare(b.code, 'de', {numeric:true}));
+}
+function sapStoreDepartments(qvp, names) {
+  state.sapDepartments = {qvp:[...new Set(qvp)], names};
+  if (!state.sapDepartments.qvp.length) sapView = 'all';
   persist();
+}
+function sapDepartmentTable() {
+  const list = sapDepartmentList(), field = (code, part) => `sapDept-${part}-${code}`;
+  const rows = list.map(item => `<tr><td><strong>${esc(item.code)}</strong></td>
+    <td><input class="pt-input" id="${field(item.code,'name')}" value="${esc(item.name)}" maxlength="100" placeholder="z. B. Projektmanagement" aria-label="Bezeichnung Abteilung ${esc(item.code)}"></td>
+    <td><select class="pt-select" id="${field(item.code,'role')}" aria-label="Zuordnung Abteilung ${esc(item.code)}"><option value="pl" ${item.qvp?'':'selected'}>PL</option><option value="qvp" ${item.qvp?'selected':''}>QVP</option></select></td>
+    <td>${item.count} · ${sapFormat(item.hours)} h</td>
+    <td><div class="kapa-user-actions"><button class="secondary" onclick="saveSapDepartment('${esc(item.code)}')">Speichern</button><button class="danger" onclick="deleteSapDepartment('${esc(item.code)}')">Löschen</button></div></td></tr>`).join('');
+  return `<div class="kapa-sap-departments"><h3>Abteilungen</h3><p class="quiet">Die Abteilung steht in den letzten Stellen des PSP-Elements (z. B. 99 = Projektmanagement). Die Zuordnung bestimmt, ob Stunden als PL oder QVP zählen.</p>
+    <div class="tablewrap"><table class="pt-table"><thead><tr><th scope="col">Code</th><th scope="col">Bezeichnung</th><th scope="col">Zuordnung</th><th scope="col">Buchungen · Stunden</th><th scope="col">Aktionen</th></tr></thead><tbody>${rows}
+    <tr><td><input class="pt-input" id="sapNewCode" maxlength="10" placeholder="Code" aria-label="Neuer Abteilungscode"></td><td><input class="pt-input" id="sapNewName" maxlength="100" placeholder="Bezeichnung (optional)" aria-label="Bezeichnung der neuen Abteilung"></td>
+    <td><select class="pt-select" id="sapNewRole" aria-label="Zuordnung der neuen Abteilung"><option value="pl">PL</option><option value="qvp">QVP</option></select></td><td></td><td><button class="secondary" onclick="addSapDepartment()">Hinzufügen</button></td></tr></tbody></table></div>${list.length?'':'<p class="quiet">Noch keine Abteilungen vorhanden. Sie erscheinen nach dem SAP-Import oder können hier angelegt werden.</p>'}</div>`;
+}
+function saveSapDepartment(code) {
+  const name = document.getElementById(`sapDept-name-${code}`).value.trim(), role = document.getElementById(`sapDept-role-${code}`).value;
+  sapStoreDepartments(sapQvpCodes().filter(item => item !== code).concat(role === 'qvp' ? [code] : []), {...sapDepartmentNames(), [code]:name});
+}
+function addSapDepartment() {
+  const code = $('#sapNewCode').value.trim(), name = $('#sapNewName').value.trim();
+  if (!SAP_CODE.test(code)) return alert('Bitte einen Abteilungscode aus Ziffern oder Buchstaben (höchstens 10 Zeichen) eingeben.');
+  if (sapDepartmentList().some(item => item.code === code)) return alert('Diese Abteilung existiert bereits.');
+  sapStoreDepartments(sapQvpCodes().concat($('#sapNewRole').value === 'qvp' ? [code] : []), {...sapDepartmentNames(), [code]:name});
+}
+function deleteSapDepartment(code) {
+  const bookings = sapRows().filter(row => sapDept(row) === code);
+  const hours = bookings.reduce((n,row) => n + row.hours, 0);
+  const text = bookings.length ? `Abteilung ${code} löschen? Dabei werden auch ${bookings.length} SAP-Buchungen (${sapFormat(hours)} h) dieser Abteilung entfernt. Sie lassen sich durch einen erneuten Import wiederherstellen.` : `Abteilung ${code} löschen?`;
+  if (!confirm(text)) return;
+  if (bookings.length) state.sapActuals = sapRows().filter(row => sapDept(row) !== code);
+  const names = {...sapDepartmentNames()};
+  delete names[code];
+  sapStoreDepartments(sapQvpCodes().filter(item => item !== code), names);
 }
 /* SAP balance: hours that were used less or more than planned up to the cut-off are carried to the remaining
    project timeline. The balance is stored per project as signed whole hours per day (project.sapBalance). */
@@ -192,7 +232,7 @@ function sapBalanceNotice(project) {
 }
 function sapSettings(){
  const rows=sapRows(), unmatched=rows.filter(row=>sapMatches(row).length!==1);
- return `<section class="panel"><span class="section-kicker">ISTABGLEICH</span><h2>SAP-Stunden</h2><p class="muted">SAP-Excel exportieren und hier einlesen. Die Buchungen werden anhand des PSP-Elements dem Projekt zugeordnet.</p><div class="kapa-backup-actions"><button class="secondary" onclick="document.querySelector('#sapFile').click()">SAP-Excel auswählen</button><input id="sapFile" type="file" accept=".xlsx" hidden onchange="previewSap(this)"></div><div class="kapa-sap-codes"><div class="pt-field"><label class="pt-field__label" for="sapQvpCodes">QVP-Abteilungscodes</label><input id="sapQvpCodes" value="${esc(sapQvpCodes().join(', '))}" maxlength="120" placeholder="z. B. 41"><span class="pt-field__help">Letzte Stelle(n) des PSP-Elements. Alle anderen Abteilungen (z. B. 99) zählen als PL.</span></div><button class="secondary" onclick="saveSapDepartments()">Speichern</button></div><p class="quiet">${rows.length?`${rows.length} Buchungen gespeichert · ${unmatched.length} ohne eindeutige Projektzuordnung.`:'Noch keine SAP-Buchungen importiert.'}</p></section>`;
+ return `<section class="panel"><span class="section-kicker">ISTABGLEICH</span><h2>SAP-Stunden</h2><p class="muted">SAP-Excel exportieren und hier einlesen. Die Buchungen werden anhand des PSP-Elements dem Projekt zugeordnet.</p><div class="kapa-backup-actions"><button class="secondary" onclick="document.querySelector('#sapFile').click()">SAP-Excel auswählen</button><input id="sapFile" type="file" accept=".xlsx" hidden onchange="previewSap(this)"></div>${sapDepartmentTable()}<p class="quiet">${rows.length?`${rows.length} Buchungen gespeichert · ${unmatched.length} ohne eindeutige Projektzuordnung.`:'Noch keine SAP-Buchungen importiert.'}</p></section>`;
 }
 function showSapUnmatched(){
  const rows=sapRows().filter(r=>sapMatches(r).length!==1);

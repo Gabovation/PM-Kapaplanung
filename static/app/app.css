@@ -57,6 +57,10 @@
 .kapa-sap-actions {display:flex;flex-wrap:wrap;gap:var(--polytec-space-2)}
 .kapa-gate-confirm {display:flex;align-items:center;gap:var(--polytec-space-2);margin-top:var(--polytec-space-2);font-weight:600}
 #gateWarning:not(:empty) {margin-top:var(--polytec-space-3)}
+.kapa-sap-departments {margin-block:var(--polytec-space-4)}
+.kapa-sap-departments h3 {margin:0 0 var(--polytec-space-2)}
+.kapa-sap-departments .pt-table td {vertical-align:middle}
+.kapa-sap-departments .pt-input,.kapa-sap-departments .pt-select {min-width:7rem}
 .kapa-version {font-size:.75rem;white-space:nowrap;opacity:.85}
 .field.full {grid-column:1/-1}
 .card,.panel {background:var(--polytec-color-surface-panel);border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);padding:var(--polytec-space-4)}

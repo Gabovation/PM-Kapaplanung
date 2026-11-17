@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.13 – 17.11.2026
+- Einstellungen → SAP-Stunden: Alle Abteilungen aus den Importen sind als Tabelle sichtbar und lassen sich bezeichnen, PL oder QVP zuordnen, hinzufügen und löschen.
+
 ## 0.10.12 – 17.11.2026
 - SAP-Ist kann nach PL und QVP getrennt angesehen werden; die QVP-Abteilungscodes werden unter Einstellungen → SAP-Stunden hinterlegt.
 - Budgetverteilung zeigt je Gate-Phase Ist gegen Plan sowie Planwertänderungen.

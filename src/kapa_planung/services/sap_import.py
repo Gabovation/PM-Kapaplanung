@@ -96,9 +96,13 @@ def validate_actuals(snapshot: dict) -> None:
     departments = snapshot.get('sapDepartments')
     if departments is not None:
         codes = departments.get('qvp') if isinstance(departments, dict) else None
-        if (not isinstance(codes, list) or len(codes) > 20
-                or any(not isinstance(code, str) or not re.fullmatch(r'[0-9A-Za-z]{1,10}', code) for code in codes)):
-            raise ValueError('Ung\u00fcltige QVP-Abteilungscodes.')
+        names = departments.get('names', {}) if isinstance(departments, dict) else None
+        if (not isinstance(codes, list) or len(codes) > 50
+                or any(not isinstance(code, str) or not re.fullmatch(r'[0-9A-Za-z]{1,10}', code) for code in codes)
+                or not isinstance(names, dict) or len(names) > 100
+                or any(not isinstance(code, str) or not re.fullmatch(r'[0-9A-Za-z]{1,10}', code)
+                       or not isinstance(label, str) or len(label) > 100 for code, label in names.items())):
+            raise ValueError('Ung\u00fcltige SAP-Abteilungen.')
     for project in snapshot.get('projects', []):
         pending = project.get('changePending') if isinstance(project, dict) else None
         if pending is not None:

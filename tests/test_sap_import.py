@@ -86,8 +86,8 @@ def test_previously_imported_legacy_psp_remains_valid():
 
 def test_department_settings_are_validated():
     from kapa_planung.services.sap_import import validate_actuals
-    validate_actuals({'sapDepartments': {'qvp': ['41', 'Q1']}})
-    for bad in ({'qvp': 'x'}, {'qvp': ['a b']}, {'qvp': [1]}, [], {'qvp': ['1'] * 21}):
+    validate_actuals({'sapDepartments': {'qvp': ['41', 'Q1'], 'names': {'99': 'Projektmanagement'}}})
+    for bad in ({'qvp': 'x'}, {'qvp': ['a b']}, {'qvp': [1]}, [], {'qvp': ['1'] * 51}, {'qvp': [], 'names': {'99': 5}}, {'qvp': [], 'names': {'a b': 'x'}}, {'qvp': [], 'names': []}):
         try:
             validate_actuals({'sapDepartments': bad})
         except ValueError:
