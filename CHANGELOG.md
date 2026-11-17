@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.11 – 17.11.2026
+- SAP-Ist je Zeitraum in der Stundentabelle; bereits durch SAP-Ist abgedeckte Zeiträume sind im Stundenverlauf gesperrt.
+- Formular-Schaltflächen (Benutzer anlegen, Passwort zurücksetzen/ändern) stehen nach dem Designsystem in einer eigenen Aktionszeile; Aktionsgruppen und Zeilen richten sich einheitlich aus.
+- Version in der Fußzeile.
+
 ## 0.10.10 – 13.11.2026
 - Navigationssymbole für Einstellungen, Passwortänderung und Benutzerverwaltung unterscheidbar zugeordnet.
 

@@ -10,6 +10,7 @@
 .kapa-heading,.hero,.panelhead,.detailtop,.actions,.row,.toolbar {display:flex;align-items:center;justify-content:space-between;gap:var(--polytec-space-3)}
 .kapa-heading,.hero,.panelhead,.detailtop {margin-bottom:var(--polytec-space-4)}
 .actions,.toolbar {flex-wrap:wrap;justify-content:flex-end}
+.row {justify-content:flex-start}
 .panelhead > div:first-child,.detailtop > div:first-child {min-width:0}
 .actions .pt-button,.toolbar .pt-button,.kapa-backup-actions .pt-button,.panelhead .pt-button {white-space:nowrap}
 .kapa-heading h1 {margin:0}
@@ -39,6 +40,8 @@
 .projectcard .bottom {display:flex;justify-content:space-between;gap:var(--polytec-space-3);margin-top:var(--polytec-space-3)}
 .formgrid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:var(--polytec-space-4)}
 .formgrid > *, .field {min-width:0}
+.formgrid > .pt-form-actions,.kapa-project-form > .pt-form-actions {grid-column:1/-1;margin-top:0}
+.kapa-version {font-size:.75rem;white-space:nowrap;opacity:.85}
 .field.full {grid-column:1/-1}
 .card,.panel {background:var(--polytec-color-surface-panel);border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);padding:var(--polytec-space-4)}
 .projectcard {cursor:pointer}

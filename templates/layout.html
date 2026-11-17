@@ -24,3 +24,4 @@
 {{ ops.mobile_navigation_item("Personen", url_for("index") ~ "#people", "user") }}
 {{ ops.mobile_navigation_item("Einstellungen", url_for("index") ~ "#settings", "settings") }}
 {% endblock %}
+{% block footer_actions %}<span class="kapa-version">Version {{ app_manifest.version }}</span>{% endblock %}

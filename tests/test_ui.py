@@ -61,3 +61,17 @@ def test_shell_dimensions_are_consumed_from_unmodified_kit_tokens():
     app_css = (ROOT / 'static/app/app.css').read_text()
     assert '.ops-header' not in app_css
     assert '.ops-navigation-item' not in app_css
+
+
+def test_footer_shows_app_version_from_manifest(client):
+    import tomllib
+    version = tomllib.loads((ROOT / 'app.manifest.toml').read_text(encoding='utf-8'))['app']['version']
+    html = client.get('/').get_data(as_text=True)
+    assert f'<span class="kapa-version">Version {version}</span>' in html
+
+
+def test_form_submit_buttons_use_design_system_action_row():
+    for name in ('server_users.html', 'change_password.html'):
+        text = (ROOT / 'templates' / name).read_text(encoding='utf-8')
+        assert 'type="submit"' in text
+        assert not re.search(r'<div><button[^>]*type="submit"', text), name
