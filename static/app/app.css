@@ -21,7 +21,8 @@
 .kapa-overview .value {font-size:1.5rem;margin:var(--polytec-space-2) 0}
 .kapa-overview .panelhead {margin-bottom:var(--polytec-space-3)}
 .kapa-overview .kapa-forecast-panel > p {margin:0}
-.kapa-overview .layout {margin-top:var(--polytec-space-3);gap:var(--polytec-space-3)}
+.kapa-overview .layout {grid-template-columns:minmax(0,5fr) minmax(0,7fr);margin-top:var(--polytec-space-3);gap:var(--polytec-space-3)}
+.kapa-portfolio-table td:last-child {white-space:nowrap}
 .kapa-overview > .spacer {height:var(--polytec-space-3)}
 .kapa-overview .empty {padding:var(--polytec-space-3)}
 .kapa-project-form {display:grid;gap:var(--polytec-space-4)}
@@ -41,6 +42,9 @@
 .formgrid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:var(--polytec-space-4)}
 .formgrid > *, .field {min-width:0}
 .formgrid > .pt-form-actions,.kapa-project-form > .pt-form-actions {grid-column:1/-1;margin-top:0}
+.kapa-form {display:grid;gap:var(--polytec-space-4);max-width:28rem;margin-top:var(--polytec-space-3)}
+.kapa-form .pt-form-actions {justify-content:flex-start;margin-top:var(--polytec-space-2)}
+.kapa-form-panel h1 {margin-top:0}
 .kapa-version {font-size:.75rem;white-space:nowrap;opacity:.85}
 .field.full {grid-column:1/-1}
 .card,.panel {background:var(--polytec-color-surface-panel);border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);padding:var(--polytec-space-4)}
@@ -157,6 +161,6 @@
 .kapa-capacity-cell.is-planned {background:var(--polytec-color-surface-subtle)}
 .kapa-capacity-cell.is-free {color:var(--polytec-color-text-secondary)}
 .kapa-capacity-cell.is-overloaded {background:color-mix(in srgb,var(--polytec-color-status-danger) 12%,var(--polytec-color-surface-panel));color:var(--polytec-color-status-danger);font-weight:700}
-@media(max-width:64rem){.layout,.split{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kapa-gate-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:64rem){.layout,.split,.kapa-overview .layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kapa-gate-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:40rem){.kapa-heading,.hero,.detailtop{align-items:flex-start;flex-wrap:wrap}.phasegrid,.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.panelhead{flex-wrap:wrap}}
 @media(max-width:30rem){.formgrid,.kapa-gate-grid{grid-template-columns:minmax(0,1fr)}}

@@ -26,7 +26,7 @@
   </section>
   <section class="panel" aria-labelledby="create-heading">
     <h2 id="create-heading">Benutzer anlegen</h2>
-    <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
+    <form method="post" action="{{ url_for('admin_users') }}" class="kapa-form">
       <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="create">
       <div class="pt-field"><label class="pt-field__label" for="new-user">Benutzername</label><input class="pt-input" id="new-user" name="username" required minlength="3" maxlength="64" autocomplete="off"><span class="pt-field__help">3–64 Zeichen: a–z, 0–9, Punkt, Unterstrich oder Bindestrich.</span></div>
       <div class="pt-field"><label class="pt-field__label" for="new-password">Einmalpasswort</label><input class="pt-input" id="new-password" name="password" type="password" required minlength="8" maxlength="256" autocomplete="new-password"><span class="pt-field__help">Mindestens 8 Zeichen. Die Person muss es beim ersten Anmelden ändern.</span></div>
@@ -36,7 +36,7 @@
   </section>
   <section class="panel" aria-labelledby="reset-heading">
     <h2 id="reset-heading">Passwort zurücksetzen</h2>
-    <form method="post" action="{{ url_for('admin_users') }}" class="formgrid">
+    <form method="post" action="{{ url_for('admin_users') }}" class="kapa-form">
       <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="reset">
       <div class="pt-field"><label class="pt-field__label" for="reset-user">Benutzername</label><select class="pt-select" id="reset-user" name="username" required>{% for user in users %}<option value="{{ user['_id'] }}">{{ user['_id'] }}</option>{% endfor %}</select></div>
       <div class="pt-field"><label class="pt-field__label" for="reset-password">Neues Einmalpasswort (mindestens 8 Zeichen)</label><input class="pt-input" id="reset-password" name="password" type="password" required minlength="8" maxlength="256" autocomplete="new-password"><span class="pt-field__help">Nach dem Zurücksetzen muss die Person das Passwort erneut ändern.</span></div>
