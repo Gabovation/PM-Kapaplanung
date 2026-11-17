@@ -45,6 +45,9 @@
 .kapa-form {display:grid;gap:var(--polytec-space-4);max-width:28rem;margin-top:var(--polytec-space-3)}
 .kapa-form .pt-form-actions {justify-content:flex-start;margin-top:var(--polytec-space-2)}
 .kapa-form-panel h1 {margin-top:0}
+.kapa-favorite-row {display:grid;grid-template-columns:minmax(9rem,2fr) repeat(4,minmax(4.5rem,1fr)) auto;align-items:end;gap:var(--polytec-space-3);margin-top:var(--polytec-space-3)}
+.kapa-favorite-row .pt-field {min-width:0}
+@media(max-width:64rem){.kapa-favorite-row{grid-template-columns:repeat(4,minmax(0,1fr))}.kapa-favorite-row > .pt-field:first-child,.kapa-favorite-row > button{grid-column:1/-1;justify-self:start}.kapa-favorite-row > .pt-field:first-child{justify-self:stretch}}
 .kapa-version {font-size:.75rem;white-space:nowrap;opacity:.85}
 .field.full {grid-column:1/-1}
 .card,.panel {background:var(--polytec-color-surface-panel);border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);padding:var(--polytec-space-4)}
