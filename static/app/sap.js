@@ -8,8 +8,19 @@ function sapMatches(row) {
   if (!number) return [];
   return state.projects.filter(p => String(p.number).trim().toLowerCase() === number.trim().toLowerCase());
 }
+function sapProjectRows(project) {
+  return sapRows().filter(row => { const matches=sapMatches(row); return matches.length===1 && matches[0].id===project.id; });
+}
+function sapActualFor(project, period) {
+  return sapProjectRows(project).filter(row=>row.date>=period.start&&row.date<period.end).reduce((n,row)=>n+row.hours,0);
+}
+/* Periods that end on or before the last booking date are covered by SAP actuals and no longer planned. */
+function sapPeriodLocked(project, period) {
+  const rows=sapProjectRows(project);
+  return rows.length>0 && period.end<=rows.reduce((d,r)=>r.date>d?r.date:d,'');
+}
 function sapProjectData(project) {
-  const rows = sapRows().filter(row => { const matches=sapMatches(row); return matches.length===1 && matches[0].id===project.id; });
+  const rows = sapProjectRows(project);
   if (!rows.length) return null;
   const cutoff=rows.reduce((d,r)=>r.date>d?r.date:d,''), actual=rows.reduce((n,r)=>n+r.hours,0);
   const pl=KapaHours.materialize(project).daily;
@@ -25,7 +36,7 @@ function sapSettings(){
 function showSapUnmatched(){
  const rows=sapRows().filter(r=>sapMatches(r).length!==1);
  const content=rows.slice(0,100).map(r=>`<tr><td>${fmt(r.date)}</td><td>${esc(r.psp||'Kein PSP')}</td><td>${sapFormat(r.hours)} h</td><td>${esc(r.name)}</td></tr>`).join('');
- openModal('Nicht zugeordnete SAP-Buchungen',`<p>Diese Buchungen z?hlen nicht zu einem Projekt. Bei fehlendem oder mehrdeutigem Projekt kann die Projektnummer in der Planung gepr?ft werden.</p><div class="tablewrap"><table><thead><tr><th>Datum</th><th>PSP-Element</th><th>Stunden</th><th>Person</th></tr></thead><tbody>${content}</tbody></table></div>${rows.length>100?'<p>Die ersten 100 Buchungen werden angezeigt.</p>':''}`,`<button class="secondary" onclick="closeModal()">Schlie?en</button>`);
+ openModal('Nicht zugeordnete SAP-Buchungen',`<p>Diese Buchungen zählen nicht zu einem Projekt. Bei fehlendem oder mehrdeutigem Projekt kann die Projektnummer in der Planung geprüft werden.</p><div class="tablewrap"><table><thead><tr><th>Datum</th><th>PSP-Element</th><th>Stunden</th><th>Person</th></tr></thead><tbody>${content}</tbody></table></div>${rows.length>100?'<p>Die ersten 100 Buchungen werden angezeigt.</p>':''}`,`<button class="secondary" onclick="closeModal()">Schließen</button>`);
 }
 async function previewSap(input){
  const file=input.files[0];input.value='';if(!file)return;
@@ -35,7 +46,7 @@ async function previewSap(input){
   const result=await response.json();if(!response.ok)throw Error(result.error||'Import konnte nicht gelesen werden.');
   const rows=result.rows, dates=rows.map(r=>r.date).sort(), groups=new Set(rows.map(r=>JSON.stringify([r.personnelNumber,r.date]))), unmatched=rows.filter(r=>sapMatches(r).length!==1);
   const replaced=sapRows().filter(r=>groups.has(JSON.stringify([r.personnelNumber,r.date]))).length;
-  if(sapRows().length-replaced+rows.length>10000)throw Error('Die Planung darf h?chstens 10.000 SAP-Buchungen enthalten.');
+  if(sapRows().length-replaced+rows.length>10000)throw Error('Die Planung darf höchstens 10.000 SAP-Buchungen enthalten.');
   sapPending=rows;
   openModal('SAP-Import prüfen',`<p><strong>${rows.length} Buchungen</strong> vom ${fmt(dates[0])} bis ${fmt(dates[dates.length-1])} · ${unmatched.length} ohne eindeutige Projektzuordnung.</p><p>Für die ${groups.size} enthaltenen Kombinationen aus Personalnummer und Datum werden ${replaced} bisherige Buchungen ersetzt. Pro Person und Datum muss der Export alle Buchungen enthalten. Andere Daten bleiben erhalten.</p><p class="quiet">Zeilen ohne PSP oder ohne passendes beziehungsweise eindeutiges Projekt bleiben gespeichert und werden nicht in Projektsummen eingerechnet. Identische Zeilen innerhalb der Datei bleiben erhalten.</p>${unmatched.length?`<details><summary>Nicht zugeordnete Buchungen anzeigen (${unmatched.length})</summary><div class="tablewrap"><table><thead><tr><th>Datum</th><th>PSP-Element</th><th>Stunden</th></tr></thead><tbody>${unmatched.slice(0,100).map(r=>`<tr><td>${fmt(r.date)}</td><td>${esc(r.psp||'Kein PSP')}</td><td>${sapFormat(r.hours)} h</td></tr>`).join('')}</tbody></table>${unmatched.length>100?'<p>Die ersten 100 Buchungen werden angezeigt.</p>':''}</div></details>`:''}`,`<button class="secondary" onclick="closeModal()">Abbrechen</button><button class="primary" onclick="applySap()">Import übernehmen</button>`,'form');
  } catch(e){alert('SAP-Import: '+e.message)}

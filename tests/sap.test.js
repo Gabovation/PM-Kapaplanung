@@ -21,3 +21,10 @@ run(`state.projects=[{id:'legacy',number:'41-22-030'}]; state.sapActuals=[{psp:'
 assert.equal(run('sapMatches(state.sapActuals[0])[0].id'),'legacy');
 run(`state.projects.push({id:'wrong',number:'41-22-030-00'})`);
 assert.equal(run('sapMatches(state.sapActuals[0]).length'),1);
+
+run(`state.projects=[{id:'p',number:'10-02763'}]; state.sapActuals=[{personnelNumber:'1',date:'2026-01-15',projectNumber:'10-02763',hours:5},{personnelNumber:'1',date:'2026-02-03',projectNumber:'10-02763',hours:7}]`);
+assert.equal(run(`sapActualFor(state.projects[0],{start:'2026-01-01',end:'2026-02-01'})`),5);
+assert.equal(run(`sapPeriodLocked(state.projects[0],{start:'2026-01-01',end:'2026-02-01'})`),true);
+assert.equal(run(`sapPeriodLocked(state.projects[0],{start:'2026-02-01',end:'2026-03-01'})`),false);
+assert.equal(run(`sapPeriodLocked({id:'none',number:'x'},{start:'2026-01-01',end:'2026-02-01'})`),false);
+console.log('SAP: Ist je Zeitraum und Sperre bereits gebuchter Zeiträume geprüft.');

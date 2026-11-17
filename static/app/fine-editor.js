@@ -65,10 +65,13 @@ function hoursTimeline(rows, columns, editable=false, project=null) {
       <tbody>${rows.map((row,rowIndex)=>`<tr class="${row.kind==='change'?'kapa-source-change':''}"><th scope="row"><strong>${esc(row.label)}</strong><span class="sub">Budget: ${row.budget} h</span>${editable?`<span id="fine-row-${rowIndex}" class="pt-status"></span><button class="pt-button pt-button--subtle" type="button" onclick="balanceFineRow(${rowIndex})">Ausgleichen</button>`:''}</th>
         ${columns.map((period,columnIndex)=>{
           const active=KapaHours.activeDays(row,period).length>0, value=KapaHours.periodTotal(row,period);
+          const locked=project&&active&&sapPeriodLocked(project,period);
           if(!editable) return `<td>${active?value+' h':'—'}</td>`;
+          if(locked) return `<td><input class="pt-input" type="number" value="${value}" disabled aria-label="${esc(row.label)} · ${esc(period.title)} · durch SAP-Ist gesperrt" title="Durch SAP-Ist abgedeckt – nicht mehr änderbar"></td>`;
           return `<td>${active?`<input class="pt-input" type="number" min="0" max="1000000" step="1" value="${value}" aria-label="${esc(row.label)} · ${esc(period.title)} · Stunden" oninput="changeFineHours(${rowIndex},${columnIndex},this)">`:'<span aria-label="Außerhalb der Phase">—</span>'}</td>`;
         }).join('')}</tr>`).join('')}</tbody>
-      <tfoot><tr><th scope="row">Gesamtstunden</th>${data.map((item,index)=>`<td ${editable?`id="fine-total-${index}"`:''}><strong>${item.total} h</strong></td>`).join('')}</tr></tfoot>
+      <tfoot><tr><th scope="row">Gesamtstunden (Plan)</th>${data.map((item,index)=>`<td ${editable?`id="fine-total-${index}"`:''}><strong>${item.total} h</strong></td>`).join('')}</tr>
+      ${project&&sapProjectRows(project).length?`<tr class="kapa-sap-actual"><th scope="row">SAP-Ist (importiert)<span class="sub">Stand ${fmt(sapProjectData(project).cutoff)}</span></th>${columns.map(period=>{const hours=sapActualFor(project,period);return `<td>${hours?`<strong>${sapFormat(hours)} h</strong>`:'—'}${sapPeriodLocked(project,period)?'<span class="sub">gesperrt</span>':''}</td>`}).join('')}</tr>`:''}</tfoot>
       </table>
     </div></div>`;
 }
@@ -86,6 +89,7 @@ function fineBody() {
   const project=state.projects.find(item=>item.id===fineDraft.projectId);
   const columns=KapaHours.periods(project,fineDraft.granularity);
   return `<div class="kapa-fine-toolbar">${grainSelector('fine-grain',fineDraft.granularity,'setFineGranularity')}<span id="fine-summary" role="status" aria-live="polite"></span></div>
+    ${sapProjectRows(project).length?`<p class="pt-field__help">Zeiträume bis zum Stand des SAP-Ist (${fmt(sapProjectData(project).cutoff)}) sind gesperrt, da dort bereits gebuchte Stunden vorliegen.</p>`:''}
     <p class="pt-field__help">Ganze Stunden direkt eingeben. „Ausgleichen“ verteilt die Reststunden auf noch unbearbeitete Zeiträume derselben Phase. Jede Phase muss ihr Budget erreichen.</p>
     ${hoursLegend()}${hoursTimeline(fineDraft.rows,columns,true,project)}`;
 }
@@ -147,7 +151,9 @@ function updateFineSummary() {
 function balanceFineRow(rowIndex) {
   if(fineDraft.invalid.size) return alert('Bitte zuerst die ungültigen Stundenwerte korrigieren.');
   const row=fineDraft.rows[rowIndex];
-  try { KapaHours.balance(row,fineDraft.protectedDays.get(row.id)||new Set()); }
+  const project=state.projects.find(item=>item.id===fineDraft.projectId), protectedDays=new Set(fineDraft.protectedDays.get(row.id)||[]);
+  KapaHours.periods(project,fineDraft.granularity).filter(period=>sapPeriodLocked(project,period)).forEach(period=>KapaHours.activeDays(row,period).forEach(date=>protectedDays.add(date)));
+  try { KapaHours.balance(row,protectedDays); }
   catch(error) { return alert(error.message); }
   const scroll=$('#dialogContent .kapa-timeline-scroll').scrollLeft;
   $('#dialogContent').innerHTML=fineBody();

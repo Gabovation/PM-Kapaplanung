@@ -9,6 +9,9 @@
 @media (max-width: 48rem) {.kapa-users-header {display:none}}
 .kapa-heading,.hero,.panelhead,.detailtop,.actions,.row,.toolbar {display:flex;align-items:center;justify-content:space-between;gap:var(--polytec-space-3)}
 .kapa-heading,.hero,.panelhead,.detailtop {margin-bottom:var(--polytec-space-4)}
+.actions,.toolbar {flex-wrap:wrap;justify-content:flex-end}
+.panelhead > div:first-child,.detailtop > div:first-child {min-width:0}
+.actions .pt-button,.toolbar .pt-button,.kapa-backup-actions .pt-button,.panelhead .pt-button {white-space:nowrap}
 .kapa-heading h1 {margin:0}
 .kapa-overview .hero {margin-bottom:var(--polytec-space-3)}
 .kapa-overview .hero h2,.kapa-overview .panelhead h2 {margin:0}
@@ -81,6 +84,11 @@
 .kapa-hours-table tbody th .pt-status {margin-block:var(--polytec-space-1)}
 .kapa-hours-table tbody td {padding-inline:var(--polytec-space-2)}
 .kapa-hours-table .pt-input {text-align:right}
+.kapa-hours-table tfoot th .sub {display:block}
+.kapa-hours-table tfoot th {white-space:normal}
+.kapa-hours-table tfoot .kapa-sap-actual th,.kapa-hours-table tfoot .kapa-sap-actual td {border-top:1px solid var(--polytec-color-border-default);color:var(--polytec-color-text-secondary)}
+.kapa-hours-table .pt-input:disabled {background:var(--polytec-color-surface-subtle);color:var(--polytec-color-text-secondary);cursor:not-allowed}
+.kapa-hours-table .kapa-sap-actual td .sub {display:block}
 .kapa-hours-table .kapa-source-change th {border-left:var(--polytec-space-1) solid var(--polytec-chart-series-1)}
 .kapa-gate-line {fill:none;stroke:var(--polytec-chart-series-focus);stroke-width:1;stroke-dasharray:4 4;opacity:.6}
 .kapa-gate-marker rect {fill:var(--polytec-color-surface-panel)}
