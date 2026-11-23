@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.0 – 23.11.2026
+- Neuer Reiter „Projektplan“ (vorerst nur für Administratoren): Gantt je Projekt mit aufklappbaren Vorgängen, Meilensteinen, Anfang, Ende, Dauer, Fortschritt und Verknüpfungen (EA, AA, EE, AE mit Zeitabstand) wie in MS Project. Die Termine werden in Arbeitstagen gerechnet; Sammelvorgänge ergeben sich aus ihren Unterpunkten.
+- Balken lassen sich verschieben, verlängern und per Ziehen verknüpfen; die Gates G3 bis G8 und der heutige Tag sind im Diagramm markiert.
+- Der Projektplan liegt getrennt von der Stundenplanung und wird serverseitig nur für Administratoren geliefert.
+
 ## 0.10.13 – 17.11.2026
 - Einstellungen → SAP-Stunden: Alle Abteilungen aus den Importen sind als Tabelle sichtbar und lassen sich bezeichnen, PL oder QVP zuordnen, hinzufügen und löschen.
 

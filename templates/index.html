@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div id="kapa-app" data-api-url="{{ url_for('planning_data') }}" data-import-url="{{ url_for('prepare_import') }}" data-sap-url="{{ url_for('sap_preview') }}" data-write-token="{{ write_token }}" data-password-url="{{ url_for('change_password') if server_auth_enabled else '' }}">
+<div id="kapa-app" data-api-url="{{ url_for('planning_data') }}" data-import-url="{{ url_for('prepare_import') }}" data-sap-url="{{ url_for('sap_preview') }}" data-write-token="{{ write_token }}" data-password-url="{{ url_for('change_password') if server_auth_enabled else '' }}"{% if gantt_enabled %} data-gantt-url="{{ url_for('gantt_data', project_id='PROJECT_ID') }}"{% endif %}>
   <header class="kapa-heading"><h1 id="title" class="pt-page-header__title">Übersicht</h1>{{ ui.button('Projekt anlegen', variant='primary', icon_name='add', id='newProject') }}</header>
   <div id="content" aria-live="polite"></div>
 </div>
@@ -12,7 +12,9 @@
 <script src="{{ url_for('static', filename='app/capacity.js') }}" defer></script>
 <script src="{{ url_for('static', filename='app/capacity-view.js') }}" defer></script>
 <script src="{{ url_for('static', filename='app/sap.js') }}" defer></script>
-<script src="{{ url_for('static', filename='app/plan.js') }}" defer></script>
+{% if gantt_enabled %}<script src="{{ url_for('static', filename='app/gantt.js') }}" defer></script>
+<script src="{{ url_for('static', filename='app/gantt-view.js') }}" defer></script>
+{% endif %}<script src="{{ url_for('static', filename='app/plan.js') }}" defer></script>
 <script src="{{ url_for('static', filename='app/fine-editor.js') }}" defer></script>
 {% endblock %}
 

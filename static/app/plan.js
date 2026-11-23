@@ -1,6 +1,8 @@
 const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const gates=['Gate 3','Gate 5','Gate 6','Gate 7','Gate 8'], phases=['G3 – G5','G5 – G6','G6 – G7','G7 – G8'];
-let state, page=['overview','projects','people','settings'].includes(location.hash.slice(1))?location.hash.slice(1):'overview', selected=null, mode='week', offset=0; const appRoot=document.querySelector('#kapa-app'), apiUrl=appRoot.dataset.apiUrl, importUrl=appRoot.dataset.importUrl, writeToken=appRoot.dataset.writeToken; let revision=0;
+let state, page=location.hash.slice(1), selected=null, mode='week', offset=0; const appRoot=document.querySelector('#kapa-app'), apiUrl=appRoot.dataset.apiUrl, importUrl=appRoot.dataset.importUrl, writeToken=appRoot.dataset.writeToken; let revision=0;
+function pageAllowed(p){return ['overview','projects','people','settings'].includes(p)||(p==='gantt'&&!!appRoot.dataset.ganttUrl&&typeof ganttPage==='function')}
+if(!pageAllowed(page))page='overview';
 const today=new Date().toISOString().slice(0,10), uid=()=>Math.random().toString(36).slice(2,10);
 const date=s=>new Date(s+'T12:00:00'), iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 function monday(d){d=new Date(d);d.setDate(d.getDate()-(d.getDay()+6)%7);return d}
@@ -83,7 +85,7 @@ function openModal(title, body, footer, size='wide') {
 function closeModal(){$('#modal').close()}
 function field(label,name,value,type='text',extra=''){return `<div class="field pt-field"><label class="pt-field__label" for="${name}">${label}</label><input id="${name}" name="${name}" type="${type}" value="${esc(value)}" ${extra}></div>`}
 function init(){state={version:2,fte:40,favorite:[20,20,20,40],roles:[{id:'project-manager',name:'Projektleiter'},{id:'qvp',name:'QVP'}],people:[],projects:[]};render()}
-function render(){document.querySelectorAll('.ops-navigation-item,.ops-mobile-navigation__item').forEach(b=>{let active=b.hash==='#'+page;b.classList.toggle('is-active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});$('#title').textContent=({overview:'Übersicht',projects:'Projekte',people:'Personen',settings:'Einstellungen',detail:'Projektplanung'})[page];$('#content').classList.toggle('kapa-overview',page==='overview');$('#content').innerHTML=({overview:overview,projects:projects,people:people,settings:settings,detail:detail})[page]();applyKit()}
+function render(){document.querySelectorAll('.ops-navigation-item,.ops-mobile-navigation__item').forEach(b=>{let active=b.hash==='#'+page;b.classList.toggle('is-active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});$('#title').textContent=({overview:'Übersicht',projects:'Projekte',people:'Personen',settings:'Einstellungen',detail:'Projektplanung',gantt:'Projektplan'})[page];$('#content').classList.toggle('kapa-overview',page==='overview');$('#content').innerHTML=({overview:overview,projects:projects,people:people,settings:settings,detail:detail,gantt:()=>pageAllowed('gantt')?ganttPage():overview()})[page]();applyKit()}
 function currentPeriod(){let d=mode==='week'?addDays(monday(new Date()),offset*7):new Date(new Date().getFullYear(),new Date().getMonth()+offset,1);return d}
 function periodLabel(d){return mode==='week'?`${fmt(iso(d))} – ${fmt(iso(addDays(d,6)))}`:d.toLocaleDateString('de-AT',{month:'long',year:'numeric'})}
 function capacityRows(forecast=null) {
@@ -138,7 +140,7 @@ function handleNavigationClick(event) {
  const link=event.target.closest?.('.ops-navigation-item, .ops-mobile-navigation__item');
  if(!link||link.origin!==location.origin||link.pathname!==location.pathname||link.search!==location.search||(link.target&&link.target!=='_self'))return;
  const destination=link.hash.slice(1);
- if(link.hash===location.hash&&page!==destination&&['overview','projects','people','settings'].includes(destination)) {
+ if(link.hash===location.hash&&page!==destination&&pageAllowed(destination)) {
   event.preventDefault();
   page=destination;
   render();
@@ -313,7 +315,7 @@ function scheduleGateDateRefresh() {
  window.setTimeout(()=>{if(state&&['overview','projects','detail'].includes(page))render();scheduleGateDateRefresh()},next.getTime()-now.getTime());
 }
 scheduleGateDateRefresh();
-$('#newProject').onclick=()=>editProject(); window.addEventListener('hashchange',()=>{let p=location.hash.slice(1);if(['overview','projects','people','settings'].includes(p)){page=p;render()}});document.addEventListener('click',handleNavigationClick);document.addEventListener('ops:refresh',e=>{e.preventDefault();location.reload()});
+$('#newProject').onclick=()=>editProject(); window.addEventListener('hashchange',()=>{let p=location.hash.slice(1);if(pageAllowed(p)){page=p;render()}});document.addEventListener('click',handleNavigationClick);document.addEventListener('ops:refresh',e=>{e.preventDefault();location.reload()});
 fetch(apiUrl).then(r=>{if(!r.ok)throw Error();return r.json()}).then(data=>{if(data&&data.version===2){state=data;revision=data._revision||0;render()}else if(data===null)init();else throw Error()}).catch(()=>{$('#content').innerHTML='<div class="notice">Die lokalen Daten konnten nicht geladen werden. Bitte Anwendung neu starten und die Datendatei prüfen.</div>'});
 
 function applyKit(){document.querySelectorAll('#kapa-app button,#modal button').forEach(b=>{if(b.classList.contains('pt-button') || b.classList.contains('pt-icon-button'))return;b.classList.add('pt-button');b.classList.add(b.classList.contains('primary')?'pt-button--primary':b.classList.contains('danger')?'pt-button--danger':'pt-button--secondary')});document.querySelectorAll('#kapa-app input,#modal input').forEach(x=>x.classList.add('pt-input'));document.querySelectorAll('#kapa-app select,#modal select').forEach(x=>x.classList.add('pt-select'));document.querySelectorAll('#kapa-app table,#modal table').forEach(x=>x.classList.add('pt-table'));document.querySelectorAll('#kapa-app .tag').forEach(x=>x.classList.add('pt-status','pt-status--neutral'))}

@@ -86,7 +86,8 @@ def create_app(*, server_repository=None) -> Flask:
     def index():
         if not platform.ui_kit_enabled:
             abort(503)
-        response = app.make_response(render_template('index.html', active_nav='overview', write_token=session['csrf'] if mode == 'server' else TOKEN))
+        response = app.make_response(render_template('index.html', active_nav='overview', write_token=session['csrf'] if mode == 'server' else TOKEN,
+                            gantt_enabled=mode == 'server' and session.get('role') == 'admin'))
         response.headers['Cache-Control'] = 'no-store'
         return response
 
@@ -149,6 +150,38 @@ def create_app(*, server_repository=None) -> Flask:
                     except OSError:
                         app.logger.warning('Temporary planning file could not be removed.')
             return jsonify(revision=incoming['_revision'])
+
+    @app.route('/api/gantt/<project_id>', methods=['GET', 'PUT'])
+    @require_permission('kapa-planung.editor')
+    @rate_limit('gantt-data', env='RATE_LIMIT_WRITE_PER_MINUTE', default=240)
+    def gantt_data(project_id):
+        # Der Terminplan ist vorerst nur für Administratoren da und existiert nur im Serverbetrieb.
+        if store is None:
+            abort(404)
+        if session.get('role') != 'admin':
+            abort(403)
+        from kapa_planung.services.gantt import valid_project_id, validate_gantt
+        planning = store.read_planning() or {}
+        if not valid_project_id(project_id) or not any(isinstance(item, dict) and item.get('id') == project_id for item in planning.get('projects', [])):
+            return jsonify(error='Dieses Projekt existiert nicht.'), 404
+        if request.method == 'GET':
+            return jsonify(store.read_gantt(project_id))
+        supplied = request.headers.get('X-Kapa-Token', '')
+        expected = session.get('csrf', '')
+        if not supplied or not expected or not hmac.compare_digest(supplied, expected):
+            abort(403)
+        incoming = request.get_json(silent=True)
+        try:
+            validate_gantt(incoming, project_id)
+        except ValueError as exc:
+            return jsonify(error=str(exc)), 400
+        from kapa_planung.repositories.server_store import RevisionConflict
+        try:
+            return jsonify(revision=store.save_gantt(project_id, incoming, actor=session['username']))
+        except RevisionConflict:
+            return jsonify(error='Der Projektplan wurde in einem anderen Fenster geändert. Bitte neu laden.'), 409
+        except ValueError as exc:
+            return jsonify(error=str(exc)), 400
 
     @app.post('/api/sap-preview')
     @require_permission('kapa-planung.editor')

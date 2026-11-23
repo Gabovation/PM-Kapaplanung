@@ -68,6 +68,19 @@ Unter Einstellungen ? SAP-Stunden kann eine XLSX-Datei aus SAP eingelesen werden
 Bei neuen PSP-Elementen wie `10-02763-000-99` lautet die Projektnummer `10-02763`. Bei alten PSP-Elementen wie `41-22-030-00-00-99` lautet sie `41-22-030`. Die letzten beiden Ziffern bezeichnen die Abteilung; `99` steht für Projektmanagement. Nicht zugeordnete Buchungen bleiben gespeichert und zählen nicht zur Projektsumme. Die Projektansicht zeigt Ist, Plan bis zum letzten importierten Projektbuchungsdatum und eine Hochrechnung aus Ist plus anschließendem Plan. Liegt diese über dem Gesamtbudget, erscheint ein Hinweis auf eine mögliche Planwertänderung. Alle importierten Abteilungen werden zusammen mit dem Gesamtbudget PL und QVP verglichen; eine getrennte Abteilungsauswertung ist noch nicht vorhanden. Die Hochrechnung benötigt vollständige und aktuelle Exporte aller Beteiligten und ausschließlich budgetrelevante Abteilungen. Sie berücksichtigt keinen tatsächlichen Projektfortschritt. Die Kapazitätsvorschau zeigt weiterhin Planstunden; Iststunden werden dort nicht abgezogen.
 
 
+## Projektplan (nur Administratoren)
+
+Der Reiter **Projektplan** zeigt den Terminplan eines Projekts als Tabelle mit Gantt-Diagramm. Er ist vorerst nur für Administratoren sichtbar und unabhängig von der Stundenplanung.
+
+- **Vorgänge anlegen:** „Vorgang“ oder „Meilenstein“ fügt eine Zeile nach dem markierten Vorgang ein. „Phasen aus den Gates übernehmen“ legt bei einem leeren Plan je Gate-Phase einen Vorgang an.
+- **Gliederung:** Mit „Einrücken“ und „Ausrücken“ entstehen Unterpunkte. Ein Vorgang mit Unterpunkten ist ein Sammelvorgang: Anfang, Ende, Dauer und Fortschritt ergeben sich aus den Unterpunkten. Mit dem Pfeil vor dem Namen lassen sich Unterpunkte auf- und zuklappen. „Nach oben“ und „Nach unten“ verschieben den Vorgang samt Unterpunkten.
+- **Termine:** Die Dauer wird in Arbeitstagen (Montag bis Freitag) angegeben, 0 ergibt einen Meilenstein. Das Ende rechnet sich aus Anfang und Dauer; wer das Ende ändert, ändert die Dauer.
+- **Vorgänger:** In der Spalte „Vorgänger“ steht die Nummer des Vorgangs, optional die Art und ein Zeitabstand in Arbeitstagen, z. B. `3`, `4AA`, `5EA+2`, `6EE-1`. EA = Ende–Anfang, AA = Anfang–Anfang, EE = Ende–Ende, AE = Anfang–Ende. Verknüpfte Vorgänge folgen ihren Vorgängern automatisch. Gibt man bei einem verknüpften Vorgang einen späteren Anfang ein, gilt dieser als „nicht früher als“.
+- **Mit der Maus:** Balken verschieben, am rechten Rand verlängern. Von einem Punkt am Balkenende (erscheint beim Darüberfahren) zu einem anderen Balken ziehen: Der linke Teil des Zielbalkens verknüpft mit dessen Anfang, der rechte mit dessen Ende. Ein Klick auf eine Verknüpfungslinie entfernt sie. Mit den Pfeiltasten verschiebt man den markierten Balken um einen Arbeitstag, mit Umschalt+Pfeil ändert man die Dauer.
+- **Prüfungen:** Zirkelbezüge, Verknüpfungen mit dem eigenen Sammelvorgang und Meilensteine mit Unterpunkten werden mit einem Hinweis abgelehnt. Ein Plan darf bis zu 500 Vorgänge enthalten.
+- **Zeitraster und Markierungen:** Tag, Woche oder Monat. Die Rauten G3 bis G8 stammen aus den Gate-Terminen des Projekts, die rote Linie ist heute.
+- Änderungen werden sofort gespeichert. Wurde der Plan in einem anderen Fenster geändert, erscheint ein Hinweis und die Seite muss neu geladen werden.
+
 ## Gate-Status und nächstes Gate
 Das Portfolio zeigt bei jedem Projekt den „Gate-Status (Plan)“ und das nächste Gate mit Datum. Dieselben Angaben stehen in der Projektliste und im Projektdetail. Grundlage sind die hinterlegten Gate-Termine und das lokale Tagesdatum des Browsers. Der gewählte Zeitraum der Kapazitätsvorschau beeinflusst diesen Status nicht.
 

@@ -23,6 +23,7 @@ class ServerStore:
             raise ValueError('Das Collection-Präfix muss mit kapa_ beginnen und darf nur Kleinbuchstaben, Zahlen und Unterstriche enthalten.')
         self._database = database
         self._planning = database[prefix + 'planning']
+        self._gantt = database[prefix + 'gantt']
         self._users = database[prefix + 'users']
         self._sessions = database[prefix + 'sessions']
         self._audit = database[prefix + 'audit']
@@ -73,6 +74,32 @@ class ServerStore:
                 update,
                 upsert=revision == 0, return_document=ReturnDocument.AFTER,
             )
+        except DuplicateKeyError as exc:
+            raise RevisionConflict from exc
+        if record is None:
+            raise RevisionConflict
+        return record['revision']
+
+    def read_gantt(self, project_id):
+        """Terminplan eines Projekts. Liegt bewusst nicht im Planungsdokument, damit nur Administratoren ihn lesen."""
+        record = self._gantt.find_one({'_id': project_id})
+        if record is None:
+            return {'projectId': project_id, 'tasks': [], '_revision': 0}
+        data = deepcopy(record['data'])
+        data['_revision'] = record['revision']
+        return data
+
+    def save_gantt(self, project_id, snapshot, actor=None):
+        data = deepcopy(snapshot)
+        revision = data.pop('_revision', 0)
+        if isinstance(revision, bool) or not isinstance(revision, int) or revision < 0:
+            raise ValueError('Ungültige Revision.')
+        update = {'$set': {'data': data}, '$inc': {'revision': 1}}
+        if actor:
+            update['$push'] = {'history': {'$each': [{'actor': actor, 'event': 'gantt.saved', 'at': datetime.now(timezone.utc)}], '$slice': -200}}
+        try:
+            record = self._gantt.find_one_and_update({'_id': project_id, 'revision': revision}, update,
+                                                     upsert=revision == 0, return_document=ReturnDocument.AFTER)
         except DuplicateKeyError as exc:
             raise RevisionConflict from exc
         if record is None:
