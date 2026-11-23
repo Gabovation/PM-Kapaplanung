@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.14.0 – 23.11.2026
+- Projektplan: Der Export sitzt jetzt als Auswahl „Exportieren“ neben „Projekt anlegen“ (PDF, Excel, MS Project) und ist nur auf der Seite Projektplan sichtbar.
+- Projektplan: Neuer Export als Microsoft-Project-XML. Die Datei enthält Gliederung, Meilensteine, Fortschritt, Verknüpfungen mit Zeitabstand und auf Wunsch den Basisplan. Microsoft Project öffnet sie über Datei › Öffnen.
+
 ## 0.13.0 – 23.11.2026
 - Projektplan: Export als Excel (.xlsx) und PDF. Der Export enthält genau die Zeilen, die gerade sichtbar sind, und auf Wunsch Basisplan und kritischen Pfad. Excel zeigt das Gantt als Wochenraster mit gefärbten Zellen, das PDF im Querformat mit Balken, Verknüpfungen, Gates und Heute-Linie auf mehreren Seiten.
 - Projektplan: Vorgänge lassen sich als „intern“ kennzeichnen. Die „Kundenansicht“ blendet interne Vorgänge samt Unterpunkten sowie Sammelvorgänge ohne sichtbare Unterpunkte aus; der Export für Kunden übernimmt diese Ansicht und nummeriert neu. Vor einem Export mit sichtbaren internen Vorgängen fragt die Anwendung nach.

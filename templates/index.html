@@ -1,7 +1,15 @@
 {% extends "layout.html" %}
 {% block content %}
 <div id="kapa-app" data-api-url="{{ url_for('planning_data') }}" data-import-url="{{ url_for('prepare_import') }}" data-sap-url="{{ url_for('sap_preview') }}" data-write-token="{{ write_token }}" data-password-url="{{ url_for('change_password') if server_auth_enabled else '' }}"{% if gantt_enabled %} data-gantt-url="{{ url_for('gantt_data', project_id='PROJECT_ID') }}"{% endif %}>
-  <header class="kapa-heading"><h1 id="title" class="pt-page-header__title">Übersicht</h1>{{ ui.button('Projekt anlegen', variant='primary', icon_name='add', id='newProject') }}</header>
+  <header class="kapa-heading"><h1 id="title" class="pt-page-header__title">Übersicht</h1>
+    <div class="kapa-heading-actions">{% if gantt_enabled %}<details class="kapa-menu" id="ganttExportMenu" hidden>
+      <summary class="pt-button pt-button--secondary" aria-haspopup="menu">Exportieren</summary>
+      <div class="kapa-menu-list" role="menu" aria-label="Exportformat">
+        <button type="button" role="menuitem" class="pt-button pt-button--subtle" onclick="ganttExport('pdf')">PDF</button>
+        <button type="button" role="menuitem" class="pt-button pt-button--subtle" onclick="ganttExport('xlsx')">Excel</button>
+        <button type="button" role="menuitem" class="pt-button pt-button--subtle" onclick="ganttExport('xml')">MS Project</button>
+      </div>
+    </details>{% endif %}{{ ui.button('Projekt anlegen', variant='primary', icon_name='add', id='newProject') }}</div></header>
   <div id="content" aria-live="polite"></div>
 </div>
 {% call ui.dialog('modal', '', size='form', close_label='Schließen') %}

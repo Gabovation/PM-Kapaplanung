@@ -98,10 +98,11 @@ function ganttExportModel(format){
   return out;
  });
  const links=[];
- tasks.forEach((task,to)=>{if(number.has(to))task.links.forEach(link=>{const from=index.get(link.from);if(number.has(from))links.push({from:number.get(from),to:number.get(to),type:link.type,critical:!!view.crit?.links.has(`${to}:${from}`)})})});
+ tasks.forEach((task,to)=>{if(number.has(to))task.links.forEach(link=>{const from=index.get(link.from);if(number.has(from))links.push({from:number.get(from),to:number.get(to),type:link.type,lag:link.lagDays||0,critical:!!view.crit?.links.has(`${to}:${from}`)})})});
  return {format,projectName:project.name,projectNumber:project.number||'',createdAt:today,options:{baseline:!!view.baseline,critical:!!view.crit,customer:ganttCustomer},rows:outRows,links,gates:project.dates.map((date,i)=>({label:gates[i].replace('Gate ','G'),date}))};
 }
 async function ganttExport(format){
+ ganttMenuClose();
  if(!ganttView||!ganttView.visible.length)return alert('Es gibt keine sichtbaren Vorgänge zum Exportieren.');
  const internal=ganttDoc.tasks.filter(task=>task.internal).length;
  if(!ganttCustomer&&internal&&!confirm(`Der Plan enthält ${internal} interne Vorgänge, die im Export enthalten wären. Für Kunden bitte zuerst „Kundenansicht“ einschalten. Trotzdem exportieren?`))return;
@@ -115,6 +116,15 @@ async function ganttExport(format){
   ganttSetStatus('Export erstellt');
  }catch(error){ganttSetStatus('');alert('Export fehlgeschlagen: '+error.message)}
 }
+function ganttMenu(){return document.querySelector('#ganttExportMenu')}
+function ganttMenuClose(){const menu=ganttMenu();if(menu)menu.open=false}
+function ganttSyncHeader(){
+ const menu=ganttMenu(); if(!menu)return;
+ menu.hidden=page!=='gantt'||!ganttDoc?.tasks?.length;
+ if(menu.hidden)menu.open=false;
+}
+document.addEventListener('click',event=>{const menu=ganttMenu();if(menu?.open&&!menu.contains(event.target))menu.open=false});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){const menu=ganttMenu();if(menu?.open){menu.open=false;menu.querySelector('summary')?.focus()}}});
 function ganttToggle(id){ganttCollapsed.has(id)?ganttCollapsed.delete(id):ganttCollapsed.add(id);ganttRerender()}
 function ganttCollapseAll(collapse){
  ganttCollapsed.clear();
@@ -330,8 +340,7 @@ function ganttToolbar(full=false){
  return `<div class="kapa-gantt-toolbar"><div class="pt-field kapa-gantt-project"><label class="pt-field__label" for="ganttProject">Projekt</label><select id="ganttProject" class="pt-select" data-pt-search="off" onchange="ganttSelectProject(this.value)">${projects}</select></div>
   ${full?`<div class="actions kapa-gantt-actions">${button('＋ Vorgang',"ganttAdd('task')")}${button('◆ Meilenstein',"ganttAdd('milestone')")}${button('← Ausrücken',"ganttAct('outdent')")}${button('Einrücken →',"ganttAct('indent')")}${button('↑ Nach oben',"ganttAct('up')")}${button('↓ Nach unten',"ganttAct('down')")}<button type="button" class="danger" onclick="ganttAct('delete')">Löschen</button></div>
   <div class="actions kapa-gantt-actions">${zoom}${button('Heute','ganttGoToday()')}${button('Alles zuklappen','ganttCollapseAll(true)')}${button('Alles aufklappen','ganttCollapseAll(false)')}</div>
-  <div class="actions kapa-gantt-actions">${button(hasBaseline?'Basisplan überschreiben':'Basisplan speichern','ganttSaveBaseline()')}${hasBaseline?button('Basisplan löschen','ganttDeleteBaseline()'):''}${hasBaseline?option('base','Basisplan anzeigen',ganttShowBase):''}${option('critical','Kritischer Pfad',ganttShowCritical)}${option('customer','Kundenansicht',ganttCustomer)}</div>
-  <div class="actions kapa-gantt-actions">${button('Excel exportieren',"ganttExport('xlsx')")}${button('PDF exportieren',"ganttExport('pdf')")}<span id="ganttStatus" class="quiet" role="status" aria-live="polite">${esc(ganttSaveText)}</span></div>`:''}</div>`;
+  <div class="actions kapa-gantt-actions">${button(hasBaseline?'Basisplan überschreiben':'Basisplan speichern','ganttSaveBaseline()')}${hasBaseline?button('Basisplan löschen','ganttDeleteBaseline()'):''}${hasBaseline?option('base','Basisplan anzeigen',ganttShowBase):''}${option('critical','Kritischer Pfad',ganttShowCritical)}${option('customer','Kundenansicht',ganttCustomer)}<span id="ganttStatus" class="quiet" role="status" aria-live="polite">${esc(ganttSaveText)}</span></div>`:''}</div>`;
 }
 function ganttLegend(){
  const items=[];

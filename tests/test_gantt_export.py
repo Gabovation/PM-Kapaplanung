@@ -107,6 +107,8 @@ def test_export_route_permissions_and_download(server):  # noqa: F811
     assert xlsx.status_code == 200 and xlsx.mimetype.endswith('spreadsheetml.sheet')
     assert 'attachment; filename="Projektplan_41-22-030_2026-11-23.xlsx"' == xlsx.headers['Content-Disposition']
     assert xlsx.headers['X-Content-Type-Options'] == 'nosniff' and load_workbook(BytesIO(xlsx.data)).active['B7'].value == 'Konzept'
+    xml = client.post(url, json=model('xml'), headers=headers)
+    assert xml.status_code == 200 and xml.mimetype == 'application/xml' and xml.data.startswith(b'<?xml')
     pdf = client.post(url, json=model('pdf'), headers=headers)
     assert pdf.status_code == 200 and pdf.mimetype == 'application/pdf' and pdf.data.startswith(b'%PDF')
     assert client.post(url, json={'format': 'pdf'}, headers=headers).status_code == 400
@@ -130,3 +132,44 @@ def test_internal_flag_is_validated():
     validate_gantt(plan(task('a', internal=True)), 'p1')
     with pytest.raises(ValueError):
         validate_gantt(plan(task('a', internal='ja')), 'p1')
+
+
+def test_ms_project_xml():
+    import xml.etree.ElementTree as ET
+    data = model('xml')
+    data['rows'][2]['name'] = 'A & B <c> "d"\x01'
+    data['links'] = [{'from': 2, 'to': 3, 'type': 'FS', 'critical': True, 'lag': 2}, {'from': 3, 'to': 4, 'type': 'SS', 'lag': -1}]
+    content, name, mime = export.build(export.validate_export(data))
+    assert name == 'Projektplan_41-22-030_2026-11-23.xml' and mime == 'application/xml'
+    ns = {'p': 'http://schemas.microsoft.com/project'}
+    root = ET.fromstring(content)
+    tasks = root.findall('.//p:Task', ns)
+    assert [task.find('p:Name', ns).text for task in tasks] == ['Konzept', 'Anforderungen', 'A & B <c> "d"', 'Freigabe']
+    assert [task.find('p:OutlineLevel', ns).text for task in tasks] == ['1', '2', '2', '2']
+    assert [task.find('p:OutlineNumber', ns).text for task in tasks] == ['1', '1.1', '1.2', '1.3']
+    assert tasks[0].find('p:Summary', ns).text == '1' and tasks[3].find('p:Milestone', ns).text == '1'
+    assert tasks[1].find('p:Duration', ns).text == 'PT64H0M0S'          # 8 Arbeitstage zu je 8 Stunden
+    assert tasks[3].find('p:Duration', ns).text == 'PT0H0M0S'
+    first = tasks[2].find('p:PredecessorLink', ns)
+    assert first.find('p:PredecessorUID', ns).text == '2' and first.find('p:Type', ns).text == '1' and first.find('p:LinkLag', ns).text == '9600'
+    second = tasks[3].find('p:PredecessorLink', ns)
+    assert second.find('p:Type', ns).text == '3' and second.find('p:LinkLag', ns).text == '-4800'  # AA mit -1 Tag
+    assert tasks[2].find('p:Critical', ns).text == '1' and tasks[2].find('p:Baseline/p:Start', ns).text == '2026-11-12T08:00:00'
+    assert root.find('p:Calendars/p:Calendar/p:UID', ns).text == '1'
+
+
+def test_ms_project_xml_without_baseline_and_critical():
+    import xml.etree.ElementTree as ET
+    data = model('xml', options={'baseline': False, 'critical': False, 'customer': True})
+    root = ET.fromstring(export.build(export.validate_export(data))[0])
+    ns = {'p': 'http://schemas.microsoft.com/project'}
+    assert root.find('.//p:Baseline', ns) is None
+    assert {task.find('p:Critical', ns).text for task in root.findall('.//p:Task', ns)} == {'0'}
+
+
+def test_link_lag_is_validated():
+    for lag in (366, -366, 'x', True):
+        data = model()
+        data['links'] = [{'from': 2, 'to': 3, 'type': 'FS', 'lag': lag}]
+        with pytest.raises(ValueError):
+            export.validate_export(data)

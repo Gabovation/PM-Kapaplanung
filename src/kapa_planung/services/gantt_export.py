@@ -12,7 +12,7 @@ from kapa_planung.services.gantt import MAX_LEVEL, MAX_TASKS, _integer, _iso
 
 KINDS = ('task', 'summary', 'milestone')
 LINK_TYPES = ('FS', 'SS', 'FF', 'SF')
-FORMATS = ('xlsx', 'pdf')
+FORMATS = ('xlsx', 'pdf', 'xml')
 MAX_LINKS = 5000
 BAR, SUMMARY, CRITICAL, BASELINE, GATE, TODAY, GRID, STRIPE = '#416680', '#25303B', '#9E0C26', '#8A949C', '#FAB72D', '#D32F2F', '#D2D7DB', '#F4F6F8'
 
@@ -55,7 +55,7 @@ def validate_export(data) -> dict:
     links = data.get('links', [])
     if not isinstance(links, list) or len(links) > MAX_LINKS or any(
             not isinstance(link, dict) or link.get('from') not in numbers or link.get('to') not in numbers
-            or link['from'] == link['to'] or link.get('type') not in LINK_TYPES or not isinstance(link.get('critical', False), bool)
+            or link['from'] == link['to'] or link.get('type') not in LINK_TYPES or not isinstance(link.get('critical', False), bool) or not _integer(link.get('lag', 0), -365, 365)
             for link in links):
         raise ValueError('Ungültige Verknüpfung im Export.')
     gates = data.get('gates', [])
@@ -436,8 +436,82 @@ def _assemble(pages, width, height, title) -> bytes:
     return bytes(out)
 
 
+# ------------------------------------------------------------------------- MS Project (MSPDI-XML)
+_XML_INVALID = re.compile('[^\x09\x0a\x0d\x20-\ud7ff\ue000-\ufffd]')
+_MSP_TYPE = {'FF': 0, 'FS': 1, 'SF': 2, 'SS': 3}  # Verknüpfungsarten im Microsoft-Project-XML
+_MSP_NS = 'http://schemas.microsoft.com/project'
+
+
+def _xml(value) -> str:
+    from xml.sax.saxutils import escape
+    return escape(_XML_INVALID.sub('', str(value)))
+
+
+def _work_days(start: str, end: str) -> int:
+    first, last = _day(start), _day(end)
+    return max(sum(1 for day in range(first, last + 1) if date.fromordinal(day).weekday() < 5), 0)
+
+
+def _duration(days: int) -> str:
+    return f'PT{days * 8}H0M0S'  # 8 Arbeitsstunden je Tag, wie im Standardkalender unten
+
+
+def build_mspdi(model) -> bytes:
+    """Microsoft-Project-XML (MSPDI). Microsoft Project öffnet die Datei über Datei › Öffnen; das Binärformat .mpp wird nicht erzeugt."""
+    options, rows, links = model.get('options', {}), model['rows'], model.get('links', [])
+    include_base, include_crit = options.get('baseline'), options.get('critical')
+    title = f"{model.get('projectNumber', '')} {model['projectName']}".strip()
+    start = min(row['start'] for row in rows)
+    finish = max(row['end'] for row in rows)
+    by_target: dict[int, list[dict]] = {}
+    for link in links:
+        by_target.setdefault(link['to'], []).append(link)
+    out = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', f'<Project xmlns="{_MSP_NS}">',
+           '<SaveVersion>12</SaveVersion>', f'<Name>{_xml(title)}</Name>', f'<Title>{_xml(title)}</Title>',
+           f"<CreationDate>{model['createdAt']}T08:00:00</CreationDate>", '<ScheduleFromStart>1</ScheduleFromStart>',
+           f'<StartDate>{start}T08:00:00</StartDate>', f'<FinishDate>{finish}T17:00:00</FinishDate>', '<CalendarUID>1</CalendarUID>',
+           '<DefaultStartTime>08:00:00</DefaultStartTime>', '<DefaultFinishTime>17:00:00</DefaultFinishTime>',
+           '<MinutesPerDay>480</MinutesPerDay>', '<MinutesPerWeek>2400</MinutesPerWeek>', '<DaysPerMonth>20</DaysPerMonth>',
+           '<DurationFormat>7</DurationFormat>', '<WeekStartDay>1</WeekStartDay>',
+           '<Calendars><Calendar><UID>1</UID><Name>Standard</Name><IsBaseCalendar>1</IsBaseCalendar><WeekDays>',
+           '<WeekDay><DayType>1</DayType><DayWorking>0</DayWorking></WeekDay>']
+    for day_type in range(2, 7):
+        out.append(f'<WeekDay><DayType>{day_type}</DayType><DayWorking>1</DayWorking><WorkingTimes>'
+                   '<WorkingTime><FromTime>08:00:00</FromTime><ToTime>12:00:00</ToTime></WorkingTime>'
+                   '<WorkingTime><FromTime>13:00:00</FromTime><ToTime>17:00:00</ToTime></WorkingTime></WorkingTimes></WeekDay>')
+    out.append('<WeekDay><DayType>7</DayType><DayWorking>0</DayWorking></WeekDay></WeekDays></Calendar></Calendars><Tasks>')
+    counters = [0] * (MAX_LEVEL + 2)
+    for row in rows:
+        level = row['level']
+        counters[level] += 1
+        for deeper in range(level + 1, len(counters)):
+            counters[deeper] = 0
+        outline = '.'.join(str(counters[i]) for i in range(level + 1))
+        milestone = row['kind'] == 'milestone'
+        days = 0 if milestone else max(_work_days(row['start'], row['end']), 1)
+        out.append(f"<Task><UID>{row['nr']}</UID><ID>{row['nr']}</ID><Name>{_xml(row['name'])}</Name><Type>1</Type><IsNull>0</IsNull>"
+                   f"<WBS>{outline}</WBS><OutlineNumber>{outline}</OutlineNumber><OutlineLevel>{level + 1}</OutlineLevel><Priority>500</Priority>"
+                   f"<Start>{row['start']}T08:00:00</Start><Finish>{row['end']}T{'08' if milestone else '17'}:00:00</Finish>"
+                   f"<Duration>{_duration(days)}</Duration><DurationFormat>7</DurationFormat><Milestone>{int(milestone)}</Milestone>"
+                   f"<Summary>{int(row['kind'] == 'summary')}</Summary><Critical>{int(bool(include_crit and row.get('critical')))}</Critical>"
+                   f"<PercentComplete>{row['percent']}</PercentComplete><ConstraintType>0</ConstraintType>")
+        for link in by_target.get(row['nr'], []):
+            out.append(f"<PredecessorLink><PredecessorUID>{link['from']}</PredecessorUID><Type>{_MSP_TYPE[link['type']]}</Type>"
+                       f"<CrossProject>0</CrossProject><LinkLag>{link.get('lag', 0) * 4800}</LinkLag><LagFormat>7</LagFormat></PredecessorLink>")
+        if include_base and row.get('baselineStart'):
+            base_days = 0 if milestone else max(_work_days(row['baselineStart'], row['baselineEnd']), 1)
+            out.append(f"<Baseline><Number>0</Number><Start>{row['baselineStart']}T08:00:00</Start>"
+                       f"<Finish>{row['baselineEnd']}T{'08' if milestone else '17'}:00:00</Finish><Duration>{_duration(base_days)}</Duration>"
+                       '<DurationFormat>7</DurationFormat></Baseline>')
+        out.append('</Task>')
+    out.append('</Tasks></Project>')
+    return '\n'.join(out).encode('utf-8')
+
+
 def build(model) -> tuple[bytes, str, str]:
     """Liefert (Inhalt, Dateiname, Medientyp)."""
     if model['format'] == 'xlsx':
         return build_xlsx(model), file_name(model), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    if model['format'] == 'xml':
+        return build_mspdi(model), file_name(model), 'application/xml'
     return build_pdf(model), file_name(model), 'application/pdf'
