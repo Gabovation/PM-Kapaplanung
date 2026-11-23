@@ -183,7 +183,9 @@
 
 /* Projektplan (Gantt) */
 .kapa-gantt {display:grid;gap:var(--polytec-space-3);min-width:0}
-.kapa-gantt-toolbar {display:flex;flex-wrap:wrap;align-items:end;gap:var(--polytec-space-3) var(--polytec-space-4)}
+.kapa-gantt {position:relative}
+.kapa-gantt-fullbtn {position:absolute;top:0;right:0;z-index:5}
+.kapa-gantt-toolbar {padding-right:3.25rem;display:flex;flex-wrap:wrap;align-items:end;gap:var(--polytec-space-3) var(--polytec-space-4)}
 .kapa-gantt-project {min-width:min(22rem,100%)}
 .kapa-gantt-actions {flex-wrap:wrap;justify-content:flex-start}
 .kapa-gantt-actions .pt-segmented {flex:none}

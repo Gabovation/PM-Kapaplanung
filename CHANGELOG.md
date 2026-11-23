@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.15.0 – 23.11.2026
-- Projektplan: Vollbildansicht über die Schaltfläche „Vollbild“ (Esc oder „Vollbild beenden“ schließt sie). Tabelle und Diagramm nutzen den ganzen Bildschirm, der Export bleibt im Vollbild erreichbar.
+- Projektplan: Vollbildansicht über das Vollbild-Symbol oben rechts im Projektplan (Esc oder das Schließen-Symbol beendet sie). Tabelle und Diagramm nutzen den ganzen Bildschirm, der Export bleibt im Vollbild erreichbar.
 - Projektplan: Stufenloses Hineinzoomen von 50 % bis 400 % mit den Schaltflächen − und + oder Strg + Mausrad über dem Diagramm. Der Bereich unter dem Mauszeiger bleibt dabei an Ort und Stelle.
 
 ## 0.14.0 – 23.11.2026
