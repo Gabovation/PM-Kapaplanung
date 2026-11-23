@@ -75,6 +75,15 @@ const KapaGantt = (() => {
     return result.length === graph.length ? result : null;
   }
 
+  /* Frühester Anfang eines Vorgangs, den eine einzelne Verknüpfung erlaubt. */
+  function candidateStart(link, source, duration, milestone) {
+    const lag = link.lagDays || 0;
+    if (milestone) return addWork(link.type === 'FS' || link.type === 'FF' ? source.end : source.start, lag);
+    if (link.type === 'FS') return addWork(source.end, lag + 1);
+    if (link.type === 'SS') return addWork(source.start, lag);
+    return addWork(addWork(link.type === 'FF' ? source.end : source.start, lag), -(duration - 1));
+  }
+
   /* Vorwärtsrechnung: Terminfolge aller vier Verknüpfungsarten mit Pufferzeit, Sammelvorgänge aggregieren. */
   function schedule(tasks) {
     const index = new Map(tasks.map((task, i) => [task.id, i])), {parents, children} = structure(tasks);
@@ -98,12 +107,7 @@ const KapaGantt = (() => {
       const milestone = task.type === 'milestone', duration = milestone ? 0 : Math.max(1, task.durationDays | 0), links = task.links || [];
       let start = null;
       for (const link of links) {
-        const source = rows[index.get(link.from)], lag = link.lagDays || 0;
-        let candidate;
-        if (milestone) candidate = addWork(link.type === 'FS' || link.type === 'FF' ? source.end : source.start, lag);
-        else if (link.type === 'FS') candidate = addWork(source.end, lag + 1);
-        else if (link.type === 'SS') candidate = addWork(source.start, lag);
-        else candidate = addWork(addWork(link.type === 'FF' ? source.end : source.start, lag), -(duration - 1));
+        const candidate = candidateStart(link, rows[index.get(link.from)], duration, milestone);
         start = start === null ? candidate : Math.max(start, candidate);
       }
       if (start === null) start = nextWork(num(task.start));
@@ -113,6 +117,56 @@ const KapaGantt = (() => {
     }
     return {rows, error: ''};
   }
+  /* Rückwärtsrechnung: Gesamtpuffer je Vorgang in Arbeitstagen und kritischer Pfad (Puffer ≤ 0).
+     Vorgänge ohne Nachfolger dürfen bis zum Projektende laufen. Eine Verknüpfung ist kritisch, wenn sie den
+     Anfang ihres Nachfolgers bestimmt und beide Vorgänge kritisch sind. */
+  function criticalPath(tasks, rows) {
+    if (!tasks.length) return {slack: [], critical: [], links: new Set()};
+    const index = new Map(tasks.map((task, i) => [task.id, i])), {parents} = structure(tasks), graph = tasks.map(() => []);
+    tasks.forEach((task, i) => {
+      (task.links || []).forEach(link => { if (index.has(link.from)) graph[index.get(link.from)].push(i); });
+      if (parents[i] !== null) graph[i].push(parents[i]);
+    });
+    const sequence = order(graph);
+    if (!sequence) return null;
+    const projectEnd = Math.max(...rows.map(row => row.end)), endLimit = tasks.map(() => Infinity), startLimit = tasks.map(() => Infinity);
+    const slack = new Array(tasks.length).fill(0), driving = new Set();
+    for (const i of [...sequence].reverse()) {
+      const row = rows[i];
+      if (row.summary) {
+        for (const child of row.children) {
+          endLimit[child] = Math.min(endLimit[child], endLimit[i]);
+          if (rows[child].start === row.start) startLimit[child] = Math.min(startLimit[child], startLimit[i]);
+        }
+        continue;
+      }
+      const duration = row.duration;
+      let latestFinish = Math.min(endLimit[i], projectEnd);
+      if (startLimit[i] !== Infinity) latestFinish = Math.min(latestFinish, duration ? addWork(startLimit[i], duration - 1) : startLimit[i]);
+      const latestStart = duration ? addWork(latestFinish, -(duration - 1)) : latestFinish;
+      slack[i] = workBetween(row.start, latestStart);
+      for (const link of tasks[i].links || []) {
+        const from = index.get(link.from), lag = link.lagDays || 0;
+        let bound, onEnd;
+        if (row.milestone) { bound = addWork(latestStart, -lag); onEnd = link.type === 'FS' || link.type === 'FF'; }
+        else if (link.type === 'FS') { bound = addWork(latestStart, -(lag + 1)); onEnd = true; }
+        else if (link.type === 'SS') { bound = addWork(latestStart, -lag); onEnd = false; }
+        else { bound = addWork(latestFinish, -lag); onEnd = link.type === 'FF'; }
+        if (onEnd) endLimit[from] = Math.min(endLimit[from], bound); else startLimit[from] = Math.min(startLimit[from], bound);
+        if (candidateStart(link, rows[from], duration, row.milestone) === row.start) driving.add(`${i}:${from}`);
+      }
+    }
+    for (const i of sequence) if (rows[i].summary) slack[i] = Math.min(...rows[i].children.map(child => slack[child]));
+    const critical = slack.map(value => value <= 0), links = new Set([...driving].filter(key => {
+      const [to, from] = key.split(':').map(Number);
+      return critical[to] && critical[from];
+    }));
+    return {slack, critical, links};
+  }
+  /* Basisplan: eingefrorene Anfangs- und Endtermine aller Vorgänge. */
+  const snapshot = (rows, savedAt) => ({savedAt, tasks: Object.fromEntries(rows.map(row => [row.id, {start: iso(row.start), end: iso(row.end)}]))});
+  const variance = (baseline, row) => baseline?.tasks?.[row.id] ? workBetween(nextWork(num(baseline.tasks[row.id].end)), row.end) : null;
+
   /* Schreibt die berechneten Anfangstermine zurück, damit ein Vorgang nach dem Entfernen seiner Verknüpfungen stehen bleibt. */
   function normalize(tasks) {
     const result = schedule(tasks);
@@ -185,6 +239,15 @@ const KapaGantt = (() => {
       }
     });
   }
+  /* „Intern“: Der Vorgang (samt Unterpunkten) wird in der Kundenansicht und im Export ausgeblendet. */
+  const setInternal = (tasks, index, value) => apply(tasks, copy => { if (value) copy[index].internal = true; else delete copy[index].internal; });
+  /* Menge der in der Kundenansicht ausgeblendeten Zeilen: interne Vorgänge, ihre Unterpunkte und Sammelvorgänge ohne sichtbare Unterpunkte. */
+  function customerHidden(tasks, rows) {
+    const hidden = new Set();
+    rows.forEach((row, i) => { if (tasks[i].internal || (row.parent !== null && hidden.has(row.parent))) hidden.add(i); });
+    for (let i = rows.length - 1; i >= 0; i--) if (rows[i].summary && !hidden.has(i) && rows[i].children.every(child => hidden.has(child))) hidden.add(i);
+    return hidden;
+  }
   const setName = (tasks, index, name) => apply(tasks, copy => {
     name = String(name).trim();
     if (!name || name.length > 120) return 'Der Name muss 1 bis 120 Zeichen enthalten.';
@@ -255,6 +318,7 @@ const KapaGantt = (() => {
     return tasks;
   }
   return {num, iso, isWork, nextWork, prevWork, addWork, workBetween, structure, subtreeEnd, validate, schedule, normalize,
+    criticalPath, snapshot, variance, setInternal, customerHidden,
     formatLinks, parseLinks, add, remove, indent, outdent, move, setName, setDuration, setStart, setEnd, setPercent,
     setLinks, addLink, removeLink, shiftStart, setDurationDays, fromGates, DE};
 })();

@@ -237,4 +237,20 @@
 .kapa-gantt-linkgroup:hover .kapa-gantt-link {stroke:var(--polytec-color-status-danger);stroke-width:2.5}
 .kapa-gantt-arrow {fill:var(--polytec-color-text-secondary)}
 .kapa-gantt-draft {fill:none;stroke:var(--polytec-color-action-primary);stroke-width:2;stroke-dasharray:5 4;pointer-events:none}
+.kapa-gantt-option {display:inline-flex;align-items:center;gap:var(--polytec-space-2);font-weight:600}
+.kapa-gantt-option input {width:auto;min-height:0;margin:0}
+.kapa-gantt-legend {display:flex;flex-wrap:wrap;gap:var(--polytec-space-4);font-size:.875rem;color:var(--polytec-color-text-secondary)}
+.kapa-gantt-legend span {display:inline-flex;align-items:center;gap:var(--polytec-space-2)}
+.kapa-gantt-key {display:inline-block;width:1.5rem;height:.5rem;border-radius:2px}
+.kapa-gantt-key-critical {background:var(--polytec-color-status-danger)}
+.kapa-gantt-key-baseline {background:var(--polytec-color-text-secondary);opacity:.6}
+.kapa-gantt-critical-text {color:var(--polytec-color-status-danger);font-weight:700}
+.kapa-gantt-baseline {fill:var(--polytec-color-text-secondary);opacity:.6;pointer-events:none}
+.kapa-gantt-bar.is-critical .kapa-gantt-bar-main,.kapa-gantt-bar.is-critical .kapa-gantt-summary {fill:var(--polytec-color-status-danger)}
+.kapa-gantt-bar.is-critical .kapa-gantt-milestone {fill:var(--polytec-color-status-danger)}
+.kapa-gantt-linkgroup.is-critical .kapa-gantt-link {stroke:var(--polytec-color-status-danger);stroke-width:2.5}
+.kapa-gantt-table td.kapa-gantt-center {text-align:center}
+.kapa-gantt-internal {width:1.1rem;height:1.1rem;min-height:0;margin:0;padding:0}
+.kapa-gantt-table tbody tr.is-internal .kapa-gantt-cell {font-style:italic;color:var(--polytec-color-text-secondary)}
+.kapa-gantt-key-customer {background:var(--polytec-chart-series-3)}
 @media (max-width:60rem) {.kapa-gantt-table {position:static}}

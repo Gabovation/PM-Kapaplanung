@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.13.0 – 23.11.2026
+- Projektplan: Export als Excel (.xlsx) und PDF. Der Export enthält genau die Zeilen, die gerade sichtbar sind, und auf Wunsch Basisplan und kritischen Pfad. Excel zeigt das Gantt als Wochenraster mit gefärbten Zellen, das PDF im Querformat mit Balken, Verknüpfungen, Gates und Heute-Linie auf mehreren Seiten.
+- Projektplan: Vorgänge lassen sich als „intern“ kennzeichnen. Die „Kundenansicht“ blendet interne Vorgänge samt Unterpunkten sowie Sammelvorgänge ohne sichtbare Unterpunkte aus; der Export für Kunden übernimmt diese Ansicht und nummeriert neu. Vor einem Export mit sichtbaren internen Vorgängen fragt die Anwendung nach.
+
+## 0.12.0 – 23.11.2026
+- Projektplan: Der kritische Pfad lässt sich einblenden. Kritische Vorgänge und die verknüpfungsbestimmenden Linien sind rot, die Tabelle zeigt den Gesamtpuffer in Arbeitstagen.
+- Projektplan: Der Basisplan friert die aktuellen Termine ein. Er erscheint als grauer Schattenbalken unter jedem Vorgang, die Tabelle zeigt die Abweichung des Endes in Arbeitstagen. Er kann überschrieben und gelöscht werden.
+- Die Rolle HO PM sieht und bearbeitet den Projektplan wie Administratoren. PL und QVP haben weiterhin keinen Zugriff.
+
 ## 0.11.0 – 23.11.2026
 - Neuer Reiter „Projektplan“ (vorerst nur für Administratoren): Gantt je Projekt mit aufklappbaren Vorgängen, Meilensteinen, Anfang, Ende, Dauer, Fortschritt und Verknüpfungen (EA, AA, EE, AE mit Zeitabstand) wie in MS Project. Die Termine werden in Arbeitstagen gerechnet; Sammelvorgänge ergeben sich aus ihren Unterpunkten.
 - Balken lassen sich verschieben, verlängern und per Ziehen verknüpfen; die Gates G3 bis G8 und der heutige Tag sind im Diagramm markiert.

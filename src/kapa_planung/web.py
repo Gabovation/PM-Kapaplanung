@@ -16,6 +16,7 @@ from kapa_planung.ops_platform import init_platform
 from kapa_planung.ops_platform.auth import require_permission
 from kapa_planung.ops_platform.rate_limiter import rate_limit
 from kapa_planung.services.roles import prepare_snapshot, validate_roles
+from kapa_planung.services.gantt import GANTT_ROLES
 from kapa_planung.services.planning import validate_assignments, validate_hour_plans
 
 TOKEN = secrets.token_urlsafe(32)
@@ -48,6 +49,7 @@ def create_app(*, server_repository=None) -> Flask:
     app.jinja_loader.encoding = 'utf-8-sig'
     platform = init_platform(app, PROJECT_ROOT, use_mongo=False)
     app.jinja_env.globals['server_auth_enabled'] = mode == 'server'
+    app.jinja_env.globals['gantt_roles'] = GANTT_ROLES
     store = None
     if mode == 'server':
         from pymongo.errors import PyMongoError
@@ -87,7 +89,7 @@ def create_app(*, server_repository=None) -> Flask:
         if not platform.ui_kit_enabled:
             abort(503)
         response = app.make_response(render_template('index.html', active_nav='overview', write_token=session['csrf'] if mode == 'server' else TOKEN,
-                            gantt_enabled=mode == 'server' and session.get('role') == 'admin'))
+                            gantt_enabled=mode == 'server' and session.get('role') in GANTT_ROLES))
         response.headers['Cache-Control'] = 'no-store'
         return response
 
@@ -151,25 +153,36 @@ def create_app(*, server_repository=None) -> Flask:
                         app.logger.warning('Temporary planning file could not be removed.')
             return jsonify(revision=incoming['_revision'])
 
-    @app.route('/api/gantt/<project_id>', methods=['GET', 'PUT'])
-    @require_permission('kapa-planung.editor')
-    @rate_limit('gantt-data', env='RATE_LIMIT_WRITE_PER_MINUTE', default=240)
-    def gantt_data(project_id):
-        # Der Terminplan ist vorerst nur für Administratoren da und existiert nur im Serverbetrieb.
+    def gantt_guard(project_id):
+        """Gemeinsame Prüfung für Projektplan und Export. Gibt eine Fehlerantwort oder None zurück."""
+        # Der Terminplan ist nur für Administratoren und HO PM da und existiert nur im Serverbetrieb.
         if store is None:
             abort(404)
-        if session.get('role') != 'admin':
+        if session.get('role') not in GANTT_ROLES:
             abort(403)
-        from kapa_planung.services.gantt import valid_project_id, validate_gantt
+        from kapa_planung.services.gantt import valid_project_id
         planning = store.read_planning() or {}
         if not valid_project_id(project_id) or not any(isinstance(item, dict) and item.get('id') == project_id for item in planning.get('projects', [])):
             return jsonify(error='Dieses Projekt existiert nicht.'), 404
-        if request.method == 'GET':
-            return jsonify(store.read_gantt(project_id))
+        return None
+
+    def gantt_write_token():
         supplied = request.headers.get('X-Kapa-Token', '')
         expected = session.get('csrf', '')
         if not supplied or not expected or not hmac.compare_digest(supplied, expected):
             abort(403)
+
+    @app.route('/api/gantt/<project_id>', methods=['GET', 'PUT'])
+    @require_permission('kapa-planung.editor')
+    @rate_limit('gantt-data', env='RATE_LIMIT_WRITE_PER_MINUTE', default=240)
+    def gantt_data(project_id):
+        denied = gantt_guard(project_id)
+        if denied is not None:
+            return denied
+        if request.method == 'GET':
+            return jsonify(store.read_gantt(project_id))
+        gantt_write_token()
+        from kapa_planung.services.gantt import validate_gantt
         incoming = request.get_json(silent=True)
         try:
             validate_gantt(incoming, project_id)
@@ -182,6 +195,28 @@ def create_app(*, server_repository=None) -> Flask:
             return jsonify(error='Der Projektplan wurde in einem anderen Fenster geändert. Bitte neu laden.'), 409
         except ValueError as exc:
             return jsonify(error=str(exc)), 400
+
+    @app.post('/api/gantt/<project_id>/export')
+    @require_permission('kapa-planung.editor')
+    @rate_limit('gantt-export', env='RATE_LIMIT_WRITE_PER_MINUTE', default=30)
+    def gantt_export(project_id):
+        denied = gantt_guard(project_id)
+        if denied is not None:
+            return denied
+        gantt_write_token()
+        from kapa_planung.services.gantt_export import build, validate_export
+        try:
+            content, name, mimetype = build(validate_export(request.get_json(silent=True)))
+        except ValueError as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            app.logger.warning('Projektplan-Export fehlgeschlagen (%s).', type(exc).__name__)
+            return jsonify(error='Der Export konnte nicht erstellt werden.'), 500
+        store.record_event('gantt.export', session['username'], project_id)
+        response = app.response_class(content, mimetype=mimetype)
+        response.headers['Content-Disposition'] = f'attachment; filename="{name}"'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        return response
 
     @app.post('/api/sap-preview')
     @require_permission('kapa-planung.editor')

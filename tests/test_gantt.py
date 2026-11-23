@@ -167,6 +167,8 @@ def server(monkeypatch):
     store = ServerStore(FakeDatabase(), 'kapa_test_')
     store.create_user('admin', hash_password('correct-password-123'), 'admin')
     store.create_user('planer', hash_password('planer-password-123'), 'pl')
+    store.create_user('qvp', hash_password('qvp-password-1234'), 'qvp')
+    store.create_user('homeoffice', hash_password('ho-password-12345'), 'ho_pm')
     store.create_user('reader', hash_password('reader-password-123'), 'reader')
     store.save_planning({'version': 2, '_revision': 0, 'roles': [{'id': 'r', 'name': 'R'}], 'people': [],
                          'projects': [{'id': 'p1', 'name': 'Projekt 1'}]})
@@ -212,13 +214,40 @@ def test_invalid_plan_unknown_project_and_bad_ids(server):
 
 def test_non_admins_are_denied_everywhere(server):
     app, _ = server
-    for name, password in (('planer', 'planer-password-123'), ('reader', 'reader-password-123')):
+    for name, password in (('planer', 'planer-password-123'), ('qvp', 'qvp-password-1234'), ('reader', 'reader-password-123')):
         client, headers = session_client(app, name, password)
         assert client.get('/api/gantt/p1').status_code == 403
         assert client.put('/api/gantt/p1', json=plan(task('a')), headers=headers).status_code == 403
         html = client.get('/').get_data(as_text=True)
         assert 'Projektplan' not in html and 'gantt' not in html
     assert app.test_client().get('/api/gantt/p1').status_code == 401
+
+
+def test_ho_pm_has_access_like_admin(server):
+    app, _ = server
+    client, headers = session_client(app, 'homeoffice', 'ho-password-12345')
+    assert client.get('/api/gantt/p1').status_code == 200
+    assert client.put('/api/gantt/p1', json=plan(task('a')), headers=headers).get_json() == {'revision': 1}
+    html = client.get('/').get_data(as_text=True)
+    assert 'Projektplan' in html and 'app/gantt.js' in html and 'data-gantt-url=' in html
+
+
+def test_baseline_roundtrip_and_validation(server):
+    app, _ = server
+    client, headers = session_client(app)
+    baseline = {'savedAt': '2026-05-10', 'tasks': {'a': {'start': '2026-05-04', 'end': '2026-05-08'}}}
+    body = plan(task('a'))
+    body['baseline'] = baseline
+    assert client.put('/api/gantt/p1', json=body, headers=headers).get_json() == {'revision': 1}
+    assert client.get('/api/gantt/p1').get_json()['baseline'] == baseline
+    for bad in ({'savedAt': 'gestern', 'tasks': {}}, {'savedAt': '2026-05-10'}, {'savedAt': '2026-05-10', 'tasks': []},
+                {'savedAt': '2026-05-10', 'tasks': {'a b': {'start': '2026-05-04', 'end': '2026-05-08'}}},
+                {'savedAt': '2026-05-10', 'tasks': {'a': {'start': '2026-05-09', 'end': '2026-05-08'}}},
+                {'savedAt': '2026-05-10', 'tasks': {'a': {'start': '2026-05-04'}}},
+                {'savedAt': '2026-05-10', 'tasks': {f't{i}': {'start': '2026-05-04', 'end': '2026-05-08'} for i in range(501)}}):
+        with pytest.raises(ValueError):
+            validate_gantt({**plan(task('a')), 'baseline': bad}, 'p1')
+    validate_gantt(plan(task('a')), 'p1')  # ohne Basisplan weiterhin gültig
 
 
 def test_navigation_and_scripts_only_for_admin(server):

@@ -9,7 +9,7 @@
 {% block sidebar_navigation %}
 {{ ops.navigation_item("Übersicht", url_for("index") ~ "#overview", "dashboard", active=active_nav not in ['users', 'password']) }}
 {{ ops.navigation_item("Projekte", url_for("index") ~ "#projects", "work-order") }}
-{% if server_auth_enabled and session.get('role') == 'admin' %}{{ ops.navigation_item("Projektplan", url_for("index") ~ "#gantt", "planner") }}{% endif %}
+{% if server_auth_enabled and session.get('role') in gantt_roles %}{{ ops.navigation_item("Projektplan", url_for("index") ~ "#gantt", "planner") }}{% endif %}
 {{ ops.navigation_divider() }}
 {{ ops.navigation_item("Personen", url_for("index") ~ "#people", "user") }}
 {{ ops.navigation_item("Einstellungen", url_for("index") ~ "#settings", "settings") }}
@@ -22,7 +22,7 @@
 {% block mobile_navigation %}
 {{ ops.mobile_navigation_item("Übersicht", url_for("index") ~ "#overview", "dashboard", active=true) }}
 {{ ops.mobile_navigation_item("Projekte", url_for("index") ~ "#projects", "work-order") }}
-{% if server_auth_enabled and session.get('role') == 'admin' %}{{ ops.mobile_navigation_item("Projektplan", url_for("index") ~ "#gantt", "planner") }}{% endif %}
+{% if server_auth_enabled and session.get('role') in gantt_roles %}{{ ops.mobile_navigation_item("Projektplan", url_for("index") ~ "#gantt", "planner") }}{% endif %}
 {{ ops.mobile_navigation_item("Personen", url_for("index") ~ "#people", "user") }}
 {{ ops.mobile_navigation_item("Einstellungen", url_for("index") ~ "#settings", "settings") }}
 {% endblock %}

@@ -4,6 +4,8 @@ from __future__ import annotations
 from datetime import date
 import re
 
+# Rollen mit Zugriff auf den Projektplan (Konto-Rollen aus server_auth).
+GANTT_ROLES = ('admin', 'ho_pm')
 MAX_TASKS = 500
 MAX_LEVEL = 5
 MAX_LINKS = 10
@@ -71,9 +73,12 @@ def validate_gantt(data, project_id: str) -> None:
             raise ValueError('Ungültige Dauer.')
         if not _integer(task.get('percent', 0), 0, 100):
             raise ValueError('Der Fortschritt muss zwischen 0 und 100 % liegen.')
+        if not isinstance(task.get('internal', False), bool):
+            raise ValueError('Ungültige Kennzeichnung „intern“.')
         note = task.get('note', '')
         if not isinstance(note, str) or len(note) > 500:
             raise ValueError('Die Bemerkung darf höchstens 500 Zeichen enthalten.')
+    _validate_baseline(data.get('baseline'))
     parents = _parents(levels)
     has_children = {parent for parent in parents if parent is not None}
     graph: dict[int, list[int]] = {position: [] for position in range(len(tasks))}
@@ -101,6 +106,19 @@ def validate_gantt(data, project_id: str) -> None:
             graph[position].append(parent)
     if _has_cycle(graph):
         raise ValueError('Die Verknüpfungen enthalten einen Zirkelbezug.')
+
+
+def _validate_baseline(baseline) -> None:
+    """Basisplan: eingefrorene Termine je Vorgang (nur Anfang und Ende), gespeichert mit dem Speicherdatum."""
+    if baseline is None:
+        return
+    entries = baseline.get('tasks') if isinstance(baseline, dict) else None
+    if not isinstance(entries, dict) or len(entries) > MAX_TASKS or not _iso(baseline.get('savedAt')):
+        raise ValueError('Ungültiger Basisplan.')
+    for task_id, entry in entries.items():
+        if not isinstance(task_id, str) or not TASK_ID_PATTERN.fullmatch(task_id) or not isinstance(entry, dict) \
+                or not _iso(entry.get('start')) or not _iso(entry.get('end')) or entry['start'] > entry['end']:
+            raise ValueError('Ungültiger Basisplan.')
 
 
 def _parents(levels):

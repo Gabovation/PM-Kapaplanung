@@ -1,6 +1,6 @@
-/* Reiter „Projektplan“: Vorgangstabelle und Gantt-Diagramm (nur Administratoren, nur Serverbetrieb). */
-let ganttProjectId=null, ganttDoc=null, ganttLoading=false, ganttError='', ganttMessage='', ganttZoom='week', ganttSel=null, ganttView=null, ganttScrollToday=false, ganttSaveText='', ganttDrag=null;
-const ganttCollapsed=new Set(), ganttRowH=34, ganttBarH=18, ganttPx={day:28,week:8,month:3}, ganttHead={upper:20,lower:22,gates:18}, ganttTableWidth=700;
+/* Reiter „Projektplan“: Vorgangstabelle und Gantt-Diagramm (Administratoren und HO PM, nur Serverbetrieb). */
+let ganttProjectId=null, ganttDoc=null, ganttLoading=false, ganttError='', ganttMessage='', ganttZoom='week', ganttSel=null, ganttView=null, ganttScrollToday=false, ganttSaveText='', ganttDrag=null, ganttShowBase=true, ganttShowCritical=false, ganttCustomer=false;
+const ganttCollapsed=new Set(), ganttRowH=34, ganttBarH=18, ganttPx={day:28,week:8,month:3}, ganttHead={upper:20,lower:22,gates:18};
 const ganttMonths=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 let ganttQueue=Promise.resolve(), ganttBlocked=false;
 
@@ -15,7 +15,7 @@ function ganttRerender(){
 function ganttLoad(){
  const id=ganttProjectId; ganttLoading=true; ganttError='';
  fetch(ganttUrl(id)).then(async r=>{
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw Error(e.error||(r.status===403?'Der Projektplan ist nur für Administratoren sichtbar.':'Der Projektplan konnte nicht geladen werden.'))}
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw Error(e.error||(r.status===403?'Der Projektplan ist nur für Administratoren und HO PM sichtbar.':'Der Projektplan konnte nicht geladen werden.'))}
   return r.json()
  }).then(doc=>{
   if(id!==ganttProjectId)return;
@@ -29,7 +29,7 @@ function ganttReload(){ganttDoc=null;ganttMessage='';ganttError='';ganttBlocked=
 
 function ganttSetStatus(text){ganttSaveText=text;const el=document.querySelector('#ganttStatus');if(el)el.textContent=text}
 function ganttSave(){
- const doc=ganttDoc, snapshot=JSON.stringify({projectId:doc.projectId,tasks:doc.tasks});
+ const doc=ganttDoc, snapshot=JSON.stringify({projectId:doc.projectId,tasks:doc.tasks,baseline:doc.baseline||undefined});
  ganttSetStatus('Speichert …');
  ganttQueue=ganttQueue.then(async()=>{
   if(ganttBlocked)return;
@@ -74,6 +74,47 @@ function ganttAct(action){
  }
  ganttCommit({indent:KapaGantt.indent,outdent:KapaGantt.outdent}[action]?.(tasks,i)||KapaGantt.move(tasks,i,action==='up'?-1:1));
 }
+function ganttSaveBaseline(){
+ const result=KapaGantt.schedule(ganttDoc.tasks);
+ if(result.error||!ganttDoc.tasks.length)return;
+ if(ganttDoc.baseline&&!confirm(`Der Basisplan vom ${fmt(ganttDoc.baseline.savedAt)} wird mit den aktuellen Terminen überschrieben. Fortfahren?`))return;
+ ganttDoc.baseline=KapaGantt.snapshot(result.rows,today); ganttShowBase=true; ganttMessage=''; ganttSave(); ganttRerender();
+}
+function ganttDeleteBaseline(){
+ if(!ganttDoc.baseline||!confirm('Basisplan löschen?'))return;
+ delete ganttDoc.baseline; ganttSave(); ganttRerender();
+}
+function ganttSetOption(kind,checked){if(kind==='base')ganttShowBase=checked;else if(kind==='customer')ganttCustomer=checked;else ganttShowCritical=checked;ganttRerender()}
+function ganttSetInternal(i,checked){ganttCommit(KapaGantt.setInternal(ganttDoc.tasks,i,checked))}
+function ganttExportModel(format){
+ const project=ganttProject(), tasks=ganttDoc.tasks, view=ganttView, rows=view.rows;
+ const number=new Map(view.visible.map((i,at)=>[i,at+1])), index=new Map(tasks.map((task,i)=>[task.id,i]));
+ const outRows=view.visible.map(i=>{
+  const row=rows[i], task=tasks[i], base=view.baseline?.tasks?.[row.id];
+  const predecessors=task.links.filter(link=>number.has(index.get(link.from))).map(link=>`${number.get(index.get(link.from))}${link.type==='FS'?'':KapaGantt.DE[link.type]}${link.lagDays?(link.lagDays>0?'+':'')+link.lagDays:''}`).join('; ');
+  const out={nr:number.get(i),level:row.level,name:task.name,kind:row.summary?'summary':row.milestone?'milestone':'task',start:KapaGantt.iso(row.start),end:KapaGantt.iso(row.end),duration:row.duration,percent:row.percent,predecessors};
+  if(base){out.baselineStart=base.start;out.baselineEnd=base.end;out.variance=KapaGantt.variance(view.baseline,row)}
+  if(view.crit){out.slack=view.crit.slack[i];out.critical=view.crit.critical[i]}
+  return out;
+ });
+ const links=[];
+ tasks.forEach((task,to)=>{if(number.has(to))task.links.forEach(link=>{const from=index.get(link.from);if(number.has(from))links.push({from:number.get(from),to:number.get(to),type:link.type,critical:!!view.crit?.links.has(`${to}:${from}`)})})});
+ return {format,projectName:project.name,projectNumber:project.number||'',createdAt:today,options:{baseline:!!view.baseline,critical:!!view.crit,customer:ganttCustomer},rows:outRows,links,gates:project.dates.map((date,i)=>({label:gates[i].replace('Gate ','G'),date}))};
+}
+async function ganttExport(format){
+ if(!ganttView||!ganttView.visible.length)return alert('Es gibt keine sichtbaren Vorgänge zum Exportieren.');
+ const internal=ganttDoc.tasks.filter(task=>task.internal).length;
+ if(!ganttCustomer&&internal&&!confirm(`Der Plan enthält ${internal} interne Vorgänge, die im Export enthalten wären. Für Kunden bitte zuerst „Kundenansicht“ einschalten. Trotzdem exportieren?`))return;
+ ganttSetStatus('Export wird erstellt …');
+ try{
+  const response=await fetch(ganttUrl(ganttDoc.projectId)+'/export',{method:'POST',headers:{'Content-Type':'application/json','X-Kapa-Token':writeToken},body:JSON.stringify(ganttExportModel(format))});
+  if(!response.ok){const e=await response.json().catch(()=>({}));throw Error(e.error||'Der Export konnte nicht erstellt werden.')}
+  const blob=await response.blob(), link=document.createElement('a'), name=/filename="([^"]+)"/.exec(response.headers.get('Content-Disposition')||'')?.[1]||`Projektplan.${format}`;
+  link.href=URL.createObjectURL(blob); link.download=name; document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(()=>URL.revokeObjectURL(link.href),10000);
+  ganttSetStatus('Export erstellt');
+ }catch(error){ganttSetStatus('');alert('Export fehlgeschlagen: '+error.message)}
+}
 function ganttToggle(id){ganttCollapsed.has(id)?ganttCollapsed.delete(id):ganttCollapsed.add(id);ganttRerender()}
 function ganttCollapseAll(collapse){
  ganttCollapsed.clear();
@@ -88,7 +129,7 @@ function ganttRemoveLink(to,fromId){
 }
 function ganttGoToday(){
  const box=document.querySelector('.kapa-gantt-scroll'); if(!box||!ganttView)return;
- box.scrollLeft=Math.max(0,ganttX(KapaGantt.num(today))-(box.clientWidth-ganttTableWidth)/2);
+ box.scrollLeft=Math.max(0,ganttX(KapaGantt.num(today))-(box.clientWidth-(box.querySelector('.kapa-gantt-table')?.offsetWidth||0))/2);
 }
 
 /* ---------------------------------------------------------------- Zeitachse */
@@ -97,15 +138,17 @@ function ganttIsoWeek(n){
  const weekday=(((n+3)%7)+7)%7, thursday=n-weekday+3, year=new Date(thursday*86400000).getUTCFullYear();
  return Math.floor((thursday-Date.UTC(year,0,1)/86400000)/7)+1;
 }
-function ganttBuildView(rows,project){
+function ganttBuildView(rows,project,tasks){
  const px=ganttPx[ganttZoom], gateDays=project.dates.map(KapaGantt.num), todayDay=KapaGantt.num(today);
- const days=rows.flatMap(row=>[row.start,row.end]).concat(gateDays,[todayDay]);
+ const away=ganttCustomer?KapaGantt.customerHidden(tasks,rows):new Set();
+ const hidden=id=>{if(away.has(id))return true;for(let p=rows[id].parent;p!==null;p=rows[p].parent)if(ganttCollapsed.has(rows[p].id))return true;return false};
+ const visible=rows.map((row,i)=>i).filter(i=>!hidden(i)), position=new Map(visible.map((i,at)=>[i,at]));
+ const crit=ganttShowCritical?KapaGantt.criticalPath(tasks,rows):null, baseline=ganttShowBase&&ganttDoc.baseline?ganttDoc.baseline:null;
+ const days=visible.flatMap(i=>{const base=baseline?.tasks?.[rows[i].id];return [rows[i].start,rows[i].end].concat(base?[KapaGantt.num(base.start),KapaGantt.num(base.end)]:[])}).concat(gateDays,[todayDay]);
  let first=Math.min(...days)-7, last=Math.max(...days)+28;
  first-=(((first+3)%7)+7)%7;
  if((last-first)*px<900)last=first+Math.ceil(900/px);
- const hidden=id=>{for(let p=rows[id].parent;p!==null;p=rows[p].parent)if(ganttCollapsed.has(rows[p].id))return true;return false};
- const visible=rows.map((row,i)=>i).filter(i=>!hidden(i)), position=new Map(visible.map((i,at)=>[i,at]));
- return {rows,px,rangeStart:first,rangeEnd:last,visible,position,gateDays,width:(last-first)*px,height:visible.length*ganttRowH};
+ return {rows,px,rangeStart:first,rangeEnd:last,visible,position,gateDays,crit,baseline,hiddenCount:away.size,width:(last-first)*px,height:visible.length*ganttRowH};
 }
 function ganttHeader(view){
  const {px,rangeStart,rangeEnd}=view, h=ganttHead, total=h.upper+h.lower+h.gates, upper=[], lower=[];
@@ -157,27 +200,35 @@ function ganttBody(view,tasks){
    const sideFrom=link.type[0], sideTo=link.type[1];
    const d=ganttLinkPath(ganttAnchor(view,rows[from],sideFrom),ganttAnchor(view,rows[to],sideTo),sideFrom,sideTo);
    const label=`Verknüpfung ${from+1} ${KapaGantt.DE[link.type]} nach ${to+1}. Klicken zum Entfernen`;
-   links.push(`<g class="kapa-gantt-linkgroup" data-task="${esc(rows[to].id)}"><title>${esc(label)}</title><path class="kapa-gantt-link-hit" d="${d}" onclick="ganttRemoveLink(${to},'${esc(link.from)}')"/><path class="kapa-gantt-link" d="${d}" marker-end="url(#kapa-gantt-arrow)"/></g>`);
+   const critical=view.crit?.links.has(`${to}:${from}`)?' is-critical':'';
+   links.push(`<g class="kapa-gantt-linkgroup${critical}" data-task="${esc(rows[to].id)}"><title>${esc(label)}</title><path class="kapa-gantt-link-hit" d="${d}" onclick="ganttRemoveLink(${to},'${esc(link.from)}')"/><path class="kapa-gantt-link" d="${d}" marker-end="url(#kapa-gantt-arrow)"/></g>`);
   });
  });
  const bars=view.visible.map(i=>ganttBar(view,rows[i],tasks[i])).join('');
  return `<svg class="kapa-gantt-body" id="ganttBody" width="${view.width}" height="${h}" role="group" aria-label="Gantt-Diagramm"><defs><marker id="kapa-gantt-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="kapa-gantt-arrow" d="M0 0 L8 4 L0 8 z"/></marker></defs>${parts.join('')}${bars}${links.join('')}</svg>`;
 }
+function ganttBaselineShape(view,row,mid){
+ const base=view.baseline?.tasks?.[row.id]; if(!base)return '';
+ const start=KapaGantt.num(base.start), end=KapaGantt.num(base.end), title=`<title>Basisplan: ${fmt(base.start)} bis ${fmt(base.end)}</title>`;
+ if(row.milestone){const cx=ganttX(start)+view.px/2;return `<path class="kapa-gantt-baseline" d="M${cx} ${mid+8} l5 5 l-5 5 l-5 -5 z">${title}</path>`}
+ const x1=ganttX(start), x2=Math.max(ganttX(end+1),x1+4);
+ return `<rect class="kapa-gantt-baseline" x="${x1}" y="${mid+(row.summary?11:ganttBarH/2+1)}" width="${x2-x1}" height="4" rx="1">${title}</rect>`;
+}
 function ganttBar(view,row,task){
  const at=view.position.get(row.index), top=at*ganttRowH, mid=top+ganttRowH/2;
  const name=`Vorgang ${row.index+1}, ${task.name}, ${fmt(KapaGantt.iso(row.start))} bis ${fmt(KapaGantt.iso(row.end))}, ${row.percent} %`;
- const common=`class="kapa-gantt-bar" data-task="${esc(row.id)}" data-gantt-bar="${row.index}" tabindex="0" role="button" aria-label="${esc(name)}" onkeydown="ganttBarKey(event,${row.index})"`;
+ const common=`class="kapa-gantt-bar${view.crit?.critical[row.index]?' is-critical':''}" data-task="${esc(row.id)}" data-gantt-bar="${row.index}" tabindex="0" role="button" aria-label="${esc(name)}" onkeydown="ganttBarKey(event,${row.index})"`;
  const connectors=(l,r)=>`<circle class="kapa-gantt-connector" data-gantt-drag="from-start" data-i="${row.index}" cx="${l}" cy="${mid}" r="5"/><circle class="kapa-gantt-connector" data-gantt-drag="from-finish" data-i="${row.index}" cx="${r}" cy="${mid}" r="5"/>`;
  if(row.milestone){
   const cx=ganttX(row.start)+view.px/2;
-  return `<g ${common}><title>${esc(name)}</title><path class="kapa-gantt-milestone" data-gantt-drag="move" data-i="${row.index}" d="M${cx} ${mid-9} l9 9 l-9 9 l-9 -9 z"/>${connectors(cx-12,cx+12)}</g>`;
+  return `<g ${common}><title>${esc(name)}</title>${ganttBaselineShape(view,row,mid)}<path class="kapa-gantt-milestone" data-gantt-drag="move" data-i="${row.index}" d="M${cx} ${mid-9} l9 9 l-9 9 l-9 -9 z"/>${connectors(cx-12,cx+12)}</g>`;
  }
  const x1=ganttX(row.start), x2=Math.max(ganttX(row.end+1),x1+6), width=x2-x1;
  if(row.summary){
-  return `<g ${common}><title>${esc(name)}</title><rect class="kapa-gantt-summary" data-gantt-drag="select" data-i="${row.index}" x="${x1}" y="${mid-5}" width="${width}" height="8" rx="1"/><path class="kapa-gantt-summary" d="M${x1} ${mid+3} h8 l-4 7 z M${x2} ${mid+3} h-8 l4 7 z"/>${connectors(x1-8,x2+8)}</g>`;
+  return `<g ${common}><title>${esc(name)}</title>${ganttBaselineShape(view,row,mid)}<rect class="kapa-gantt-summary" data-gantt-drag="select" data-i="${row.index}" x="${x1}" y="${mid-5}" width="${width}" height="8" rx="1"/><path class="kapa-gantt-summary" d="M${x1} ${mid+3} h8 l-4 7 z M${x2} ${mid+3} h-8 l4 7 z"/>${connectors(x1-8,x2+8)}</g>`;
  }
  const done=width*row.percent/100;
- return `<g ${common}><title>${esc(name)}</title><rect class="kapa-gantt-bar-main" data-gantt-drag="move" data-i="${row.index}" x="${x1}" y="${mid-ganttBarH/2}" width="${width}" height="${ganttBarH}" rx="3"/>`
+ return `<g ${common}><title>${esc(name)}</title>${ganttBaselineShape(view,row,mid)}<rect class="kapa-gantt-bar-main" data-gantt-drag="move" data-i="${row.index}" x="${x1}" y="${mid-ganttBarH/2}" width="${width}" height="${ganttBarH}" rx="3"/>`
   +`<rect class="kapa-gantt-bar-progress" x="${x1}" y="${mid-ganttBarH/2+ganttBarH-6}" width="${done}" height="4" rx="1"/>`
   +`<rect class="kapa-gantt-handle" data-gantt-drag="resize" data-i="${row.index}" x="${x2-5}" y="${mid-ganttBarH/2}" width="5" height="${ganttBarH}"/>${connectors(x1-8,x2+8)}</g>`;
 }
@@ -253,26 +304,41 @@ function ganttTable(view,tasks){
  const body=view.visible.map(i=>{
   const row=rows[i], task=tasks[i], n=i+1, locked=row.summary;
   const toggle=children[i].length?`<button type="button" class="pt-button pt-button--subtle kapa-gantt-toggle" aria-expanded="${!ganttCollapsed.has(task.id)}" aria-label="${ganttCollapsed.has(task.id)?'Aufklappen':'Zuklappen'}: ${esc(task.name)}" onclick="ganttToggle('${esc(task.id)}')">${ganttCollapsed.has(task.id)?'▸':'▾'}</button>`:'<span class="kapa-gantt-toggle-space"></span>';
+  const slackCell=view.crit?`<td><span class="kapa-gantt-readonly ${view.crit.critical[i]?'kapa-gantt-critical-text':''}">${view.crit.slack[i]} d</span></td>`:'';
+  const variance=view.baseline?KapaGantt.variance(view.baseline,row):null, varianceCell=view.baseline?`<td><span class="kapa-gantt-readonly ${variance>0?'kapa-gantt-critical-text':''}" title="Abweichung des Endes vom Basisplan in Arbeitstagen">${variance===null?'–':(variance>0?'+':'')+variance+' d'}</span></td>`:'';
   const date=(kind,iso)=>locked?`<span class="kapa-gantt-readonly">${fmt(iso)}</span>`:ganttCell(kind,i,iso,`${kind==='start'?'Anfang':'Ende'} von Vorgang ${n}`,'type="date"');
-  return `<tr class="${row.summary?'is-summary':''} ${task.id===ganttSel?'is-selected':''}" data-task="${esc(task.id)}" onclick="ganttSelect('${esc(task.id)}')">
+  return `<tr class="${row.summary?'is-summary':''} ${task.internal?'is-internal':''} ${task.id===ganttSel?'is-selected':''}" data-task="${esc(task.id)}" onclick="ganttSelect('${esc(task.id)}')">
    <td class="kapa-gantt-nr">${n}</td>
    <td class="kapa-gantt-name"><div class="kapa-gantt-namebox" style="padding-left:${task.level*1.25}rem">${toggle}${ganttCell('name',i,task.name,`Name von Vorgang ${n}`,'maxlength="120"')}</div></td>
    <td>${locked?`<span class="kapa-gantt-readonly">${row.duration} d</span>`:ganttCell('duration',i,row.duration,`Dauer von Vorgang ${n} in Arbeitstagen`,'inputmode="numeric"')}</td>
    <td>${date('start',KapaGantt.iso(row.start))}</td>
    <td>${date('end',KapaGantt.iso(row.end))}</td>
    <td>${locked?'':ganttCell('links',i,KapaGantt.formatLinks(tasks,i),`Vorgänger von Vorgang ${n}`,'placeholder="z. B. 3EA+2"')}</td>
-   <td>${locked?`<span class="kapa-gantt-readonly">${row.percent} %</span>`:ganttCell('percent',i,row.percent,`Fortschritt von Vorgang ${n} in Prozent`,'inputmode="numeric"')}</td></tr>`;
+   <td>${locked?`<span class="kapa-gantt-readonly">${row.percent} %</span>`:ganttCell('percent',i,row.percent,`Fortschritt von Vorgang ${n} in Prozent`,'inputmode="numeric"')}</td>
+   <td class="kapa-gantt-center"><input type="checkbox" class="kapa-gantt-internal" ${task.internal?'checked':''} aria-label="Vorgang ${n} intern, für Kunden ausblenden" title="Intern: in Kundenansicht und Export ausgeblendet" onclick="event.stopPropagation()" onchange="ganttSetInternal(${i},this.checked)"></td>${varianceCell}${slackCell}</tr>`;
  }).join('');
- return `<table class="kapa-gantt-table" style="width:${ganttTableWidth}px"><colgroup><col style="width:2.75rem"><col style="width:15rem"><col style="width:4.5rem"><col style="width:8.5rem"><col style="width:8.5rem"><col style="width:6.5rem"><col style="width:4.5rem"></colgroup>
-  <thead><tr style="height:${ganttHead.upper+ganttHead.lower+ganttHead.gates}px"><th scope="col">Nr.</th><th scope="col">Vorgang</th><th scope="col">Dauer</th><th scope="col">Anfang</th><th scope="col">Ende</th><th scope="col">Vorgänger</th><th scope="col">%</th></tr></thead><tbody>${body}</tbody></table>`;
+ const extra=(view.baseline?1:0)+(view.crit?1:0), widthRem=54.25+extra*4.5;
+ return `<table class="kapa-gantt-table" style="width:${widthRem}rem"><colgroup><col style="width:2.75rem"><col style="width:15rem"><col style="width:4.5rem"><col style="width:8.5rem"><col style="width:8.5rem"><col style="width:6.5rem"><col style="width:4.5rem"><col style="width:4rem">${'<col style="width:4.5rem">'.repeat(extra)}</colgroup>
+  <thead><tr style="height:${ganttHead.upper+ganttHead.lower+ganttHead.gates}px"><th scope="col">Nr.</th><th scope="col">Vorgang</th><th scope="col">Dauer</th><th scope="col">Anfang</th><th scope="col">Ende</th><th scope="col">Vorgänger</th><th scope="col">%</th><th scope="col">Intern</th>${view.baseline?'<th scope="col">Abw.</th>':''}${view.crit?'<th scope="col">Puffer</th>':''}</tr></thead><tbody>${body}</tbody></table>`;
 }
 function ganttToolbar(full=false){
+ const hasBaseline=!!ganttDoc?.baseline;
+ const option=(kind,label,checked)=>`<label class="kapa-gantt-option"><input type="checkbox" ${checked?'checked':''} onchange="ganttSetOption('${kind}',this.checked)"> ${label}</label>`;
  const button=(label,action,extra='')=>`<button type="button" class="secondary" onclick="${action}" ${extra}>${label}</button>`;
  const zoom=`<div class="pt-segmented" role="group" aria-label="Zeitraster">${[['day','Tag'],['week','Woche'],['month','Monat']].map(([value,label])=>`<label class="pt-segmented__option"><input class="pt-segmented__input" type="radio" name="gantt-zoom" value="${value}" ${ganttZoom===value?'checked':''} onchange="ganttSetZoom(this.value)"><span class="pt-segmented__label">${label}</span></label>`).join('')}</div>`;
  const projects=[...state.projects].sort((a,b)=>a.name.localeCompare(b.name,'de')).map(p=>`<option value="${esc(p.id)}" ${p.id===ganttProjectId?'selected':''}>${esc(p.number?p.number+' · ':'')}${esc(p.name)}</option>`).join('');
  return `<div class="kapa-gantt-toolbar"><div class="pt-field kapa-gantt-project"><label class="pt-field__label" for="ganttProject">Projekt</label><select id="ganttProject" class="pt-select" data-pt-search="off" onchange="ganttSelectProject(this.value)">${projects}</select></div>
   ${full?`<div class="actions kapa-gantt-actions">${button('＋ Vorgang',"ganttAdd('task')")}${button('◆ Meilenstein',"ganttAdd('milestone')")}${button('← Ausrücken',"ganttAct('outdent')")}${button('Einrücken →',"ganttAct('indent')")}${button('↑ Nach oben',"ganttAct('up')")}${button('↓ Nach unten',"ganttAct('down')")}<button type="button" class="danger" onclick="ganttAct('delete')">Löschen</button></div>
-  <div class="actions kapa-gantt-actions">${zoom}${button('Heute','ganttGoToday()')}${button('Alles zuklappen','ganttCollapseAll(true)')}${button('Alles aufklappen','ganttCollapseAll(false)')}<span id="ganttStatus" class="quiet" role="status" aria-live="polite">${esc(ganttSaveText)}</span></div>`:''}</div>`;
+  <div class="actions kapa-gantt-actions">${zoom}${button('Heute','ganttGoToday()')}${button('Alles zuklappen','ganttCollapseAll(true)')}${button('Alles aufklappen','ganttCollapseAll(false)')}</div>
+  <div class="actions kapa-gantt-actions">${button(hasBaseline?'Basisplan überschreiben':'Basisplan speichern','ganttSaveBaseline()')}${hasBaseline?button('Basisplan löschen','ganttDeleteBaseline()'):''}${hasBaseline?option('base','Basisplan anzeigen',ganttShowBase):''}${option('critical','Kritischer Pfad',ganttShowCritical)}${option('customer','Kundenansicht',ganttCustomer)}</div>
+  <div class="actions kapa-gantt-actions">${button('Excel exportieren',"ganttExport('xlsx')")}${button('PDF exportieren',"ganttExport('pdf')")}<span id="ganttStatus" class="quiet" role="status" aria-live="polite">${esc(ganttSaveText)}</span></div>`:''}</div>`;
+}
+function ganttLegend(){
+ const items=[];
+ if(ganttCustomer)items.push(`<span><i class="kapa-gantt-key kapa-gantt-key-customer"></i> Kundenansicht: ${ganttView?.hiddenCount||0} interne Zeilen ausgeblendet, Export enthält nur die sichtbaren Zeilen</span>`);
+ if(ganttShowCritical)items.push('<span><i class="kapa-gantt-key kapa-gantt-key-critical"></i> Kritischer Pfad (Puffer 0 Arbeitstage)</span>');
+ if(ganttShowBase&&ganttDoc.baseline)items.push(`<span><i class="kapa-gantt-key kapa-gantt-key-baseline"></i> Basisplan vom ${fmt(ganttDoc.baseline.savedAt)}</span>`);
+ return items.length?`<div class="kapa-gantt-legend" role="note">${items.join('')}</div>`:'';
 }
 function ganttPage(){
  if(!state.projects.length)return `<div class="notice">Lege zuerst ein Projekt an. Der Projektplan gehört immer zu einem Projekt.</div>`;
@@ -288,9 +354,10 @@ function ganttPage(){
   ganttView=null;
   return `<section class="panel kapa-gantt">${toolbar}${notice}<div class="empty kapa-gantt-empty"><p>Für dieses Projekt gibt es noch keinen Projektplan.</p><div class="actions"><button type="button" class="primary" onclick="ganttAdd('task')">Ersten Vorgang anlegen</button><button type="button" class="secondary" onclick="ganttFromGates()">Phasen aus den Gates übernehmen</button></div></div></section>`;
  }
- ganttView=ganttBuildView(result.rows,project);
+ ganttView=ganttBuildView(result.rows,project,tasks);
  if(ganttScrollToday){ganttScrollToday=false;setTimeout(ganttGoToday,0)}
  return `<section class="panel kapa-gantt">${toolbar}${notice}
   <p class="pt-field__help kapa-gantt-help">Vorgänger: Nummer des Vorgangs, optional Art (EA, AA, EE, AE) und Zeitabstand in Arbeitstagen, z. B. <b>3</b>, <b>4AA</b>, <b>5EA+2</b>. Balken verschieben oder am rechten Rand verlängern. Von einem Punkt am Balkenende zu einem anderen Balken ziehen, um zu verknüpfen. Klick auf eine Linie entfernt die Verknüpfung.</p>
+  ${ganttLegend()}
   <div class="kapa-gantt-scroll" role="region" tabindex="0" aria-label="Projektplan, horizontal und vertikal scrollbar"><div class="kapa-gantt-grid">${ganttTable(ganttView,tasks)}<div class="kapa-gantt-chart">${ganttHeader(ganttView)}${ganttBody(ganttView,tasks)}</div></div></div></section>`;
 }
