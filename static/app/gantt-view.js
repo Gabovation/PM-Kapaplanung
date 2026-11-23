@@ -1,5 +1,6 @@
 /* Reiter „Projektplan“: Vorgangstabelle und Gantt-Diagramm (Administratoren und HO PM, nur Serverbetrieb). */
-let ganttProjectId=null, ganttDoc=null, ganttLoading=false, ganttError='', ganttMessage='', ganttZoom='week', ganttSel=null, ganttView=null, ganttScrollToday=false, ganttSaveText='', ganttDrag=null, ganttShowBase=true, ganttShowCritical=false, ganttCustomer=false;
+let ganttProjectId=null, ganttDoc=null, ganttLoading=false, ganttError='', ganttMessage='', ganttZoom='week', ganttSel=null, ganttView=null, ganttScrollToday=false, ganttSaveText='', ganttDrag=null, ganttShowBase=true, ganttShowCritical=false, ganttCustomer=false, ganttFull=false, ganttNative=false, ganttScale=1, ganttWheel=0;
+const ganttScales=[0.5,0.75,1,1.5,2,3,4];
 const ganttCollapsed=new Set(), ganttRowH=34, ganttBarH=18, ganttPx={day:28,week:8,month:3}, ganttHead={upper:20,lower:22,gates:18};
 const ganttMonths=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 let ganttQueue=Promise.resolve(), ganttBlocked=false;
@@ -118,13 +119,43 @@ async function ganttExport(format){
 }
 function ganttMenu(){return document.querySelector('#ganttExportMenu')}
 function ganttMenuClose(){const menu=ganttMenu();if(menu)menu.open=false}
+function ganttClass(){return ganttFull?'panel kapa-gantt is-full':'panel kapa-gantt'}
+function ganttToggleFull(){
+ ganttFull=!ganttFull;
+ if(ganttFull){const request=document.documentElement.requestFullscreen?.();if(request)request.then(()=>{ganttNative=true}).catch(()=>{})}
+ else ganttLeaveNative();
+ ganttRerender();
+}
+function ganttLeaveNative(){if(ganttNative&&document.fullscreenElement)document.exitFullscreen().catch(()=>{});ganttNative=false}
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&ganttNative){ganttNative=false;if(ganttFull){ganttFull=false;if(page==='gantt')ganttRerender()}}});
+function ganttScaleTo(next,clientX){
+ if(next===ganttScale||!ganttView)return;
+ const box=document.querySelector('.kapa-gantt-scroll'), tableWidth=box?.querySelector('.kapa-gantt-table')?.offsetWidth||0;
+ let anchor=null;
+ if(box){const offset=clientX===undefined?tableWidth+(box.clientWidth-tableWidth)/2:clientX-box.getBoundingClientRect().left;anchor={offset,day:(box.scrollLeft+offset-tableWidth)/ganttView.px}}
+ ganttScale=next; ganttRerender();
+ const after=document.querySelector('.kapa-gantt-scroll');
+ if(after&&anchor&&ganttView)after.scrollLeft=Math.max(0,anchor.day*ganttView.px+tableWidth-anchor.offset);
+}
+function ganttScaleStep(direction,clientX){
+ const at=ganttScales.indexOf(ganttScale);
+ ganttScaleTo(ganttScales[Math.min(Math.max(at+direction,0),ganttScales.length-1)],clientX);
+}
+document.addEventListener('wheel',event=>{
+ if(!(event.ctrlKey||event.metaKey)||page!=='gantt'||!ganttView||!event.target.closest?.('.kapa-gantt-chart'))return;
+ event.preventDefault(); ganttWheel+=event.deltaY;
+ if(Math.abs(ganttWheel)<40)return;
+ const direction=ganttWheel<0?1:-1; ganttWheel=0; ganttScaleStep(direction,event.clientX);
+},{passive:false});
 function ganttSyncHeader(){
+ if(ganttFull&&page!=='gantt'){ganttFull=false;ganttLeaveNative()}
+ document.body.classList.toggle('kapa-gantt-fullscreen',ganttFull&&page==='gantt');
  const menu=ganttMenu(); if(!menu)return;
  menu.hidden=page!=='gantt'||!ganttDoc?.tasks?.length;
  if(menu.hidden)menu.open=false;
 }
 document.addEventListener('click',event=>{const menu=ganttMenu();if(menu?.open&&!menu.contains(event.target))menu.open=false});
-document.addEventListener('keydown',event=>{if(event.key==='Escape'){const menu=ganttMenu();if(menu?.open){menu.open=false;menu.querySelector('summary')?.focus()}}});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){const menu=ganttMenu();if(menu?.open){menu.open=false;menu.querySelector('summary')?.focus()}else if(ganttFull&&page==='gantt'&&!ganttDrag)ganttToggleFull()}});
 function ganttToggle(id){ganttCollapsed.has(id)?ganttCollapsed.delete(id):ganttCollapsed.add(id);ganttRerender()}
 function ganttCollapseAll(collapse){
  ganttCollapsed.clear();
@@ -149,7 +180,7 @@ function ganttIsoWeek(n){
  return Math.floor((thursday-Date.UTC(year,0,1)/86400000)/7)+1;
 }
 function ganttBuildView(rows,project,tasks){
- const px=ganttPx[ganttZoom], gateDays=project.dates.map(KapaGantt.num), todayDay=KapaGantt.num(today);
+ const px=ganttPx[ganttZoom]*ganttScale, gateDays=project.dates.map(KapaGantt.num), todayDay=KapaGantt.num(today);
  const away=ganttCustomer?KapaGantt.customerHidden(tasks,rows):new Set();
  const hidden=id=>{if(away.has(id))return true;for(let p=rows[id].parent;p!==null;p=rows[p].parent)if(ganttCollapsed.has(rows[p].id))return true;return false};
  const visible=rows.map((row,i)=>i).filter(i=>!hidden(i)), position=new Map(visible.map((i,at)=>[i,at]));
@@ -336,10 +367,13 @@ function ganttToolbar(full=false){
  const option=(kind,label,checked)=>`<label class="kapa-gantt-option"><input type="checkbox" ${checked?'checked':''} onchange="ganttSetOption('${kind}',this.checked)"> ${label}</label>`;
  const button=(label,action,extra='')=>`<button type="button" class="secondary" onclick="${action}" ${extra}>${label}</button>`;
  const zoom=`<div class="pt-segmented" role="group" aria-label="Zeitraster">${[['day','Tag'],['week','Woche'],['month','Monat']].map(([value,label])=>`<label class="pt-segmented__option"><input class="pt-segmented__input" type="radio" name="gantt-zoom" value="${value}" ${ganttZoom===value?'checked':''} onchange="ganttSetZoom(this.value)"><span class="pt-segmented__label">${label}</span></label>`).join('')}</div>`;
+ const atMin=ganttScale<=ganttScales[0], atMax=ganttScale>=ganttScales[ganttScales.length-1];
+ const scale=`<div class="kapa-gantt-scale" role="group" aria-label="Vergrößerung">${button('−','ganttScaleStep(-1)',`aria-label="Verkleinern" title="Verkleinern (Strg + Mausrad)" ${atMin?'disabled':''}`)}${button(Math.round(ganttScale*100)+' %','ganttScaleTo(1)','title="Auf 100 % zurücksetzen" aria-label="Vergrößerung zurücksetzen"')}${button('+','ganttScaleStep(1)',`aria-label="Vergrößern" title="Vergrößern (Strg + Mausrad)" ${atMax?'disabled':''}`)}</div>`;
+ const fullExport=ganttFull?`${button('PDF',"ganttExport('pdf')")}${button('Excel',"ganttExport('xlsx')")}${button('MS Project',"ganttExport('xml')")}`:'';
  const projects=[...state.projects].sort((a,b)=>a.name.localeCompare(b.name,'de')).map(p=>`<option value="${esc(p.id)}" ${p.id===ganttProjectId?'selected':''}>${esc(p.number?p.number+' · ':'')}${esc(p.name)}</option>`).join('');
  return `<div class="kapa-gantt-toolbar"><div class="pt-field kapa-gantt-project"><label class="pt-field__label" for="ganttProject">Projekt</label><select id="ganttProject" class="pt-select" data-pt-search="off" onchange="ganttSelectProject(this.value)">${projects}</select></div>
   ${full?`<div class="actions kapa-gantt-actions">${button('＋ Vorgang',"ganttAdd('task')")}${button('◆ Meilenstein',"ganttAdd('milestone')")}${button('← Ausrücken',"ganttAct('outdent')")}${button('Einrücken →',"ganttAct('indent')")}${button('↑ Nach oben',"ganttAct('up')")}${button('↓ Nach unten',"ganttAct('down')")}<button type="button" class="danger" onclick="ganttAct('delete')">Löschen</button></div>
-  <div class="actions kapa-gantt-actions">${zoom}${button('Heute','ganttGoToday()')}${button('Alles zuklappen','ganttCollapseAll(true)')}${button('Alles aufklappen','ganttCollapseAll(false)')}</div>
+  <div class="actions kapa-gantt-actions">${zoom}${scale}${button('Heute','ganttGoToday()')}${button('Alles zuklappen','ganttCollapseAll(true)')}${button('Alles aufklappen','ganttCollapseAll(false)')}${button(ganttFull?'Vollbild beenden':'Vollbild','ganttToggleFull()','aria-pressed="'+ganttFull+'" title="Vollbild ein/aus (Esc beendet)"')}${fullExport}</div>
   <div class="actions kapa-gantt-actions">${button(hasBaseline?'Basisplan überschreiben':'Basisplan speichern','ganttSaveBaseline()')}${hasBaseline?button('Basisplan löschen','ganttDeleteBaseline()'):''}${hasBaseline?option('base','Basisplan anzeigen',ganttShowBase):''}${option('critical','Kritischer Pfad',ganttShowCritical)}${option('customer','Kundenansicht',ganttCustomer)}<span id="ganttStatus" class="quiet" role="status" aria-live="polite">${esc(ganttSaveText)}</span></div>`:''}</div>`;
 }
 function ganttLegend(){
@@ -354,19 +388,19 @@ function ganttPage(){
  if(!ganttProject()){ganttProjectId=[...state.projects].sort((a,b)=>a.name.localeCompare(b.name,'de'))[0].id;ganttDoc=null}
  if(!ganttDoc&&!ganttLoading&&!ganttError)ganttLoad();
  const project=ganttProject(), hasTasks=!!ganttDoc?.tasks.length, toolbar=ganttToolbar(hasTasks);
- if(ganttError)return `<section class="panel kapa-gantt">${toolbar}<div class="pt-alert pt-alert--danger" role="alert"><span>${esc(ganttError)}</span><button type="button" class="secondary" onclick="ganttReload()">Erneut laden</button></div></section>`;
- if(!ganttDoc)return `<section class="panel kapa-gantt">${toolbar}<p class="quiet" role="status">Projektplan wird geladen …</p></section>`;
+ if(ganttError)return `<section class="${ganttClass()}">${toolbar}<div class="pt-alert pt-alert--danger" role="alert"><span>${esc(ganttError)}</span><button type="button" class="secondary" onclick="ganttReload()">Erneut laden</button></div></section>`;
+ if(!ganttDoc)return `<section class="${ganttClass()}">${toolbar}<p class="quiet" role="status">Projektplan wird geladen …</p></section>`;
  const tasks=ganttDoc.tasks, result=KapaGantt.schedule(tasks);
  const notice=ganttMessage?`<div class="pt-alert pt-alert--warning" role="alert"><span>${esc(ganttMessage)}</span></div>`:'';
- if(result.error)return `<section class="panel kapa-gantt">${toolbar}<div class="pt-alert pt-alert--danger" role="alert">${esc(result.error)}</div></section>`;
+ if(result.error)return `<section class="${ganttClass()}">${toolbar}<div class="pt-alert pt-alert--danger" role="alert">${esc(result.error)}</div></section>`;
  if(!tasks.length){
   ganttView=null;
-  return `<section class="panel kapa-gantt">${toolbar}${notice}<div class="empty kapa-gantt-empty"><p>Für dieses Projekt gibt es noch keinen Projektplan.</p><div class="actions"><button type="button" class="primary" onclick="ganttAdd('task')">Ersten Vorgang anlegen</button><button type="button" class="secondary" onclick="ganttFromGates()">Phasen aus den Gates übernehmen</button></div></div></section>`;
+  return `<section class="${ganttClass()}">${toolbar}${notice}<div class="empty kapa-gantt-empty"><p>Für dieses Projekt gibt es noch keinen Projektplan.</p><div class="actions"><button type="button" class="primary" onclick="ganttAdd('task')">Ersten Vorgang anlegen</button><button type="button" class="secondary" onclick="ganttFromGates()">Phasen aus den Gates übernehmen</button></div></div></section>`;
  }
  ganttView=ganttBuildView(result.rows,project,tasks);
  if(ganttScrollToday){ganttScrollToday=false;setTimeout(ganttGoToday,0)}
- return `<section class="panel kapa-gantt">${toolbar}${notice}
-  <p class="pt-field__help kapa-gantt-help">Vorgänger: Nummer des Vorgangs, optional Art (EA, AA, EE, AE) und Zeitabstand in Arbeitstagen, z. B. <b>3</b>, <b>4AA</b>, <b>5EA+2</b>. Balken verschieben oder am rechten Rand verlängern. Von einem Punkt am Balkenende zu einem anderen Balken ziehen, um zu verknüpfen. Klick auf eine Linie entfernt die Verknüpfung.</p>
+ return `<section class="${ganttClass()}">${toolbar}${notice}
+  ${ganttFull?'':`<p class="pt-field__help kapa-gantt-help">Vorgänger: Nummer des Vorgangs, optional Art (EA, AA, EE, AE) und Zeitabstand in Arbeitstagen, z. B. <b>3</b>, <b>4AA</b>, <b>5EA+2</b>. Balken verschieben oder am rechten Rand verlängern. Von einem Punkt am Balkenende zu einem anderen Balken ziehen, um zu verknüpfen. Klick auf eine Linie entfernt die Verknüpfung. Mit Strg + Mausrad über dem Diagramm wird gezoomt.</p>`}
   ${ganttLegend()}
   <div class="kapa-gantt-scroll" role="region" tabindex="0" aria-label="Projektplan, horizontal und vertikal scrollbar"><div class="kapa-gantt-grid">${ganttTable(ganttView,tasks)}<div class="kapa-gantt-chart">${ganttHeader(ganttView)}${ganttBody(ganttView,tasks)}</div></div></div></section>`;
 }

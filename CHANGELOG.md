@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.0 – 23.11.2026
+- Projektplan: Vollbildansicht über die Schaltfläche „Vollbild“ (Esc oder „Vollbild beenden“ schließt sie). Tabelle und Diagramm nutzen den ganzen Bildschirm, der Export bleibt im Vollbild erreichbar.
+- Projektplan: Stufenloses Hineinzoomen von 50 % bis 400 % mit den Schaltflächen − und + oder Strg + Mausrad über dem Diagramm. Der Bereich unter dem Mauszeiger bleibt dabei an Ort und Stelle.
+
 ## 0.14.0 – 23.11.2026
 - Projektplan: Der Export sitzt jetzt als Auswahl „Exportieren“ neben „Projekt anlegen“ (PDF, Excel, MS Project) und ist nur auf der Seite Projektplan sichtbar.
 - Projektplan: Neuer Export als Microsoft-Project-XML. Die Datei enthält Gliederung, Meilensteine, Fortschritt, Verknüpfungen mit Zeitabstand und auf Wunsch den Basisplan. Microsoft Project öffnet sie über Datei › Öffnen.
