@@ -2,7 +2,7 @@
    Arbeitstagen (Montag bis Freitag). Die Aufgabenliste ist flach; die Gliederungsebene (level) bestimmt,
    zu welchem Sammelvorgang ein Vorgang gehört. Alle Operationen sind rein und liefern {tasks} oder {error}. */
 const KapaGantt = (() => {
-  const DAY = 86400000, MAX_TASKS = 500, MAX_LEVEL = 5, MAX_LINKS = 10;
+  const DAY = 86400000, MAX_HOURS = 1000000, MAX_TASKS = 500, MAX_LEVEL = 5, MAX_LINKS = 10;
   const DE = {FS:'EA', SS:'AA', FF:'EE', SF:'AE'}, EN = {EA:'FS', AA:'SS', EE:'FF', AE:'SF', FS:'FS', SS:'SS', FF:'FF', SF:'SF'};
   const num = iso => { const [y, m, d] = iso.split('-').map(Number); return Math.round(Date.UTC(y, m-1, d) / DAY); };
   const iso = n => new Date(n * DAY).toISOString().slice(0, 10);
@@ -47,6 +47,13 @@ const KapaGantt = (() => {
       if (task.level > previous + 1) return 'Die Gliederung überspringt eine Ebene.';
       if (i && tasks[i-1].type === 'milestone' && task.level > previous) return 'Ein Meilenstein kann keine Unterpunkte haben.';
       if ((task.links || []).length > MAX_LINKS) return `Ein Vorgang darf höchstens ${MAX_LINKS} Vorgänger haben.`;
+    }
+    let lastPhase = -1;
+    for (const task of tasks) {
+      if (!Number.isInteger(task.phase)) continue;
+      if (task.level !== 0) return 'Ein Phasenvorgang bleibt auf der obersten Ebene.';
+      if (task.phase <= lastPhase) return 'Die Gate-Phasen müssen in der Reihenfolge G3 bis G8 stehen und dürfen nur einmal vorkommen.';
+      lastPhase = task.phase;
     }
     const {parents, children} = structure(tasks), graph = tasks.map(() => []);
     for (let i = 0; i < tasks.length; i++) {
@@ -170,7 +177,7 @@ const KapaGantt = (() => {
   /* Schreibt die berechneten Anfangstermine zurück, damit ein Vorgang nach dem Entfernen seiner Verknüpfungen stehen bleibt. */
   function normalize(tasks) {
     const result = schedule(tasks);
-    if (!result.error) tasks.forEach((task, i) => { if (!result.rows[i].summary) task.start = iso(result.rows[i].start); });
+    if (!result.error) tasks.forEach((task, i) => { if (!result.rows[i].summary) task.start = iso(result.rows[i].start); else delete task.hours; });
     return result;
   }
 
@@ -212,6 +219,7 @@ const KapaGantt = (() => {
     copy.splice(at, 0, make(id, kind, level, start, name));
   });
   const remove = (tasks, index) => apply(tasks, copy => {
+    if (Number.isInteger(copy[index].phase)) return 'Phasenvorgänge gehören zu den Gates und können nicht gelöscht werden.';
     const gone = new Set(copy.slice(index, subtreeEnd(copy, index)).map(task => task.id));
     copy.splice(index, subtreeEnd(copy, index) - index);
     copy.forEach(task => { task.links = task.links.filter(link => !gone.has(link.from)); });
@@ -249,6 +257,7 @@ const KapaGantt = (() => {
     return hidden;
   }
   const setName = (tasks, index, name) => apply(tasks, copy => {
+    if (Number.isInteger(copy[index].phase)) return 'Der Name eines Phasenvorgangs ist fest.';
     name = String(name).trim();
     if (!name || name.length > 120) return 'Der Name muss 1 bis 120 Zeichen enthalten.';
     copy[index].name = name;
@@ -313,11 +322,112 @@ const KapaGantt = (() => {
       const start = nextWork(num(dates[i])), end = prevWork(num(dates[i + 1]) - 1);
       const task = make(id(), 'task', 0, iso(start), name);
       task.durationDays = Math.max(1, end >= start ? workBetween(start, end) + 1 : 1);
+      task.phase = i;
       tasks.push(task);
     });
     return tasks;
   }
-  return {num, iso, isWork, nextWork, prevWork, addWork, workBetween, structure, subtreeEnd, validate, schedule, normalize,
+
+  /* ---------------------------------------------------------------- Stunden und Gate-Phasen
+     Ein Vorgang der obersten Ebene mit `phase` (0–3) steht für eine Gate-Phase (G3 – G5 … G7 – G8). Die Stunden
+     (`hours`, ganze Stunden) liegen an den Vorgängen ohne Unterpunkte; Sammelvorgänge summieren ihre Unterpunkte. */
+  const isPhase = task => Number.isInteger(task.phase);
+  function allocate(total, weights) {
+    const sum = weights.reduce((n, w) => n + w, 0);
+    if (!sum) return weights.map(() => 0);
+    const raw = weights.map(w => total * w / sum), result = raw.map(Math.floor);
+    raw.map((value, i) => ({i, rest: value - result[i]})).sort((a, b) => b.rest - a.rest || a.i - b.i)
+      .slice(0, total - result.reduce((n, v) => n + v, 0)).forEach(item => result[item.i]++);
+    return result;
+  }
+  /* Bestehende Pläne: Vorgänge der obersten Ebene mit dem Namen einer Phase werden dieser Phase zugeordnet. */
+  function bindPhases(tasks, names) {
+    if (tasks.some(isPhase)) return null;
+    const copy = clone(tasks);
+    let last = -1, changed = false;
+    copy.forEach(task => {
+      const at = names.indexOf(task.name);
+      if (task.level === 0 && task.type !== 'milestone' && at > last) { task.phase = at; last = at; changed = true; }
+    });
+    return changed ? copy : null;
+  }
+  function phaseTask(names, dates, i, id) {
+    const start = nextWork(num(dates[i])), end = prevWork(num(dates[i + 1]) - 1);
+    const task = make(id(), 'task', 0, iso(start), names[i]);
+    task.durationDays = Math.max(1, end >= start ? workBetween(start, end) + 1 : 1);
+    task.phase = i;
+    return task;
+  }
+  /* Fehlende Phasenvorgänge ergänzen, jeweils vor der nächsten vorhandenen Phase. */
+  const ensurePhases = (tasks, names, dates, id) => apply(tasks, copy => {
+    names.forEach((name, i) => {
+      if (copy.some(task => task.phase === i)) return;
+      const at = copy.findIndex(task => isPhase(task) && task.phase > i);
+      copy.splice(at < 0 ? copy.length : at, 0, phaseTask(names, dates, i, id));
+    });
+  });
+  /* Stunden je Vorgang; Sammelvorgänge und Phasen summieren ihre Unterpunkte, Meilensteine haben keine. */
+  function rollup(tasks, rows) {
+    const hours = tasks.map((task, i) => rows[i].summary || rows[i].milestone ? 0 : (task.hours | 0));
+    for (let i = rows.length - 1; i >= 0; i--) if (rows[i].parent !== null) hours[rows[i].parent] += hours[i];
+    return hours;
+  }
+  /* Phase eines Vorgangs: Index des Phasenvorgangs, in dem er liegt (oder null). */
+  function phaseOf(tasks, i) {
+    for (let at = i; at >= 0; at--) {
+      if (tasks[at].level === 0) return isPhase(tasks[at]) && subtreeEnd(tasks, at) > i ? at : null;
+    }
+    return null;
+  }
+  const leaves = (rows, from, to) => { const out = []; for (let i = from; i < to; i++) if (!rows[i].summary && !rows[i].milestone) out.push(i); return out; };
+  function setHours(tasks, index, value) {
+    const match = /^\s*(\d{1,7})\s*(?:h|std)?\s*$/i.exec(String(value));
+    if (!match || Number(match[1]) > MAX_HOURS) return {error: 'Bitte ganze Stunden zwischen 0 und 1.000.000 eingeben.'};
+    return apply(tasks, copy => {
+      if (structure(copy).children[index].length) return 'Die Stunden eines Sammelvorgangs ergeben sich aus den Unterpunkten.';
+      if (copy[index].type === 'milestone') return 'Ein Meilenstein hat keine Stunden.';
+      copy[index].hours = Number(match[1]);
+    });
+  }
+  function setHoursPercent(tasks, index, value, budget) {
+    const match = /^\s*(\d{1,4}(?:[.,]\d+)?)\s*%?\s*$/.exec(String(value));
+    if (!match) return {error: 'Bitte den Anteil an der Phase in Prozent eingeben, z. B. 25 oder 12,5.'};
+    if (!budget) return {error: 'Die Phase hat kein Stundenbudget, daher lässt sich kein Prozentwert umrechnen.'};
+    return setHours(tasks, index, String(Math.round(budget * Number(match[1].replace(',', '.')) / 100)));
+  }
+  /* Reststunden der Phase nach Dauer auf die Vorgänge ohne Unterpunkte verteilen (zusätzlich zu bereits eingetragenen Stunden). */
+  function distributeRest(tasks, phaseIndex, target) {
+    const rows = schedule(tasks).rows, ids = leaves(rows, phaseIndex, subtreeEnd(tasks, phaseIndex));
+    if (!ids.length) return {error: 'In dieser Phase gibt es keinen Vorgang, auf den sich Stunden verteilen lassen.'};
+    const rest = target - ids.reduce((n, i) => n + (tasks[i].hours | 0), 0);
+    if (rest <= 0) return {error: 'Es gibt keine Reststunden zu verteilen.'};
+    const share = allocate(rest, ids.map(i => rows[i].duration));
+    return apply(tasks, copy => { ids.forEach((i, at) => { copy[i].hours = (copy[i].hours | 0) + share[at]; }); });
+  }
+  /* Tagesverlauf einer Phase aus den Vorgangsstunden: gleichmäßig über die Arbeitstage des Vorgangs. Stunden, die auf Tage
+     außerhalb des Phasenfensters [from, to) fallen, werden gezählt (outside), aber nicht platziert. Nicht zugeteilte Reststunden
+     der Phase verteilen sich gleichmäßig über die Arbeitstage des Fensters. ok = vollständig und ohne Überschreitung platzierbar. */
+  function phaseDaily(tasks, rows, phaseIndex, from, to, budget) {
+    const first = num(from), last = num(to) - 1, daily = {};
+    let allocated = 0, outside = 0;
+    const put = (n, hours) => { if (hours) daily[iso(n)] = (daily[iso(n)] || 0) + hours; };
+    for (const i of leaves(rows, phaseIndex, subtreeEnd(tasks, phaseIndex))) {
+      const hours = tasks[i].hours | 0;
+      if (!hours) continue;
+      allocated += hours;
+      const days = [];
+      for (let n = rows[i].start; n <= rows[i].end; n++) if (isWork(n)) days.push(n);
+      if (!days.length) days.push(rows[i].start);
+      allocate(hours, days.map(() => 1)).forEach((share, at) => { if (days[at] >= first && days[at] <= last) put(days[at], share); else outside += share; });
+    }
+    const rest = budget - allocated, window = [];
+    for (let n = first; n <= last; n++) if (isWork(n)) window.push(n);
+    if (!window.length) for (let n = first; n <= last; n++) window.push(n);
+    const over = rest < 0, placeable = rest <= 0 || window.length > 0;
+    if (!over && !outside && placeable && rest > 0) allocate(rest, window.map(() => 1)).forEach((share, at) => put(window[at], share));
+    return {daily, allocated, rest, over, outside, ok: !over && !outside && placeable};
+  }
+  return {isPhase, bindPhases, ensurePhases, rollup, phaseOf, setHours, setHoursPercent, distributeRest, phaseDaily, allocate, num, iso, isWork, nextWork, prevWork, addWork, workBetween, structure, subtreeEnd, validate, schedule, normalize,
     criticalPath, snapshot, variance, setInternal, customerHidden,
     formatLinks, parseLinks, add, remove, indent, outdent, move, setName, setDuration, setStart, setEnd, setPercent,
     setLinks, addLink, removeLink, shiftStart, setDurationDays, fromGates, DE};

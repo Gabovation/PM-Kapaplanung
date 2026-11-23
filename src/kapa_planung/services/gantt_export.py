@@ -29,7 +29,7 @@ def validate_export(data) -> dict:
             or not _iso(data.get('createdAt')):
         raise ValueError('Ungültige Projektangaben.')
     options = data.get('options', {})
-    if not isinstance(options, dict) or any(not isinstance(options.get(key, False), bool) for key in ('baseline', 'critical', 'customer')):
+    if not isinstance(options, dict) or any(not isinstance(options.get(key, False), bool) for key in ('baseline', 'critical', 'customer', 'hours')):
         raise ValueError('Ungültige Exportoptionen.')
     rows = data.get('rows')
     if not isinstance(rows, list) or not rows or len(rows) > MAX_TASKS:
@@ -40,7 +40,7 @@ def validate_export(data) -> dict:
                 or not _integer(row.get('level'), 0, MAX_LEVEL) or not _text(row.get('name'), 120, required=True) \
                 or not _iso(row.get('start')) or not _iso(row.get('end')) or row['start'] > row['end'] \
                 or not _integer(row.get('duration'), 0, 3650) or not _integer(row.get('percent'), 0, 100) \
-                or not _text(row.get('predecessors', ''), 120):
+                or not _text(row.get('predecessors', ''), 120) or not _integer(row.get('hours', 0), 0, 100000000):
             raise ValueError('Ungültige Zeile im Export.')
         if (row.get('baselineStart') is None) != (row.get('baselineEnd') is None) \
                 or (row.get('baselineStart') is not None and not (_iso(row['baselineStart']) and _iso(row['baselineEnd']) and row['baselineStart'] <= row['baselineEnd'])):
@@ -117,6 +117,9 @@ def build_xlsx(model) -> bytes:
         headers += ['Basis-Anfang', 'Basis-Ende', 'Abw. Ende (AT)']
     if show_crit:
         headers += ['Puffer (AT)']
+    show_hours = bool(options.get('hours'))
+    if show_hours:
+        headers += ['Stunden']
     title = f"{model.get('projectNumber', '')} · {model['projectName']}".strip(' ·')
 
     def put(cell, value, **style):
@@ -170,6 +173,8 @@ def build_xlsx(model) -> bytes:
                        date.fromisoformat(row['baselineEnd']) if has_base else None, row.get('variance')]
         if show_crit:
             values += [row.get('slack')]
+        if show_hours:
+            values += [row.get('hours', 0) if kind != 'milestone' else None]
         for column, value in enumerate(values, start=1):
             cell = sheet.cell(line, column)
             put(cell, value, font=font, border=Border(bottom=thin),
@@ -282,7 +287,10 @@ def build_pdf(model) -> bytes:
     show_base, show_crit = bool(options.get('baseline')), bool(options.get('critical'))
     page_w, page_h, margin = 842.0, 595.0, 28.0
     row_h, head_h = 13.5, 34.0
-    columns = [('Nr.', 22, 'r'), ('Vorgang', 178, 'l'), ('Dauer', 30, 'r'), ('Anfang', 48, 'r'), ('Ende', 48, 'r')]
+    show_hours = bool(options.get('hours'))
+    columns = [('Nr.', 22, 'r'), ('Vorgang', 178 - (30 if show_hours else 0), 'l'), ('Dauer', 30, 'r'), ('Anfang', 48, 'r'), ('Ende', 48, 'r')]
+    if show_hours:
+        columns.append(('Std.', 30, 'r'))
     table_w = sum(width for _, width, _ in columns) + 6
     gantt_x = margin + table_w + 6
     gantt_w = page_w - margin - gantt_x
@@ -350,6 +358,8 @@ def build_pdf(model) -> bytes:
             color = '#9E0C26' if critical else '#25303B'
             bold = row['kind'] == 'summary'
             values = [str(row['nr']), None, f"{row['duration']} d", _german(row['start']), _german(row['end'])]
+            if show_hours:
+                values.append('' if row['kind'] == 'milestone' else f"{row.get('hours', 0):,}".replace(',', '.'))
             x = margin
             for (label, width, align), value in zip(columns, values):
                 if value is None:

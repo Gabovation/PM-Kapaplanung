@@ -173,3 +173,27 @@ def test_link_lag_is_validated():
         data['links'] = [{'from': 2, 'to': 3, 'type': 'FS', 'lag': lag}]
         with pytest.raises(ValueError):
             export.validate_export(data)
+
+
+def test_hours_column_in_xlsx_and_pdf():
+    rows = model()['rows']
+    for item, hours in zip(rows, (50, 20, 30, 0)):
+        item['hours'] = hours
+    data = model(options={'baseline': False, 'critical': False, 'customer': False, 'hours': True}, rows=rows)
+    sheet = load_workbook(BytesIO(export.build(export.validate_export(data))[0])).active
+    assert sheet['H6'].value == 'Stunden' and sheet['H7'].value == 50 and sheet['H8'].value == 20 and sheet['H10'].value is None
+    pdf = export.build(export.validate_export(dict(data, format='pdf')))[0]
+    plain_pdf = export.build(export.validate_export(dict(data, format='pdf', options=dict(data['options'], hours=False))))[0]
+    assert pdf.startswith(b'%PDF') and pdf != plain_pdf  # Stundenspalte verändert das PDF
+    plain = load_workbook(BytesIO(export.build(export.validate_export(model(options={'baseline': False, 'critical': False, 'customer': False})))[0])).active
+    assert plain['H6'].value is None  # ohne Option keine Stundenspalte
+
+
+def test_invalid_hours_in_export_are_rejected():
+    data = model(options={'baseline': False, 'critical': False, 'customer': False, 'hours': True})
+    data['rows'][1]['hours'] = -5
+    with pytest.raises(ValueError):
+        export.validate_export(data)
+    data = model(options={'baseline': False, 'critical': False, 'customer': False, 'hours': 'ja'})
+    with pytest.raises(ValueError):
+        export.validate_export(data)

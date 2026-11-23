@@ -262,3 +262,28 @@ def test_local_mode_has_no_project_plan(client):
     assert client.get('/api/gantt/p1').status_code == 404
     html = client.get('/').get_data(as_text=True)
     assert 'Projektplan' not in html and 'gantt' not in html
+
+
+def test_phase_and_hours_are_accepted():
+    validate_gantt(plan(task('g3', phase=0, hours=0), task('a', 1, hours=40), task('b', 1, hours=1000000),
+                        task('g5', phase=1), task('m', 1, type='milestone', durationDays=0)), 'p1')
+
+
+@pytest.mark.parametrize('bad', [
+    plan(task('a', hours=-1)),
+    plan(task('a', hours=1000001)),
+    plan(task('a', hours=1.5)),
+    plan(task('a', hours=True)),
+    plan(task('a', hours='5')),
+    plan(task('m', type='milestone', durationDays=0, hours=3)),         # Meilensteine haben keine Stunden
+    plan(task('a', phase=4)),
+    plan(task('a', phase=-1)),
+    plan(task('a', phase=True)),
+    plan(task('a', phase='0')),
+    plan(task('a'), task('b', 1, phase=0)),                             # Phasenvorgang nicht auf oberster Ebene
+    plan(task('a', phase=1), task('b', phase=1)),                       # Phase doppelt
+    plan(task('a', phase=2), task('b', phase=1)),                       # falsche Reihenfolge
+])
+def test_invalid_phases_and_hours_are_rejected(bad):
+    with pytest.raises(ValueError):
+        validate_gantt(bad, 'p1')

@@ -269,4 +269,16 @@
 body.kapa-gantt-fullscreen {overflow:hidden}
 .kapa-gantt.is-full {position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;gap:var(--polytec-space-2);box-sizing:border-box;margin:0;padding:var(--polytec-space-3);border-radius:0;overflow:hidden;background:var(--polytec-color-surface-panel)}
 .kapa-gantt.is-full .kapa-gantt-scroll {flex:1 1 auto;min-height:0;max-height:none}
+.kapa-gantt-hours {border:1px solid var(--polytec-color-border-default);border-radius:var(--polytec-radius-panel);background:var(--polytec-color-surface-panel)}
+.kapa-gantt-hours > summary {cursor:pointer;padding:var(--polytec-space-2) var(--polytec-space-3);font-weight:700}
+.kapa-gantt-hours-body {display:grid;gap:var(--polytec-space-2);padding:0 var(--polytec-space-3) var(--polytec-space-3)}
+.kapa-gantt-hours-scroll {overflow:auto}
+.kapa-gantt-hourtable {width:100%;border-collapse:collapse;font-size:.875rem}
+.kapa-gantt-hourtable th,.kapa-gantt-hourtable td {padding:var(--polytec-space-1) var(--polytec-space-2);text-align:left;vertical-align:top;border-bottom:1px solid var(--polytec-color-border-default);white-space:nowrap}
+.kapa-gantt-hourtable .sub {font-size:.75rem;color:var(--polytec-color-text-secondary);white-space:normal}
+.kapa-gantt-hours-status {font-weight:600}
+.kapa-gantt-hours-status.is-synced {color:var(--polytec-color-status-success)}
+.kapa-gantt-hours-status.is-differs {color:var(--polytec-color-status-warning)}
+.kapa-gantt-hours-status.is-blocked {color:var(--polytec-color-status-danger)}
+.kapa-gantt.is-full .kapa-gantt-hours-body {max-height:30vh;overflow:auto}
 @media (max-width:60rem) {.kapa-gantt-table {position:static}}

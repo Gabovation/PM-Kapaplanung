@@ -9,6 +9,8 @@ GANTT_ROLES = ('admin', 'ho_pm')
 MAX_TASKS = 500
 MAX_LEVEL = 5
 MAX_LINKS = 10
+MAX_HOURS = 1000000
+PHASES = 4  # G3 – G5, G5 – G6, G6 – G7, G7 – G8
 LINK_TYPES = ('FS', 'SS', 'FF', 'SF')
 ID_PATTERN = re.compile(r'[A-Za-z0-9_-]{1,64}')
 TASK_ID_PATTERN = re.compile(r'[A-Za-z0-9_-]{1,32}')
@@ -48,6 +50,7 @@ def validate_gantt(data, project_id: str) -> None:
         raise ValueError('Vorgangs-IDs müssen eindeutig sein.')
     index = {task_id: position for position, task_id in enumerate(ids)}
     levels = []
+    phases: list[int] = []
     for position, task in enumerate(tasks):
         name = task.get('name')
         if not isinstance(name, str) or not 1 <= len(name.strip()) <= 120:
@@ -78,6 +81,15 @@ def validate_gantt(data, project_id: str) -> None:
         note = task.get('note', '')
         if not isinstance(note, str) or len(note) > 500:
             raise ValueError('Die Bemerkung darf höchstens 500 Zeichen enthalten.')
+        hours = task.get('hours', 0)
+        if not _integer(hours, 0, MAX_HOURS) or (kind == 'milestone' and hours):
+            raise ValueError('Die Stunden müssen ganze Stunden zwischen 0 und 1.000.000 sein (Meilensteine haben keine).')
+        if 'phase' in task:
+            if not _integer(task['phase'], 0, PHASES - 1) or level != 0:
+                raise ValueError('Ein Phasenvorgang muss auf der obersten Ebene stehen und zu einer der Gate-Phasen gehören.')
+            phases.append(task['phase'])
+    if phases != sorted(set(phases)):
+        raise ValueError('Jede Gate-Phase darf nur einmal vorkommen, in der Reihenfolge G3 bis G8.')
     _validate_baseline(data.get('baseline'))
     parents = _parents(levels)
     has_children = {parent for parent in parents if parent is not None}

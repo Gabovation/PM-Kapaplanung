@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.0 – 23.11.2026
+- Projektplan: Stunden je Gate-Phase. Die Phasen G3 – G5 bis G7 – G8 sind feste Vorgänge der obersten Ebene (bestehende Pläne mit diesen Namen werden automatisch zugeordnet, fehlende lassen sich ergänzen). Die Übersicht „Stunden je Gate-Phase“ zeigt Budget, zugeteilte Stunden, Rest, Plan PL inklusive Planwertänderungen, Plan QVP und das SAP-Ist.
+- Projektplan: Das PL-Budget einer Phase lässt sich in der neuen Spalte „Stunden“ auf Unterpunkte aufteilen, wahlweise in Stunden oder als Prozent der Phase. „Rest verteilen“ legt die Reststunden nach Dauer auf die Vorgänge. Überschreitungen werden rot angezeigt.
+- Projektplan: „Stundenverlauf in die Stundenplanung übernehmen“ verteilt die Stunden der Vorgänge auf deren Arbeitstage und ersetzt die Tagesverteilung der betroffenen Phasen in der Stundenplanung (und damit Kapazität und Auslastung). Eine Statusanzeige zeigt, ob Projektplan und Stundenplanung übereinstimmen. Änderungen an Budget, Gate-Verteilung, Gate-Terminen und SAP-Ist erscheinen automatisch im Projektplan.
+- Projektplan: Optional „Stunden im Export“ (Excel und PDF).
+
 ## 0.15.0 – 23.11.2026
 - Projektplan: Vollbildansicht über das Vollbild-Symbol oben rechts im Projektplan (Esc oder das Schließen-Symbol beendet sie). Tabelle und Diagramm nutzen den ganzen Bildschirm, der Export bleibt im Vollbild erreichbar.
 - Projektplan: Stufenloses Hineinzoomen von 50 % bis 400 % mit den Schaltflächen − und + oder Strg + Mausrad über dem Diagramm. Der Bereich unter dem Mauszeiger bleibt dabei an Ort und Stelle.
