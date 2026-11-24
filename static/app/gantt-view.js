@@ -348,24 +348,24 @@ function ganttCell(kind,i,value,label,extra=''){
 function ganttTable(view,tasks){
  const rows=view.rows, {children}=KapaGantt.structure(tasks);
  const body=view.visible.map(i=>{
-  const row=rows[i], task=tasks[i], n=i+1, locked=row.summary;
+  const row=rows[i], task=tasks[i], n=i+1, locked=row.summary, fixed=row.summary||row.fixed;
   const toggle=children[i].length?`<button type="button" class="pt-button pt-button--subtle kapa-gantt-toggle" aria-expanded="${!ganttCollapsed.has(task.id)}" aria-label="${ganttCollapsed.has(task.id)?'Aufklappen':'Zuklappen'}: ${esc(task.name)}" onclick="ganttToggle('${esc(task.id)}')">${ganttCollapsed.has(task.id)?'▸':'▾'}</button>`:'<span class="kapa-gantt-toggle-space"></span>';
   const slackCell=view.crit?`<td><span class="kapa-gantt-readonly ${view.crit.critical[i]?'kapa-gantt-critical-text':''}">${view.crit.slack[i]} d</span></td>`:'';
   const variance=view.baseline?KapaGantt.variance(view.baseline,row):null, varianceCell=view.baseline?`<td><span class="kapa-gantt-readonly ${variance>0?'kapa-gantt-critical-text':''}" title="Abweichung des Endes vom Basisplan in Arbeitstagen">${variance===null?'–':(variance>0?'+':'')+variance+' d'}</span></td>`:'';
-  const date=(kind,iso)=>locked?`<span class="kapa-gantt-readonly">${fmt(iso)}</span>`:ganttCell(kind,i,iso,`${kind==='start'?'Anfang':'Ende'} von Vorgang ${n}`,'type="date"');
+  const date=(kind,iso)=>fixed?`<span class="kapa-gantt-readonly">${fmt(iso)}</span>`:ganttCell(kind,i,iso,`${kind==='start'?'Anfang':'Ende'} von Vorgang ${n}`,'type="date"');
   return `<tr class="${row.summary?'is-summary':''} ${task.internal?'is-internal':''} ${task.id===ganttSel?'is-selected':''}" data-task="${esc(task.id)}" onclick="ganttSelect('${esc(task.id)}')">
    <td class="kapa-gantt-nr">${n}</td>
    <td class="kapa-gantt-name"><div class="kapa-gantt-namebox" style="padding-left:${task.level*1.25}rem">${toggle}${ganttCell('name',i,task.name,`Name von Vorgang ${n}`,KapaGantt.isPhase(task)?'readonly title="Gate-Phase: Name und Zuordnung sind fest"':'maxlength="120"')}</div></td>
-   <td>${locked?`<span class="kapa-gantt-readonly">${row.duration} d</span>`:ganttCell('duration',i,row.duration,`Dauer von Vorgang ${n} in Arbeitstagen`,'inputmode="numeric"')}</td>
+   <td>${fixed?`<span class="kapa-gantt-readonly">${row.duration} d</span>`:ganttCell('duration',i,row.duration,`Dauer von Vorgang ${n} in Arbeitstagen`,'inputmode="numeric"')}</td>
    ${ganttHoursCell(view,tasks,rows,i)}
    <td>${date('start',KapaGantt.iso(row.start))}</td>
    <td>${date('end',KapaGantt.iso(row.end))}</td>
-   <td>${locked?'':ganttCell('links',i,KapaGantt.formatLinks(tasks,i),`Vorgänger von Vorgang ${n}`,'placeholder="z. B. 3EA+2"')}</td>
+   <td>${fixed?'':ganttCell('links',i,KapaGantt.formatLinks(tasks,i),`Vorgänger von Vorgang ${n}`,'placeholder="z. B. 3EA+2"')}</td>
    <td>${locked?`<span class="kapa-gantt-readonly">${row.percent} %</span>`:ganttCell('percent',i,row.percent,`Fortschritt von Vorgang ${n} in Prozent`,'inputmode="numeric"')}</td>
    <td class="kapa-gantt-center"><input type="checkbox" class="kapa-gantt-internal" ${task.internal?'checked':''} aria-label="Vorgang ${n} intern, für Kunden ausblenden" title="Intern: in Kundenansicht und Export ausgeblendet" onclick="event.stopPropagation()" onchange="ganttSetInternal(${i},this.checked)"></td>${varianceCell}${slackCell}</tr>`;
  }).join('');
- const extra=(view.baseline?1:0)+(view.crit?1:0), widthRem=59.75+extra*4.5;
- return `<table class="kapa-gantt-table" style="width:${widthRem}rem"><colgroup><col style="width:2.75rem"><col style="width:15rem"><col style="width:4.5rem"><col style="width:5.5rem"><col style="width:8.5rem"><col style="width:8.5rem"><col style="width:6.5rem"><col style="width:4.5rem"><col style="width:4rem">${'<col style="width:4.5rem">'.repeat(extra)}</colgroup>
+ const extra=(view.baseline?1:0)+(view.crit?1:0), widthRem=63.25+extra*4.5;
+ return `<table class="kapa-gantt-table" style="width:${widthRem}rem"><colgroup><col style="width:2.75rem"><col style="width:15rem"><col style="width:4.5rem"><col style="width:9rem"><col style="width:8.5rem"><col style="width:8.5rem"><col style="width:6.5rem"><col style="width:4.5rem"><col style="width:4rem">${'<col style="width:4.5rem">'.repeat(extra)}</colgroup>
   <thead><tr style="height:${ganttHead.upper+ganttHead.lower+ganttHead.gates}px"><th scope="col">Nr.</th><th scope="col">Vorgang</th><th scope="col">Dauer</th><th scope="col">${ganttHoursUnit==='pct'?'% Phase':'Stunden'}</th><th scope="col">Anfang</th><th scope="col">Ende</th><th scope="col">Vorgänger</th><th scope="col">%</th><th scope="col">Intern</th>${view.baseline?'<th scope="col">Abw.</th>':''}${view.crit?'<th scope="col">Puffer</th>':''}</tr></thead><tbody>${body}</tbody></table>`;
 }
 function ganttToolbar(full=false){
@@ -398,6 +398,7 @@ function ganttPage(){
  const project=ganttProject(), hasTasks=!!ganttDoc?.tasks.length, toolbar=ganttToolbar(hasTasks);
  if(ganttError)return `<section class="${ganttClass()}">${toolbar}<div class="pt-alert pt-alert--danger" role="alert"><span>${esc(ganttError)}</span><button type="button" class="secondary" onclick="ganttReload()">Erneut laden</button></div></section>`;
  if(!ganttDoc)return `<section class="${ganttClass()}">${toolbar}<p class="quiet" role="status">Projektplan wird geladen …</p></section>`;
+ KapaGantt.setWindows(ganttPhaseWindows(project));
  const tasks=ganttDoc.tasks, result=KapaGantt.schedule(tasks);
  const notice=ganttMessage?`<div class="pt-alert pt-alert--warning" role="alert"><span>${esc(ganttMessage)}</span></div>`:'';
  if(result.error)return `<section class="${ganttClass()}">${toolbar}<div class="pt-alert pt-alert--danger" role="alert">${esc(result.error)}</div></section>`;

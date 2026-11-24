@@ -21,6 +21,12 @@ const KapaGantt = (() => {
     for (let n = a, step = a < b ? 1 : -1; n !== b;) { n += step; if (isWork(n)) count += step; }
     return count;
   }
+  /* Gate-Fenster der Phasen {start, end} (ISO, beide Tage eingeschlossen); setzt die Ansicht aus den Gate-Terminen des Projekts.
+     Phasenvorgänge haben feste Termine: Anfang und Ende ergeben sich aus diesen Fenstern. */
+  let windows = [];
+  const setWindows = list => { windows = Array.isArray(list) ? list : []; };
+  const phaseWindow = task => (Number.isInteger(task.phase) && windows[task.phase]) || null;
+  function countWork(a, b) { let count = 0; for (let n = a; n <= b; n++) if (isWork(n)) count++; return count; }
   const clone = tasks => tasks.map(task => ({...task, links: (task.links || []).map(link => ({...link}))}));
 
   function structure(tasks) {
@@ -105,10 +111,11 @@ const KapaGantt = (() => {
     for (const i of sequence) {
       const task = tasks[i], kids = children[i];
       if (kids.length) {
-        const list = kids.map(k => rows[k]), start = Math.min(...list.map(r => r.start)), end = Math.max(...list.map(r => r.end));
+        const list = kids.map(k => rows[k]), win = phaseWindow(task);
+        const start = win ? num(win.start) : Math.min(...list.map(r => r.start)), end = win ? Math.max(num(win.start), num(win.end)) : Math.max(...list.map(r => r.end));
         const weight = list.reduce((n, r) => n + Math.max(r.duration, 1), 0);
         rows[i] = {id: task.id, index: i, level: task.level, summary: true, milestone: false, parent: parents[i], children: kids,
-          start, end, duration: workBetween(start, end) + 1, percent: Math.round(list.reduce((n, r) => n + r.percent * Math.max(r.duration, 1), 0) / weight)};
+          start, end, fixed: !!win, duration: win ? Math.max(1, countWork(start, end)) : workBetween(start, end) + 1, percent: Math.round(list.reduce((n, r) => n + r.percent * Math.max(r.duration, 1), 0) / weight)};
         continue;
       }
       const milestone = task.type === 'milestone', duration = milestone ? 0 : Math.max(1, task.durationDays | 0), links = task.links || [];
@@ -116,6 +123,13 @@ const KapaGantt = (() => {
       for (const link of links) {
         const candidate = candidateStart(link, rows[index.get(link.from)], duration, milestone);
         start = start === null ? candidate : Math.max(start, candidate);
+      }
+      const win = phaseWindow(task);
+      if (win) {
+        const winStart = num(win.start), winEnd = Math.max(winStart, num(win.end)), days = Math.max(1, countWork(winStart, winEnd));
+        rows[i] = {id: task.id, index: i, level: task.level, summary: false, milestone: false, fixed: true, parent: parents[i], children: [],
+          start: winStart, end: winEnd, duration: days, percent: Math.min(100, Math.max(0, task.percent | 0)), linked: false};
+        continue;
       }
       if (start === null) start = nextWork(num(task.start));
       if (task.snet) start = Math.max(start, nextWork(num(task.snet)));
@@ -229,6 +243,10 @@ const KapaGantt = (() => {
     if (delta > 0 && !index) return 'Der erste Vorgang kann nicht eingerückt werden.';
     if (delta < 0 && !copy[index].level) return 'Der Vorgang steht bereits auf der obersten Ebene.';
     for (let i = index; i < end; i++) copy[i].level += delta;
+    if (delta > 0) {
+      const owner = phaseOf(copy, index), win = owner === null ? null : phaseWindow(copy[owner]);
+      if (win && !copy[index].links.length && (copy[index].start < win.start || copy[index].start > win.end)) copy[index].start = iso(nextWork(num(win.start)));
+    }
   });
   const indent = (tasks, index) => shiftLevel(tasks, index, 1);
   const outdent = (tasks, index) => shiftLevel(tasks, index, -1);
@@ -266,6 +284,7 @@ const KapaGantt = (() => {
     const match = /^\s*(\d+)\s*(?:d|t|tage?)?\s*$/i.exec(String(value));
     if (!match || Number(match[1]) > 3650) return {error: 'Bitte die Dauer in Arbeitstagen als ganze Zahl angeben (0 = Meilenstein).'};
     const days = Number(match[1]);
+    if (isPhase(tasks[index])) return {error: 'Anfang und Ende einer Gate-Phase ergeben sich aus den Gate-Terminen des Projekts.'};
     return apply(tasks, copy => {
       if (structure(copy).children[index].length) return 'Die Dauer eines Sammelvorgangs ergibt sich aus den Unterpunkten.';
       if (!days && index + 1 < copy.length && copy[index + 1].level > copy[index].level) return 'Ein Meilenstein kann keine Unterpunkte haben.';
@@ -275,6 +294,7 @@ const KapaGantt = (() => {
   }
   function setStart(tasks, index, value) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(value))) return {error: 'Bitte ein gültiges Datum eingeben.'};
+    if (isPhase(tasks[index])) return {error: 'Anfang und Ende einer Gate-Phase ergeben sich aus den Gate-Terminen des Projekts.'};
     return apply(tasks, copy => {
       if (structure(copy).children[index].length) return 'Der Anfang eines Sammelvorgangs ergibt sich aus den Unterpunkten.';
       if (copy[index].links.length) copy[index].snet = value; else copy[index].start = value;
@@ -282,6 +302,7 @@ const KapaGantt = (() => {
   }
   function setEnd(tasks, index, value) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(value))) return {error: 'Bitte ein gültiges Datum eingeben.'};
+    if (isPhase(tasks[index])) return {error: 'Anfang und Ende einer Gate-Phase ergeben sich aus den Gate-Terminen des Projekts.'};
     const row = schedule(tasks).rows[index];
     if (row.summary) return {error: 'Das Ende eines Sammelvorgangs ergibt sich aus den Unterpunkten.'};
     const end = prevWork(num(value));
@@ -297,10 +318,12 @@ const KapaGantt = (() => {
   function setLinks(tasks, index, text) {
     const parsed = parseLinks(text, tasks, index);
     if (parsed.error) return {error: parsed.error};
+    if (isPhase(tasks[index]) && parsed.links.length) return {error: 'Gate-Phasen haben feste Termine und keine Vorgänger.'};
     return apply(tasks, copy => { copy[index].links = parsed.links; });
   }
   const addLink = (tasks, from, to, type, lag = 0) => apply(tasks, copy => {
     if (from === to) return 'Ein Vorgang kann nicht mit sich selbst verknüpft werden.';
+    if (isPhase(copy[to])) return 'Gate-Phasen haben feste Termine und keine Vorgänger.';
     if (copy[to].links.some(link => link.from === copy[from].id)) return 'Diese Verknüpfung besteht bereits.';
     copy[to].links.push({from: copy[from].id, type, lagDays: lag});
   });
@@ -427,7 +450,7 @@ const KapaGantt = (() => {
     if (!over && !outside && placeable && rest > 0) allocate(rest, window.map(() => 1)).forEach((share, at) => put(window[at], share));
     return {daily, allocated, rest, over, outside, ok: !over && !outside && placeable};
   }
-  return {isPhase, bindPhases, ensurePhases, rollup, phaseOf, setHours, setHoursPercent, distributeRest, phaseDaily, allocate, num, iso, isWork, nextWork, prevWork, addWork, workBetween, structure, subtreeEnd, validate, schedule, normalize,
+  return {setWindows, isPhase, bindPhases, ensurePhases, rollup, phaseOf, setHours, setHoursPercent, distributeRest, phaseDaily, allocate, num, iso, isWork, nextWork, prevWork, addWork, workBetween, structure, subtreeEnd, validate, schedule, normalize,
     criticalPath, snapshot, variance, setInternal, customerHidden,
     formatLinks, parseLinks, add, remove, indent, outdent, move, setName, setDuration, setStart, setEnd, setPercent,
     setLinks, addLink, removeLink, shiftStart, setDurationDays, fromGates, DE};

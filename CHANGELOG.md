@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.1 – 24.11.2026
+- Projektplan: Die Gate-Phasen haben jetzt feste Termine. Anfang = Gate-Termin der Phase, Ende = Tag vor dem nächsten Gate; Dauer, Anfang und Ende der Phasenvorgänge sind nicht mehr editierbar und folgen Änderungen der Gate-Termine automatisch. Ein Vorgang, der in eine Phase eingerückt wird, springt an den Phasenanfang.
+- Projektplan: Die Spalte „Stunden“ ist breiter, Stunden und Anfang überlappen nicht mehr.
+
 ## 0.16.0 – 23.11.2026
 - Projektplan: Stunden je Gate-Phase. Die Phasen G3 – G5 bis G7 – G8 sind feste Vorgänge der obersten Ebene (bestehende Pläne mit diesen Namen werden automatisch zugeordnet, fehlende lassen sich ergänzen). Die Übersicht „Stunden je Gate-Phase“ zeigt Budget, zugeteilte Stunden, Rest, Plan PL inklusive Planwertänderungen, Plan QVP und das SAP-Ist.
 - Projektplan: Das PL-Budget einer Phase lässt sich in der neuen Spalte „Stunden“ auf Unterpunkte aufteilen, wahlweise in Stunden oder als Prozent der Phase. „Rest verteilen“ legt die Reststunden nach Dauer auf die Vorgänge. Überschreitungen werden rot angezeigt.

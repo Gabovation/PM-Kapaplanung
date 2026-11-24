@@ -3,6 +3,11 @@
 let ganttHoursUnit='h', ganttHoursOpen=true, ganttExportHours=false;
 const ganttHoursFmt=value=>Number(value).toLocaleString('de-AT',{maximumFractionDigits:1});
 
+/* Gate-Fenster der Phasen für den Terminplan: Anfang = Gate-Termin, Ende = Tag vor dem nächsten Gate (beide eingeschlossen). */
+function ganttPhaseWindows(project){
+ return phases.map((name,i)=>({start:project.dates[i],end:KapaGantt.iso(Math.max(KapaGantt.num(project.dates[i]),KapaGantt.num(project.dates[i+1])-1))}));
+}
+
 /* Stunden und Ist einer Gate-Phase aus der Stundenplanung. budget = aufteilbares PL-Basisbudget der Phase. */
 function ganttPhaseInfo(project,phase){
  const base=KapaHours.sources(project).find(row=>row.id===`phase-${phase}`), data=sapPhaseData(project,phase);
@@ -88,7 +93,7 @@ function ganttHoursPanel(view,project){
  const unit=`<div class="pt-segmented" role="group" aria-label="Eingabe der Stunden">${[['h','Stunden'],['pct','% der Phase']].map(([value,label])=>`<label class="pt-segmented__option"><input class="pt-segmented__input" type="radio" name="gantt-hours-unit" value="${value}" ${ganttHoursUnit===value?'checked':''} onchange="ganttSetHoursUnit(this.value)"><span class="pt-segmented__label">${label}</span></label>`).join('')}</div>`;
  const missing=model.list.some(entry=>entry.at<0);
  const lines=model.list.map(entry=>{
-  const info=entry.info, name=phases[entry.phase], period=`${fmt(project.dates[entry.phase])} – ${fmt(project.dates[entry.phase+1])}`;
+  const info=entry.info, name=phases[entry.phase], window=ganttPhaseWindows(project)[entry.phase], period=`${fmt(window.start)} – ${fmt(window.end)}`;
   if(entry.at<0)return `<tr><th scope="row">${esc(name)}</th><td>${period}</td><td>${ganttHoursFmt(info.budget)} h</td><td colspan="${showQvp?6:5}" class="quiet">Kein Phasenvorgang im Projektplan.</td></tr>`;
   const r=entry.result, over=entry.rest<0, plan=info.plPlan+info.qvpPlan;
   const notes=[r.outside?`${ganttHoursFmt(r.outside)} h liegen auf Tagen außerhalb der Phase`:'',r.over?'Phasenbudget überschritten':''].filter(Boolean).join(' · ');
